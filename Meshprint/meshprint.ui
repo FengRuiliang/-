@@ -1210,7 +1210,7 @@
     <slot>ResetView()</slot>
     <slot>ApplyMaintenance()</slot>
     <slot>SetLineId(int)</slot>
-    <slot>add_support()</slot>
+    <slot>AddSupportStructure()</slot>
     <slot>check_support(bool)</slot>
    </slots>
   </customwidget>
@@ -2039,7 +2039,7 @@
    <sender>pushButton_XYScan_3</sender>
    <signal>clicked()</signal>
    <receiver>openGLWidget</receiver>
-   <slot>add_support()</slot>
+   <slot>AddSupportStructure()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>201</x>

@@ -1114,7 +1114,7 @@ public:
         QObject::connect(actionIsometric_View, SIGNAL(triggered()), openGLWidget, SLOT(ResetView()));
         QObject::connect(spinBox, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
         QObject::connect(spinBox_3, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetLineId(int)));
-        QObject::connect(pushButton_XYScan_3, SIGNAL(clicked()), openGLWidget, SLOT(add_support()));
+        QObject::connect(pushButton_XYScan_3, SIGNAL(clicked()), openGLWidget, SLOT(AddSupportStructure()));
         QObject::connect(actionsupport, SIGNAL(triggered(bool)), openGLWidget, SLOT(check_support(bool)));
 
         tabWidget->setCurrentIndex(2);

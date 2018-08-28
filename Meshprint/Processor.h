@@ -21,7 +21,8 @@ typedef CGAL::AABB_halfedge_graph_segment_primitive<Mesh> HGSP;
 typedef CGAL::AABB_traits<K, HGSP>    AABB_traits;
 typedef CGAL::AABB_tree<AABB_traits>  AABB_tree;
 
-
+#include "Library/clipper.hpp"
+using namespace ClipperLib;
 
 class Processor
 {

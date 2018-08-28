@@ -39,8 +39,7 @@ signals:
 private:
 	void Render();
 	void SetLight();
-
-	public slots:
+public slots:
 	void SetBackground();
 	void ReadMesh();
 	void WriteMesh();
@@ -51,6 +50,8 @@ private:
 	void CheckDrawTexture();
 	void CheckDrawAxes();
 	void DoSliceAndHatch();
+
+	void AddSupportStructure();
 
 private:
 	void DrawAxes(bool bv);

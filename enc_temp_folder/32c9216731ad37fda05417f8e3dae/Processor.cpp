@@ -1,5 +1,7 @@
 #include "Processor.h"
 
+#include <QDebug>
+
 
 Processor::Processor()
 {
@@ -82,29 +84,20 @@ void Processor::add_support()
 	{
 		do_slice();
 	}
-	Paths base_region;
-	Clipper solver;
-	ClipperOffset offseter;
+	Nef_polyhedron sup_region(Nef_polyhedron::EMPTY),needed_region(Nef_polyhedron::EMPTY);
 	for (auto iterc=contours.begin();iterc!=contours.end();iterc++)
 	{
-		solver.Clear(); offseter.Clear();
-		offseter.AddPaths(base_region, jtMiter, etClosedPolygon);
-		Paths support_region;
-		offseter.Execute(support_region, 3000);
-		Paths cur_contour, need_support_region;
+		Nef_polyhedron cur_region(Nef_polyhedron::EMPTY);
 		for (auto iterl=iterc->begin();iterl!=iterc->end();iterl++)
 		{
-			Path lines;
-			for (auto iterp=iterl->begin();iterp!=iterl->end();iterp++)
+			std::vector<Point_2> polyline;
+			for (auto iterp=iterl->begin();iterp!=iterl->end()-1;iterp++)
 			{
-				lines << IntPoint(iterp->x()*1e3, iterp->y()*1e3);
+				polyline.push_back(Point_2 (iterp->x()*1e3, iterp->y()*1e3));
 			}
-			cur_contour << lines;
+			cur_region=cur_region.join(Nef_polyhedron(polyline.begin(), polyline.end()));
 		}
-		solver.AddPaths(support_region, ptClip, true);
-		solver.AddPaths(cur_contour, ptSubject, true);
-		solver.Execute(ctDifference, need_support_region, pftNonZero);
-		base_region = cur_contour;
-		
+		needed_region = cur_region.difference(sup_region);
+		sup_region = cur_region;
 	}
 }

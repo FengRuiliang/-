@@ -504,3 +504,7 @@ void RenderingWidget::DoSliceAndHatch()
 {
 	procesoor.do_slice();
 }
+void RenderingWidget::AddSupportStructure()
+{
+	procesoor.add_support();
+}
