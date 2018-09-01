@@ -1,7 +1,5 @@
 #include "Processor.h"
 
-#include <QDebug>
-
 
 Processor::Processor()
 {
@@ -28,7 +26,7 @@ void Processor::read_obj_file(const char* file_name)
 				positon.push_back(value);
 			if (positon.size()==3)
 			{
-				Point p(positon[0], positon[1], positon[2]);
+				K::Point_3 p(positon[0], positon[1], positon[2]);
 				mesh.add_vertex(p);
 			}
 	
@@ -49,9 +47,9 @@ void Processor::read_obj_file(const char* file_name)
 }
 void Processor::update_my_mesh()
 {
-	Mesh::Property_map<face_descriptor, Vector> fnormals = mesh.add_property_map<face_descriptor, Vector>
+	Mesh::Property_map<face_descriptor, K::Vector_3> fnormals = mesh.add_property_map<face_descriptor, K::Vector_3>
 		("f:normals", CGAL::NULL_VECTOR).first;
-	Mesh::Property_map<vertex_descriptor, Vector> vnormals = mesh.add_property_map<vertex_descriptor, Vector>
+	Mesh::Property_map<vertex_descriptor, K::Vector_3> vnormals = mesh.add_property_map < vertex_descriptor, K::Vector_3 >
 		("v:normals", CGAL::NULL_VECTOR).first;
 
 	CGAL::Polygon_mesh_processing::compute_normals(mesh,
@@ -83,21 +81,5 @@ void Processor::add_support()
 	if (contours.empty())
 	{
 		do_slice();
-	}
-	Nef_polyhedron sup_region(Nef_polyhedron::EMPTY),needed_region(Nef_polyhedron::EMPTY);
-	for (auto iterc=contours.begin();iterc!=contours.end();iterc++)
-	{
-		Nef_polyhedron cur_region(Nef_polyhedron::EMPTY);
-		for (auto iterl=iterc->begin();iterl!=iterc->end();iterl++)
-		{
-			std::vector<Point_2> polyline;
-			for (auto iterp=iterl->begin();iterp!=iterl->end()-1;iterp++)
-			{
-				polyline.push_back(Point_2 (iterp->x()*1e3, iterp->y()*1e3));
-			}
-			cur_region=cur_region.join(Nef_polyhedron(polyline.begin(), polyline.end()));
-		}
-		needed_region = cur_region.difference(sup_region);
-		sup_region = cur_region;
 	}
 }

@@ -5,9 +5,7 @@
 #include <iostream>
 #include <fstream>
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef K::Point_3 Point;
-typedef K::Vector_3 Vector;
-typedef CGAL::Surface_mesh<Point> Mesh;
+typedef CGAL::Surface_mesh<K::Point_3> Mesh;
 typedef boost::graph_traits<Mesh>::vertex_descriptor vertex_descriptor;
 typedef boost::graph_traits<Mesh>::face_descriptor   face_descriptor;
 #include <CGAL/AABB_halfedge_graph_segment_primitive.h>
@@ -20,9 +18,18 @@ typedef std::list< Polyline_type > Polylines;
 typedef CGAL::AABB_halfedge_graph_segment_primitive<Mesh> HGSP;
 typedef CGAL::AABB_traits<K, HGSP>    AABB_traits;
 typedef CGAL::AABB_tree<AABB_traits>  AABB_tree;
+#include<boost/shared_ptr.hpp>
+#include<CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include<CGAL/Polygon_with_holes_2.h>
+#include<CGAL/create_offset_polygons_from_polygon_with_holes_2.h>
+#include <CGAL/arrange_offset_polygons_2.h>
+typedef CGAL::Polygon_2<K>            Polygon_2;
+typedef CGAL::Polygon_with_holes_2<K> Polygon_with_holes;
+typedef CGAL::Straight_skeleton_2<K>  Ss;
+typedef boost::shared_ptr<Polygon_2> PolygonPtr;
+typedef boost::shared_ptr<Ss> SsPtr;
+typedef std::vector<PolygonPtr> PolygonPtrVector;
 
-#include "Library/clipper.hpp"
-using namespace ClipperLib;
 
 class Processor
 {

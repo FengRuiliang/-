@@ -26,7 +26,7 @@ void Processor::read_obj_file(const char* file_name)
 				positon.push_back(value);
 			if (positon.size()==3)
 			{
-				Point p(positon[0], positon[1], positon[2]);
+				K::Point_3 p(positon[0], positon[1], positon[2]);
 				mesh.add_vertex(p);
 			}
 	
@@ -47,9 +47,9 @@ void Processor::read_obj_file(const char* file_name)
 }
 void Processor::update_my_mesh()
 {
-	Mesh::Property_map<face_descriptor, Vector> fnormals = mesh.add_property_map<face_descriptor, Vector>
+	Mesh::Property_map<face_descriptor, K::Vector_3> fnormals = mesh.add_property_map<face_descriptor, K::Vector_3>
 		("f:normals", CGAL::NULL_VECTOR).first;
-	Mesh::Property_map<vertex_descriptor, Vector> vnormals = mesh.add_property_map<vertex_descriptor, Vector>
+	Mesh::Property_map<vertex_descriptor, K::Vector_3> vnormals = mesh.add_property_map < vertex_descriptor, K::Vector_3 >
 		("v:normals", CGAL::NULL_VECTOR).first;
 
 	CGAL::Polygon_mesh_processing::compute_normals(mesh,
@@ -82,29 +82,17 @@ void Processor::add_support()
 	{
 		do_slice();
 	}
-	Paths base_region;
-	Clipper solver;
-	ClipperOffset offseter;
-	for (auto iterc=contours.begin();iterc!=contours.end();iterc++)
+	for (auto iterC=contours.begin();iterC!=contours.end();iterC++)
 	{
-		solver.Clear(); offseter.Clear();
-		offseter.AddPaths(base_region, jtMiter, etClosedPolygon);
-		Paths support_region;
-		offseter.Execute(support_region, 3000);
-		Paths cur_contour, need_support_region;
-		for (auto iterl=iterc->begin();iterl!=iterc->end();iterl++)
+		for (auto iterP=iterC->begin();iterP!=iterC->end();iterC++)
 		{
-			Path lines;
-			for (auto iterp=iterl->begin();iterp!=iterl->end();iterp++)
+			Polygon_2 poly;
+			for (auto iterV=iterP->begin();iterV!=iterP->end();iterV++)
 			{
-				lines << IntPoint(iterp->x()*1e3, iterp->y()*1e3);
+				poly.push_back(K::Point_2(iterV->x(), iterV->y()));
 			}
-			cur_contour << lines;
+			PolygonPtr contour_use_CGAL;
+			contour_use_CGAL.push_back(poly);
 		}
-		solver.AddPaths(support_region, ptClip, true);
-		solver.AddPaths(cur_contour, ptSubject, true);
-		solver.Execute(ctDifference, need_support_region, pftNonZero);
-		base_region = cur_contour;
-		
 	}
 }

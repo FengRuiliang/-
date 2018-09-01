@@ -449,13 +449,13 @@ void RenderingWidget::DrawFace(bool bv)
 	}
 	bool found;
 	Mesh& pm = procesoor.mesh;
-	Mesh::Property_map<face_descriptor, Vector> fnormals;
-	boost::tie(fnormals,found)=pm.property_map<face_descriptor, Vector>("f:normals");
+	Mesh::Property_map<face_descriptor, K::Vector_3> fnormals;
+	boost::tie(fnormals,found)=pm.property_map<face_descriptor, K::Vector_3>("f:normals");
 	if (found)
 	{
 		glColor3ub(0, 170, 0);
 		glBegin(GL_TRIANGLES);
-		Point p;
+		K::Point_3 p;
 		for (Mesh::Face_iterator iter = pm.faces_begin(); iter != pm.faces_end(); iter++)
 		{
 			glNormal3f(fnormals[*iter].x(), fnormals[*iter].y(), fnormals[*iter].z());
