@@ -18,24 +18,25 @@ typedef std::list< Polyline_type > Polylines;
 typedef CGAL::AABB_halfedge_graph_segment_primitive<Mesh> HGSP;
 typedef CGAL::AABB_traits<K, HGSP>    AABB_traits;
 typedef CGAL::AABB_tree<AABB_traits>  AABB_tree;
-#include<boost/shared_ptr.hpp>
-#include<CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include<CGAL/Polygon_with_holes_2.h>
-#include<CGAL/create_offset_polygons_from_polygon_with_holes_2.h>
-#include <CGAL/arrange_offset_polygons_2.h>
-typedef CGAL::Polygon_2<K>            Polygon_2;
-typedef CGAL::Polygon_with_holes_2<K> Polygon_with_holes;
-typedef CGAL::Straight_skeleton_2<K>  Ss;
-typedef boost::shared_ptr<Polygon_2> PolygonPtr;
-typedef boost::shared_ptr<Ss> SsPtr;
-typedef std::vector<PolygonPtr> PolygonPtrVector;
-
+#include "Library/clipper.hpp"
+using namespace ClipperLib;
+// define the kernel
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Filtered_kernel.h>
+typedef CGAL::Simple_cartesian<double>    CK;
+typedef CGAL::Filtered_kernel<CK>         Kernel;
+// typedefs for the traits and the algorithm
+#include <CGAL/Segment_Delaunay_graph_traits_2.h>
+#include <CGAL/Segment_Delaunay_graph_2.h>
+typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>  Gt;
+typedef CGAL::Segment_Delaunay_graph_2<Gt>             SDG2;
 
 class Processor
 {
 public:
 	Mesh mesh;
 	std::vector<Polylines> contours;
+	std::vector<std::vector<std::tuple<double,double,double,double>>> support_region_voronoi_diagrams;
 public:
 	Processor();
 	~Processor();

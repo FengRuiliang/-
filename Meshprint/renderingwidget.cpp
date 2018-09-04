@@ -214,7 +214,7 @@ void RenderingWidget::mouseDoubleClickEvent(QMouseEvent *e)
 void RenderingWidget::wheelEvent(QWheelEvent *e)
 {
 
-	eye_distance_ -= e->delta();
+	eye_distance_ -= e->delta()/10;
 	eye_distance_ = eye_distance_ < 0 ? 0 : eye_distance_;
 	update();
 }
@@ -249,6 +249,7 @@ void RenderingWidget::Render()
 	DrawFace(is_draw_face_);
 	DrawTexture(is_draw_texture_);
 	DrawSlice(true);
+	DrawDebug(true);
 }
 
 void RenderingWidget::SetLight()
@@ -482,24 +483,50 @@ void RenderingWidget::DrawSlice(bool bv)
 	}
 	std::vector<Polylines>& ctours=procesoor.contours;
 	glColor3ub(255, 0, 0);
-	for (std::vector<Polylines>::iterator iter=ctours.begin();iter!=ctours.end();iter++)
+	for (int i=0;i<ctours.size();i++)
 	{
-		for (auto iterlines=(*iter).begin();iterlines!=(*iter).end();iterlines++)
+		if (i!=i_th_slice)
+		{
+			continue;
+		}
+		for (auto iterlines = ctours[i].begin(); iterlines != ctours[i].end(); iterlines++)
 		{
 			glBegin(GL_LINE_LOOP);
-			for (auto iterpoints=(*iterlines).begin();iterpoints!=(*iterlines).end();iterpoints++)
+			for (auto iterpoints = (*iterlines).begin(); iterpoints != (*iterlines).end(); iterpoints++)
 			{
 				glVertex3f(iterpoints->x(), iterpoints->y(), iterpoints->z());
 			}
 			glEnd();
 		}
 	}
-	
 }
 void RenderingWidget::DrawHatch(bool bv)
 {
 	
 }
+
+void RenderingWidget::DrawDebug(bool param1)
+{
+
+	glBegin(GL_LINES);
+	std::vector<std::vector<std::tuple<double, double, double, double>>> tupes = procesoor.support_region_voronoi_diagrams;
+	for (int slice_id=0;slice_id<tupes.size();slice_id++)
+	{
+		if (slice_id!=i_th_slice)
+		{
+			continue;
+		}
+		for (auto iterS=tupes[slice_id].begin();iterS!=tupes[slice_id].end();iterS++)
+		{
+			GLfloat x1, y1,x2, y2;
+			std::tie(x1, y1, x2, y2) = *iterS;
+			glVertex3f(x1*1e-3,y1/1000,slice_id);
+			glVertex3f(x2*1e-3, y2/1000, slice_id);
+		}
+	}
+	glEnd();
+}
+
 void RenderingWidget::DoSliceAndHatch()
 {
 	procesoor.do_slice();
@@ -507,4 +534,9 @@ void RenderingWidget::DoSliceAndHatch()
 void RenderingWidget::AddSupportStructure()
 {
 	procesoor.add_support();
+}
+void RenderingWidget::SetSliceCheckId(int val)
+{
+	i_th_slice = val;
+	update();
 }

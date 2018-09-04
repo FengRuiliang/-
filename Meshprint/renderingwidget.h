@@ -53,6 +53,7 @@ public slots:
 
 	void AddSupportStructure();
 
+	void SetSliceCheckId(int val);
 private:
 	void DrawAxes(bool bv);
 	void DrawPoints(bool);
@@ -81,6 +82,9 @@ public:
 	bool						is_draw_texture_;
 	bool						has_lighting_;
 	bool						is_draw_axes_;
+private:
+	int i_th_slice=0;
+	void DrawDebug(bool param1);
 };
 
 #endif // RENDERINGWIDGET_H
