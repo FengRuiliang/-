@@ -100,40 +100,31 @@ void Processor::add_support()
 		Clipper sov;
 		sov.AddPaths(cur_contour, ptSubject, true);
 		sov.AddPaths(last_contour, ptClip, true);
-		last_contour = cur_contour;
+		//last_contour = cur_contour;
 		sov.Execute(ctDifference, different_contour, pftNonZero, pftNonZero);
 		SDG2          sdg;
 		SDG2::Site_2  site;
+		std::vector<std::pair<Gt::Point_2, Gt::Point_2> > segments;
 		for (auto iterD = different_contour.begin(); iterD != different_contour.end(); iterD++)
 		{
-			//polygon points
-			std::vector<Gt::Point_2> points;
 			//segments of the polygon as a pair of point indices
-			std::vector<std::pair<std::size_t, std::size_t> > indices;
-			SDG2::Site_2 site;
-			//read a close polygon given by its segments
-			// s x0 y0 x1 y1
-			// s x1 y1 x2 y2
-			// ...
-			// s xn yn x0 y0
-			ifs >> site;
-			assert(site.is_segment());
-			points.push_back(site.source_of_supporting_site());
-			std::size_t k = 0;
-			while (ifs >> site) {
-				assert(site.is_segment());
-				points.push_back(site.source_of_supporting_site());
-				indices.push_back(std::make_pair(k, k + 1));
-				++k;
+			for (int cur_id=0;cur_id!=iterD->size();cur_id++)
+			{
+				segments.push_back(std::make_pair(Gt::Point_2(iterD->at(cur_id).X, iterD->at(cur_id).Y),
+					Gt::Point_2(iterD->at((cur_id + 1) % iterD->size()).X, iterD->at((cur_id + 1) % iterD->size()).Y)));
 			}
-			indices.push_back(std::make_pair(k, 0));
-			ifs.close();
-			SDG2          sdg;
-			//insert the polygon segments all at once using spatial sorting to speed the insertion
-			sdg.insert_segments(points.begin(), points.end(), indices.begin(), indices.end());
-			// validate the segment Delaunay graph
-			assert(sdg.is_valid(true, 1));
-			return 0;
+		}
+		sdg.insert_segments(segments.begin(),segments.end());
+		SDG2::Output_sites_iterator oit;
+		for (oit = sdg.output_sites_begin(); oit != sdg.output_sites_end(); ++oit)
+		{
+			if (oit->is_segment()) {  
+			
+				Gt::Point_2 ps = oit->source_of_supporting_site();
+				Gt::Point_2 pt = oit->target_of_supporting_site();
+				auto t= std::make_tuple(ps.x(), ps.y(), pt.x(), pt.y());
+				support_region_voronoi_diagrams[slice_id].push_back(t);
+			}
 		}
 	}
 }

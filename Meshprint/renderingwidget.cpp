@@ -509,6 +509,7 @@ void RenderingWidget::DrawDebug(bool param1)
 {
 
 	glBegin(GL_LINES);
+	glColor3ub(0, 170, 0);
 	std::vector<std::vector<std::tuple<double, double, double, double>>> tupes = procesoor.support_region_voronoi_diagrams;
 	for (int slice_id=0;slice_id<tupes.size();slice_id++)
 	{
@@ -520,8 +521,8 @@ void RenderingWidget::DrawDebug(bool param1)
 		{
 			GLfloat x1, y1,x2, y2;
 			std::tie(x1, y1, x2, y2) = *iterS;
-			glVertex3f(x1*1e-3,y1/1000,slice_id);
-			glVertex3f(x2*1e-3, y2/1000, slice_id);
+			glVertex3f(x1,y1,slice_id);
+			glVertex3f(x2, y2, slice_id);
 		}
 	}
 	glEnd();
