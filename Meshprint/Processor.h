@@ -20,16 +20,29 @@ typedef CGAL::AABB_traits<K, HGSP>    AABB_traits;
 typedef CGAL::AABB_tree<AABB_traits>  AABB_tree;
 #include "Library/clipper.hpp"
 using namespace ClipperLib;
-// define the kernel
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Filtered_kernel.h>
-typedef CGAL::Simple_cartesian<double>    CK;
-typedef CGAL::Filtered_kernel<CK>         Kernel;
-// typedefs for the traits and the algorithm
-#include <CGAL/Segment_Delaunay_graph_traits_2.h>
-#include <CGAL/Segment_Delaunay_graph_2.h>
-typedef CGAL::Segment_Delaunay_graph_traits_2<Kernel>  Gt;
-typedef CGAL::Segment_Delaunay_graph_2<Gt>             SDG2;
+
+// includes for defining the Voronoi diagram adaptor
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Segment_Delaunay_graph_Linf_filtered_traits_2.h>
+#include <CGAL/Segment_Delaunay_graph_Linf_2.h>
+#include <CGAL/Voronoi_diagram_2.h>
+#include <CGAL/Segment_Delaunay_graph_adaptation_traits_2.h>
+#include <CGAL/Segment_Delaunay_graph_adaptation_policies_2.h>
+// typedefs for defining the adaptor
+typedef CGAL::Segment_Delaunay_graph_Linf_filtered_traits_2<K>               Gt;
+typedef CGAL::Segment_Delaunay_graph_Linf_2<Gt>                              DT;
+typedef CGAL::Segment_Delaunay_graph_adaptation_traits_2<DT>                 AT;
+typedef CGAL::Segment_Delaunay_graph_degeneracy_removal_policy_2<DT>         AP;
+typedef CGAL::Voronoi_diagram_2<DT, AT, AP>                                    VD;
+// typedef for the result type of the point location
+typedef AT::Site_2                    Site_2;
+typedef AT::Point_2                   Point_2;
+typedef VD::Locate_result             Locate_result;
+typedef VD::Vertex_handle             Vertex_handle;
+typedef VD::Face_handle               Face_handle;
+typedef VD::Halfedge_handle           Halfedge_handle;
+typedef VD::Ccb_halfedge_circulator   Ccb_halfedge_circulator;
+
 
 class Processor
 {
