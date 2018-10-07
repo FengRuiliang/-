@@ -63,19 +63,13 @@ void Processor::do_slice()
 	{
 		return;
 	}
-	// Use the Slicer constructor from a pre-built AABB_tree
+	std::vector<bool> is_unavailable(mesh.faces().size());
+	const float thickness = 0.09;
 	AABB_tree tree(edges(mesh).first, edges(mesh).second, mesh);
-	CGAL::Polygon_mesh_slicer<Mesh, K> slicer_aabb(mesh, tree);
-	float z_height = 0, zmax = tree.bbox().zmax();
-	while (z_height < tree.bbox().zmax())
-	{
-		Polylines current_polylines;
-		slicer_aabb(K::Plane_3(0, 0, 1, -z_height), std::back_inserter(current_polylines));
-		contours.push_back(current_polylines);
-		z_height += 2.0;
-	}
-}
+	const int num_of_slice = tree.bbox().zmax() / thickness;
+	std::vector<std::vector<Mesh::Face_index>> faces_in_slices(num_of_slice);
 
+}
 void Processor::add_support()
 {
 	if (contours.empty())
@@ -126,6 +120,5 @@ void Processor::add_support()
 				}
 			}
 		}
-	
 	}
 }

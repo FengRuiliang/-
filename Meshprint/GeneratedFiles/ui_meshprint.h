@@ -13,7 +13,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGroupBox>
@@ -60,8 +59,8 @@ public:
     QAction *actionGrid;
     QAction *actionBackground;
     QAction *actionALight;
+    QAction *actionSave_contour;
     QAction *actionMaintenance;
-    QAction *actionsupport;
     QWidget *centralWidget;
     QHBoxLayout *centralLayout;
     QVBoxLayout *operationLayout;
@@ -151,7 +150,7 @@ public:
     QDoubleSpinBox *doubleSpinBox_11;
     QHBoxLayout *pointLayout1_36;
     QLabel *label_pDiameter_36;
-    QSpinBox *spinBox_7;
+    QDoubleSpinBox *doubleSpinBox_12;
     QHBoxLayout *pointLayout1_38;
     QLabel *label_pDiameter_38;
     QSpinBox *spinBox_10;
@@ -159,23 +158,12 @@ public:
     QWidget *page;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
-    QPushButton *pushButton_XYScan_3;
     QPushButton *pushButton_XYScan_2;
-    QHBoxLayout *pointLayout1_3;
-    QLabel *label_pDiameter_3;
-    QSpinBox *spinBox;
-    QSlider *horizontalSlider_4;
-    QHBoxLayout *pointLayout1_5;
-    QLabel *label_pDiameter_5;
-    QSpinBox *spinBox_2;
-    QHBoxLayout *pointLayout1_7;
-    QLabel *label_pDiameter_7;
-    QSpinBox *spinBox_3;
-    QCheckBox *checkBox;
-    QCheckBox *checkBox_2;
-    QCheckBox *checkBox_3;
-    QSpacerItem *verticalSpacer_3;
-    QHBoxLayout *renderingLayout;
+    QGroupBox *verticalGroupBox;
+    QHBoxLayout *horizontalLayout_2;
+    QSpinBox *spinBox_11;
+    QSlider *horizontalSlider_5;
+    QVBoxLayout *verticalLayout_5;
     RenderingWidget *openGLWidget;
     QMenuBar *menuBar;
     QMenu *menuFile;
@@ -194,7 +182,7 @@ public:
         if (MeshprintClass->objectName().isEmpty())
             MeshprintClass->setObjectName(QStringLiteral("MeshprintClass"));
         MeshprintClass->setEnabled(true);
-        MeshprintClass->resize(1311, 1069);
+        MeshprintClass->resize(1213, 931);
         actionOpen = new QAction(MeshprintClass);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         QIcon icon;
@@ -303,17 +291,13 @@ public:
         QIcon icon19;
         icon19.addFile(QStringLiteral(":/Meshprint/Resources/images/Light On-50.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionALight->setIcon(icon19);
+        actionSave_contour = new QAction(MeshprintClass);
+        actionSave_contour->setObjectName(QStringLiteral("actionSave_contour"));
         actionMaintenance = new QAction(MeshprintClass);
         actionMaintenance->setObjectName(QStringLiteral("actionMaintenance"));
         QIcon icon20;
         icon20.addFile(QStringLiteral(":/Meshprint/Resources/images/Maintenance.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionMaintenance->setIcon(icon20);
-        actionsupport = new QAction(MeshprintClass);
-        actionsupport->setObjectName(QStringLiteral("actionsupport"));
-        actionsupport->setCheckable(true);
-        QIcon icon21;
-        icon21.addFile(QStringLiteral(":/Meshprint/Resources/images/icons8-scissor-lift-80.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionsupport->setIcon(icon21);
         centralWidget = new QWidget(MeshprintClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         centralWidget->setEnabled(true);
@@ -416,6 +400,7 @@ public:
 
         pushButton_3 = new QPushButton(addPointSupport);
         pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
+        pushButton_3->setCheckable(true);
 
         pointLayout->addWidget(pushButton_3);
 
@@ -480,6 +465,7 @@ public:
 
         pushButton = new QPushButton(addLineSupport);
         pushButton->setObjectName(QStringLiteral("pushButton"));
+        pushButton->setCheckable(true);
 
         verticalLayout_4->addWidget(pushButton);
 
@@ -601,14 +587,14 @@ public:
 
         verticalLayout_2->addWidget(pushButton_XYScan_7);
 
-        QIcon icon22;
+        QIcon icon21;
         QString iconThemeName = QStringLiteral("AutoSupport");
         if (QIcon::hasThemeIcon(iconThemeName)) {
-            icon22 = QIcon::fromTheme(iconThemeName);
+            icon21 = QIcon::fromTheme(iconThemeName);
         } else {
-            icon22.addFile(QStringLiteral("."), QSize(), QIcon::Normal, QIcon::Off);
+            icon21.addFile(QStringLiteral("."), QSize(), QIcon::Normal, QIcon::Off);
         }
-        tabWidget->addTab(autosupport, icon22, QString());
+        tabWidget->addTab(autosupport, icon21, QString());
 
         operationLayout->addWidget(tabWidget);
 
@@ -808,7 +794,7 @@ public:
 
         doubleSpinBox_11 = new QDoubleSpinBox(stateGroupLayout_5);
         doubleSpinBox_11->setObjectName(QStringLiteral("doubleSpinBox_11"));
-        doubleSpinBox_11->setValue(0.09);
+        doubleSpinBox_11->setValue(0.05);
 
         pointLayout1_17->addWidget(doubleSpinBox_11);
 
@@ -823,12 +809,12 @@ public:
 
         pointLayout1_36->addWidget(label_pDiameter_36);
 
-        spinBox_7 = new QSpinBox(stateGroupLayout_5);
-        spinBox_7->setObjectName(QStringLiteral("spinBox_7"));
-        spinBox_7->setMaximum(999);
-        spinBox_7->setValue(150);
+        doubleSpinBox_12 = new QDoubleSpinBox(stateGroupLayout_5);
+        doubleSpinBox_12->setObjectName(QStringLiteral("doubleSpinBox_12"));
+        doubleSpinBox_12->setDecimals(3);
+        doubleSpinBox_12->setValue(0.05);
 
-        pointLayout1_36->addWidget(spinBox_7);
+        pointLayout1_36->addWidget(doubleSpinBox_12);
 
 
         verticalLayout_13->addLayout(pointLayout1_36);
@@ -865,15 +851,33 @@ public:
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        pushButton_XYScan_3 = new QPushButton(page);
-        pushButton_XYScan_3->setObjectName(QStringLiteral("pushButton_XYScan_3"));
-
-        verticalLayout->addWidget(pushButton_XYScan_3);
-
         pushButton_XYScan_2 = new QPushButton(page);
         pushButton_XYScan_2->setObjectName(QStringLiteral("pushButton_XYScan_2"));
 
         verticalLayout->addWidget(pushButton_XYScan_2);
+
+        verticalGroupBox = new QGroupBox(page);
+        verticalGroupBox->setObjectName(QStringLiteral("verticalGroupBox"));
+        horizontalLayout_2 = new QHBoxLayout(verticalGroupBox);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        spinBox_11 = new QSpinBox(verticalGroupBox);
+        spinBox_11->setObjectName(QStringLiteral("spinBox_11"));
+        spinBox_11->setMaximum(9999);
+        spinBox_11->setValue(67);
+
+        horizontalLayout_2->addWidget(spinBox_11);
+
+        horizontalSlider_5 = new QSlider(verticalGroupBox);
+        horizontalSlider_5->setObjectName(QStringLiteral("horizontalSlider_5"));
+        horizontalSlider_5->setMaximum(10000);
+        horizontalSlider_5->setOrientation(Qt::Horizontal);
+
+        horizontalLayout_2->addWidget(horizontalSlider_5);
+
+
+        verticalLayout->addWidget(verticalGroupBox);
 
 
         horizontalLayout->addLayout(verticalLayout);
@@ -882,119 +886,28 @@ public:
 
         operationLayout->addWidget(stackedWidget);
 
-        pointLayout1_3 = new QHBoxLayout();
-        pointLayout1_3->setSpacing(6);
-        pointLayout1_3->setObjectName(QStringLiteral("pointLayout1_3"));
-        label_pDiameter_3 = new QLabel(centralWidget);
-        label_pDiameter_3->setObjectName(QStringLiteral("label_pDiameter_3"));
-
-        pointLayout1_3->addWidget(label_pDiameter_3);
-
-        spinBox = new QSpinBox(centralWidget);
-        spinBox->setObjectName(QStringLiteral("spinBox"));
-        spinBox->setWrapping(false);
-        spinBox->setFrame(true);
-        spinBox->setMaximum(10000);
-        spinBox->setValue(0);
-
-        pointLayout1_3->addWidget(spinBox);
-
-        pointLayout1_3->setStretch(0, 1);
-        pointLayout1_3->setStretch(1, 1);
-
-        operationLayout->addLayout(pointLayout1_3);
-
-        horizontalSlider_4 = new QSlider(centralWidget);
-        horizontalSlider_4->setObjectName(QStringLiteral("horizontalSlider_4"));
-        horizontalSlider_4->setMaximum(10000);
-        horizontalSlider_4->setOrientation(Qt::Horizontal);
-
-        operationLayout->addWidget(horizontalSlider_4);
-
-        pointLayout1_5 = new QHBoxLayout();
-        pointLayout1_5->setSpacing(6);
-        pointLayout1_5->setObjectName(QStringLiteral("pointLayout1_5"));
-        label_pDiameter_5 = new QLabel(centralWidget);
-        label_pDiameter_5->setObjectName(QStringLiteral("label_pDiameter_5"));
-
-        pointLayout1_5->addWidget(label_pDiameter_5);
-
-        spinBox_2 = new QSpinBox(centralWidget);
-        spinBox_2->setObjectName(QStringLiteral("spinBox_2"));
-        spinBox_2->setWrapping(false);
-        spinBox_2->setFrame(true);
-        spinBox_2->setMaximum(10000);
-        spinBox_2->setValue(0);
-
-        pointLayout1_5->addWidget(spinBox_2);
-
-        pointLayout1_5->setStretch(0, 1);
-        pointLayout1_5->setStretch(1, 1);
-
-        operationLayout->addLayout(pointLayout1_5);
-
-        pointLayout1_7 = new QHBoxLayout();
-        pointLayout1_7->setSpacing(6);
-        pointLayout1_7->setObjectName(QStringLiteral("pointLayout1_7"));
-        label_pDiameter_7 = new QLabel(centralWidget);
-        label_pDiameter_7->setObjectName(QStringLiteral("label_pDiameter_7"));
-
-        pointLayout1_7->addWidget(label_pDiameter_7);
-
-        spinBox_3 = new QSpinBox(centralWidget);
-        spinBox_3->setObjectName(QStringLiteral("spinBox_3"));
-        spinBox_3->setWrapping(false);
-        spinBox_3->setFrame(true);
-        spinBox_3->setMaximum(10000);
-        spinBox_3->setValue(0);
-
-        pointLayout1_7->addWidget(spinBox_3);
-
-        pointLayout1_7->setStretch(0, 1);
-        pointLayout1_7->setStretch(1, 1);
-
-        operationLayout->addLayout(pointLayout1_7);
-
-        checkBox = new QCheckBox(centralWidget);
-        checkBox->setObjectName(QStringLiteral("checkBox"));
-
-        operationLayout->addWidget(checkBox);
-
-        checkBox_2 = new QCheckBox(centralWidget);
-        checkBox_2->setObjectName(QStringLiteral("checkBox_2"));
-
-        operationLayout->addWidget(checkBox_2);
-
-        checkBox_3 = new QCheckBox(centralWidget);
-        checkBox_3->setObjectName(QStringLiteral("checkBox_3"));
-
-        operationLayout->addWidget(checkBox_3);
-
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        operationLayout->addItem(verticalSpacer_3);
-
 
         centralLayout->addLayout(operationLayout);
 
-        renderingLayout = new QHBoxLayout();
-        renderingLayout->setSpacing(6);
-        renderingLayout->setObjectName(QStringLiteral("renderingLayout"));
-        renderingLayout->setContentsMargins(0, -1, -1, -1);
+        verticalLayout_5 = new QVBoxLayout();
+        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setContentsMargins(0, -1, -1, -1);
         openGLWidget = new RenderingWidget(centralWidget);
         openGLWidget->setObjectName(QStringLiteral("openGLWidget"));
         openGLWidget->setEnabled(true);
 
-        renderingLayout->addWidget(openGLWidget);
+        verticalLayout_5->addWidget(openGLWidget);
 
+        verticalLayout_5->setStretch(0, 20);
 
-        centralLayout->addLayout(renderingLayout);
+        centralLayout->addLayout(verticalLayout_5);
 
         centralLayout->setStretch(1, 5);
         MeshprintClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MeshprintClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1311, 23));
+        menuBar->setGeometry(QRect(0, 0, 1213, 23));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuView = new QMenu(menuBar);
@@ -1033,6 +946,8 @@ public:
         menuFile->addSeparator();
         menuFile->addAction(actionSave);
         menuFile->addAction(actionSave_As);
+        menuFile->addSeparator();
+        menuFile->addAction(actionSave_contour);
         menuView->addAction(actionFront_View);
         menuView->addAction(actionLeft_View);
         menuView->addAction(actionTop_View);
@@ -1052,7 +967,6 @@ public:
         viewToolBar->addAction(actionRotate_Camera);
         viewToolBar->addAction(actionTranslation);
         viewToolBar->addAction(actionGrid);
-        viewToolBar->addAction(actionsupport);
         viewToolBar->addAction(actionLine_View);
         viewToolBar->addAction(actionFace_View);
         viewToolBar->addSeparator();
@@ -1065,7 +979,7 @@ public:
         retranslateUi(MeshprintClass);
         QObject::connect(actionOpen, SIGNAL(triggered()), openGLWidget, SLOT(ReadMesh()));
         QObject::connect(actionGrid, SIGNAL(triggered()), openGLWidget, SLOT(CheckGrid()));
-        QObject::connect(actionNew, SIGNAL(triggered()), openGLWidget, SLOT(AutoSupport()));
+        QObject::connect(actionNew, SIGNAL(triggered()), openGLWidget, SLOT(ReadSingleMesh()));
         QObject::connect(actionCut, SIGNAL(triggered()), openGLWidget, SLOT(DeleteSupport()));
         QObject::connect(actionLine_View, SIGNAL(triggered()), openGLWidget, SLOT(CheckDrawEdge()));
         QObject::connect(actionFace_View, SIGNAL(triggered()), openGLWidget, SLOT(CheckDrawFace()));
@@ -1075,8 +989,7 @@ public:
         QObject::connect(actionSave_As, SIGNAL(triggered()), openGLWidget, SLOT(Export()));
         QObject::connect(actionSave, SIGNAL(triggered()), openGLWidget, SLOT(WriteMesh()));
         QObject::connect(actionALight, SIGNAL(triggered()), openGLWidget, SLOT(CheckLight()));
-        QObject::connect(horizontalSlider_4, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
-        QObject::connect(pushButton_XYScan_2, SIGNAL(clicked()), openGLWidget, SLOT(DoSliceAndHatch()));
+        QObject::connect(pushButton_XYScan_2, SIGNAL(clicked()), openGLWidget, SLOT(renderdoHatch()));
         QObject::connect(comboBox_2, SIGNAL(activated(int)), openGLWidget, SLOT(setHatchType(int)));
         QObject::connect(doubleSpinBox_3, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setOffset(double)));
         QObject::connect(doubleSpinBox_4, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setfieldWidth(double)));
@@ -1084,7 +997,6 @@ public:
         QObject::connect(doubleSpinBox_11, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setlineOverlap(double)));
         QObject::connect(spinBox_6, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setLaserPower(int)));
         QObject::connect(spinBox_5, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setLaserSpeed(int)));
-        QObject::connect(spinBox_7, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setHatchType(int)));
         QObject::connect(spinBox_8, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setLaserPowerPolygon(int)));
         QObject::connect(spinBox_9, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setLaserSpeedPolygon(int)));
         QObject::connect(spinBox_10, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setAngle(int)));
@@ -1095,9 +1007,6 @@ public:
         QObject::connect(doubleSpinBox_28, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setVerticalgap(double)));
         QObject::connect(pushButton_XYScan_7, SIGNAL(clicked()), openGLWidget, SLOT(AutoSupport()));
         QObject::connect(actionTranslation, SIGNAL(triggered()), openGLWidget, SLOT(CheckSetFace()));
-        QObject::connect(checkBox, SIGNAL(clicked(bool)), openGLWidget, SLOT(CheckRegion(bool)));
-        QObject::connect(checkBox_2, SIGNAL(clicked(bool)), openGLWidget, SLOT(CheckSupport(bool)));
-        QObject::connect(spinBox_2, SIGNAL(valueChanged(int)), openGLWidget, SLOT(setFildID(int)));
         QObject::connect(doubleSpinBox_pDiameter, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setPointD(double)));
         QObject::connect(doubleSpinBox_pHeight, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setPointH(double)));
         QObject::connect(doubleSpinBox, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setLineD(double)));
@@ -1107,17 +1016,14 @@ public:
         QObject::connect(actionRotate, SIGNAL(toggled(bool)), openGLWidget, SLOT(CheckRotateModel(bool)));
         QObject::connect(doubleSpinBox_7, SIGNAL(valueChanged(double)), openGLWidget, SLOT(SetScaleT(double)));
         QObject::connect(pushButton_XYScan_8, SIGNAL(clicked()), openGLWidget, SLOT(SclaleModel()));
-        QObject::connect(checkBox_3, SIGNAL(toggled(bool)), openGLWidget, SLOT(SetAllHatch(bool)));
-        QObject::connect(spinBox, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckIdText(int)));
         QObject::connect(doubleSpinBox_24, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setThickness(double)));
+        QObject::connect(horizontalSlider_5, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
+        QObject::connect(doubleSpinBox_12, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setHatchDis(double)));
+        QObject::connect(spinBox_11, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
+        QObject::connect(actionSave_contour, SIGNAL(triggered()), openGLWidget, SLOT(SaveContour()));
         QObject::connect(actionMaintenance, SIGNAL(triggered()), openGLWidget, SLOT(ApplyMaintenance()));
-        QObject::connect(actionIsometric_View, SIGNAL(triggered()), openGLWidget, SLOT(ResetView()));
-        QObject::connect(spinBox, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
-        QObject::connect(spinBox_3, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetLineId(int)));
-        QObject::connect(pushButton_XYScan_3, SIGNAL(clicked()), openGLWidget, SLOT(AddSupportStructure()));
-        QObject::connect(actionsupport, SIGNAL(triggered(bool)), openGLWidget, SLOT(check_support(bool)));
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
         comboBox_2->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
 
@@ -1127,7 +1033,7 @@ public:
 
     void retranslateUi(QMainWindow *MeshprintClass)
     {
-        MeshprintClass->setWindowTitle(QApplication::translate("MeshprintClass", "Meshprint", Q_NULLPTR));
+        MeshprintClass->setWindowTitle(QApplication::translate("MeshprintClass", "SLM Print", Q_NULLPTR));
         actionOpen->setText(QApplication::translate("MeshprintClass", "Open..", Q_NULLPTR));
         actionOpen->setShortcut(QApplication::translate("MeshprintClass", "Ctrl+O", Q_NULLPTR));
         actionSave->setText(QApplication::translate("MeshprintClass", "Save", Q_NULLPTR));
@@ -1150,22 +1056,19 @@ public:
         actionGrid->setText(QApplication::translate("MeshprintClass", "Grid", Q_NULLPTR));
         actionBackground->setText(QApplication::translate("MeshprintClass", "Background", Q_NULLPTR));
         actionALight->setText(QApplication::translate("MeshprintClass", "aLight", Q_NULLPTR));
+        actionSave_contour->setText(QApplication::translate("MeshprintClass", "Save contour", Q_NULLPTR));
         actionMaintenance->setText(QApplication::translate("MeshprintClass", "Maintenance", Q_NULLPTR));
-#ifndef QT_NO_TOOLTIP
-        actionMaintenance->setToolTip(QApplication::translate("MeshprintClass", "Maintenance", Q_NULLPTR));
-#endif // QT_NO_TOOLTIP
-        actionsupport->setText(QApplication::translate("MeshprintClass", "support", Q_NULLPTR));
         stateGroupLayout->setTitle(QString());
         label_Lheight_3->setText(QApplication::translate("MeshprintClass", "Scale Size", Q_NULLPTR));
         pushButton_XYScan_8->setText(QApplication::translate("MeshprintClass", "Apply", Q_NULLPTR));
         label_pDiameter->setText(QApplication::translate("MeshprintClass", "Width", Q_NULLPTR));
         label_pHeight->setText(QApplication::translate("MeshprintClass", "Height", Q_NULLPTR));
-        pushButton_3->setText(QApplication::translate("MeshprintClass", "Compute Support Region", Q_NULLPTR));
+        pushButton_3->setText(QApplication::translate("MeshprintClass", "Show Support Region", Q_NULLPTR));
         applyPointSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Point Support", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(addPointSupport), QApplication::translate("MeshprintClass", "Point Support", Q_NULLPTR));
         label_LDiameter->setText(QApplication::translate("MeshprintClass", "Width", Q_NULLPTR));
         label_Lheight->setText(QApplication::translate("MeshprintClass", "Height", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("MeshprintClass", "Compute Support Region", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("MeshprintClass", "Show Support Region", Q_NULLPTR));
         applyLineSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Line Support", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(addLineSupport), QApplication::translate("MeshprintClass", "Line Support", Q_NULLPTR));
         label_Lheight_2->setText(QApplication::translate("MeshprintClass", "support angle", Q_NULLPTR));
@@ -1179,8 +1082,10 @@ public:
         comboBox_2->insertItems(0, QStringList()
          << QApplication::translate("MeshprintClass", "No hatch", Q_NULLPTR)
          << QApplication::translate("MeshprintClass", "Chessboard hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Offset filling hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Strip hatch", Q_NULLPTR)
+         << QApplication::translate("MeshprintClass", "Offset Filling hatch", Q_NULLPTR)
+         << QApplication::translate("MeshprintClass", "X_parallel hatch", Q_NULLPTR)
+         << QApplication::translate("MeshprintClass", "Y parallel hatch", Q_NULLPTR)
+         << QApplication::translate("MeshprintClass", "Hybird hatch", Q_NULLPTR)
         );
         comboBox_2->setCurrentText(QApplication::translate("MeshprintClass", "No hatch", Q_NULLPTR));
         stateGroupLayout_6->setTitle(QString());
@@ -1196,16 +1101,9 @@ public:
         label_pDiameter_10->setText(QApplication::translate("MeshprintClass", "Field Width", Q_NULLPTR));
         label_pDiameter_11->setText(QApplication::translate("MeshprintClass", "Field Height", Q_NULLPTR));
         label_pDiameter_17->setText(QApplication::translate("MeshprintClass", "Field Space", Q_NULLPTR));
-        label_pDiameter_36->setText(QApplication::translate("MeshprintClass", "Line Space", Q_NULLPTR));
+        label_pDiameter_36->setText(QApplication::translate("MeshprintClass", "Hatch Distance", Q_NULLPTR));
         label_pDiameter_38->setText(QApplication::translate("MeshprintClass", "Increment angle", Q_NULLPTR));
-        pushButton_XYScan_3->setText(QApplication::translate("MeshprintClass", "support optimization", Q_NULLPTR));
         pushButton_XYScan_2->setText(QApplication::translate("MeshprintClass", "Slicing and Path Generation", Q_NULLPTR));
-        label_pDiameter_3->setText(QApplication::translate("MeshprintClass", "SLICE ID", Q_NULLPTR));
-        label_pDiameter_5->setText(QApplication::translate("MeshprintClass", "FIELD ID", Q_NULLPTR));
-        label_pDiameter_7->setText(QApplication::translate("MeshprintClass", "LINE ID", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("MeshprintClass", "DISPLY SUPPORT REGION", Q_NULLPTR));
-        checkBox_2->setText(QApplication::translate("MeshprintClass", "DISPLY SUPPORT", Q_NULLPTR));
-        checkBox_3->setText(QApplication::translate("MeshprintClass", "SHOW ALL HATCH", Q_NULLPTR));
         menuFile->setTitle(QApplication::translate("MeshprintClass", "File", Q_NULLPTR));
         menuView->setTitle(QApplication::translate("MeshprintClass", "View", Q_NULLPTR));
         menuHelp->setTitle(QApplication::translate("MeshprintClass", "Help", Q_NULLPTR));
