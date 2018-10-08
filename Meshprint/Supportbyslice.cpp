@@ -1,5 +1,5 @@
 #include "Supportbyslice.h"
-#include "IntersectionPolygon.h"
+#include "SweepLine.h"
 
 Supportbyslice::Supportbyslice()
 {
@@ -59,7 +59,7 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 		clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
 		if (!overhang.empty())
 		{
-			sample_support_point(safe_region, tc[i]);
+			sample_support_point(tc[i-1], tc[i]);
 			offsetor.Clear();
 			offsetor.AddPaths(contours[i], jtMiter, etClosedPolygon);
 			offsetor.Execute(safe_region, 3.0);
@@ -78,15 +78,17 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 	}
 }
 
-void Supportbyslice::sample_support_point(Paths safe_region, std::vector < std::vector<cutLine>* > contours)
+void Supportbyslice::sample_support_point(std::vector < std::vector<cutLine>* > safe_region, 
+	std::vector < std::vector<cutLine>* > contours)
 {
-	IntersectionPolygon  solver_;
-	for (auto iterl=safe_region.begin();iterl!=safe_region.end();iterl++)
+	for (int i=0;i<safe_region.size();i++)
 	{
-		for (auto iterp=iterl->begin();iterp!=iterl->end();iterp++)
+		for (int j=0;j<safe_region[i]->size();j++)
 		{
-			
+			Segment* seg = new Segment(safe_region[i]->at(j).position_vert[0],
+				safe_region[i]->at(j).position_vert[1]);
 		}
 	}
-	solver_
+	
+	
 }

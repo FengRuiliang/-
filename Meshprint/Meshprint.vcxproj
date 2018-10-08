@@ -158,6 +158,7 @@
     <ClCompile Include="ArcBall.cpp" />
     <ClCompile Include="clipper.cpp" />
     <ClCompile Include="Cubes.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_maintenance.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -264,6 +265,7 @@
     <ClInclude Include="ArcBall.h" />
     <ClInclude Include="clipper.hpp" />
     <ClInclude Include="Cubes.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="GeneratedFiles\ui_maintenance.h" />
     <ClInclude Include="GeneratedFiles\ui_meshprint.h" />
     <ClInclude Include="GeneratedFiles\ui_oepndialog.h" />
@@ -272,7 +274,6 @@
     <ClInclude Include="Hatch.h" />
     <ClInclude Include="HE_mesh\Mesh3D.h" />
     <ClInclude Include="HE_mesh\Vec.h" />
-    <ClInclude Include="Sweep.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="SweepLine.h" />
     <ClInclude Include="triangle\triangle.h" />

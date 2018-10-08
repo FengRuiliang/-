@@ -1,16 +1,25 @@
 #pragma once
+
 #include "HE_mesh/Vec.h"
-
+#include "Event.h"
 using namespace trimesh;
-
-class CSegment
+class Segment
 {
 public:
-	CSegment() {};
-	~CSegment() {};
+	Segment() ;
+	~Segment() ;
+	Segment(vec3 p1, vec3 p2);
+	bool operator<(const Segment & right)const   //ÖØÔØ<ÔËËã·û
+	{
+		return this->_middle.x() < right._middle.x();
+		
+	}
 private:
-	vec3 sta_, end_;
-	CSegment* next_;
-	CSegment* prev_;
+	vec3 _front,_back,_middle;
+	float _angle_belong;
+	Segment* _next;
+	Segment* _prev;
 };
+
+
 

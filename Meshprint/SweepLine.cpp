@@ -1,12 +1,17 @@
 #include "SweepLine.h"
 
 
-template <typename T>
+
 SweepLine::SweepLine()
 {
 }
 
-template <typename T>
 SweepLine::~SweepLine()
 {
+}
+
+
+void SweepLine::insert_segment(Segment  segment)
+{
+	return;
 }
