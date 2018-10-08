@@ -1,5 +1,5 @@
 #include "Supportbyslice.h"
-
+#include "IntersectionPolygon.h"
 
 Supportbyslice::Supportbyslice()
 {
@@ -59,7 +59,7 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 		clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
 		if (!overhang.empty())
 		{
-			sample_support_point(safe_region, contours[i], i*target->getThickness());
+			sample_support_point(safe_region, tc[i]);
 			offsetor.Clear();
 			offsetor.AddPaths(contours[i], jtMiter, etClosedPolygon);
 			offsetor.Execute(safe_region, 3.0);
@@ -78,7 +78,15 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 	}
 }
 
-void Supportbyslice::sample_support_point(Paths safe_region, Paths contours, float hei)
+void Supportbyslice::sample_support_point(Paths safe_region, std::vector < std::vector<cutLine>* > contours)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	IntersectionPolygon  solver_;
+	for (auto iterl=safe_region.begin();iterl!=safe_region.end();iterl++)
+	{
+		for (auto iterp=iterl->begin();iterp!=iterl->end();iterp++)
+		{
+			
+		}
+	}
+	solver_
 }

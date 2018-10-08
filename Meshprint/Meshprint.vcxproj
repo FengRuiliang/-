@@ -204,17 +204,18 @@
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Hatch.cpp" />
     <ClCompile Include="HE_mesh\Mesh3D.cpp" />
-    <ClCompile Include="IntersectionPolygon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="maintenance.cpp" />
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="meshprint.cpp" />
     <ClCompile Include="MSAABB.cpp" />
     <ClCompile Include="renderingwidget.cpp" />
+    <ClCompile Include="Segment.cpp" />
     <ClCompile Include="SliceCut.cpp" />
     <ClCompile Include="space2dKDTree.cpp" />
     <ClCompile Include="Support.cpp" />
     <ClCompile Include="Supportbyslice.cpp" />
+    <ClCompile Include="SweepLine.cpp" />
     <ClCompile Include="TriangleglobalFunctions.cpp" />
     <ClCompile Include="triangle\triangle.cpp" />
   </ItemGroup>
@@ -271,7 +272,9 @@
     <ClInclude Include="Hatch.h" />
     <ClInclude Include="HE_mesh\Mesh3D.h" />
     <ClInclude Include="HE_mesh\Vec.h" />
-    <ClInclude Include="IntersectionPolygon.h" />
+    <ClInclude Include="Sweep.h" />
+    <ClInclude Include="Segment.h" />
+    <ClInclude Include="SweepLine.h" />
     <ClInclude Include="triangle\triangle.h" />
     <CustomBuild Include="maintenance.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

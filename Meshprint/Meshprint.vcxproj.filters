@@ -122,7 +122,10 @@
     <ClCompile Include="triangle\triangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntersectionPolygon.cpp">
+    <ClCompile Include="Segment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SweepLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -219,7 +222,13 @@
     <ClInclude Include="triangle\triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntersectionPolygon.h">
+    <ClInclude Include="Segment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sweep.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SweepLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
