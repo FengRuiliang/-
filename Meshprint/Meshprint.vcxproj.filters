@@ -122,6 +122,9 @@
     <ClCompile Include="triangle\triangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IntersectionPolygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="meshprint.h">
@@ -214,6 +217,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="triangle\triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntersectionPolygon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
