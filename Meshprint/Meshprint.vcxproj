@@ -212,6 +212,7 @@
     <ClCompile Include="MSAABB.cpp" />
     <ClCompile Include="renderingwidget.cpp" />
     <ClCompile Include="SliceCut.cpp" />
+    <ClCompile Include="slicer.cpp" />
     <ClCompile Include="space2dKDTree.cpp" />
     <ClCompile Include="Support.cpp" />
     <ClCompile Include="Supportbyslice.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="HE_mesh\Mesh3D.h" />
     <ClInclude Include="HE_mesh\Vec.h" />
     <ClInclude Include="IntersectionPolygon.h" />
+    <ClInclude Include="slicer.h" />
     <ClInclude Include="triangle\triangle.h" />
     <CustomBuild Include="maintenance.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
