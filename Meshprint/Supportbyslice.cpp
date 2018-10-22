@@ -1,5 +1,5 @@
 #include "Supportbyslice.h"
-
+#include "SweepLine.h"
 
 Supportbyslice::Supportbyslice()
 {
@@ -59,7 +59,7 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 		clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
 		if (!overhang.empty())
 		{
-			sample_support_point(safe_region, contours[i], i*target->getThickness());
+			sample_support_point(tc[i-1], tc[i]);
 			offsetor.Clear();
 			offsetor.AddPaths(contours[i], jtMiter, etClosedPolygon);
 			offsetor.Execute(safe_region, 3.0);
@@ -78,7 +78,17 @@ void Supportbyslice::construct_by_slices(SliceCut* target)
 	}
 }
 
-void Supportbyslice::sample_support_point(Paths safe_region, Paths contours, float hei)
+void Supportbyslice::sample_support_point(std::vector < std::vector<cutLine>* > safe_region, 
+	std::vector < std::vector<cutLine>* > contours)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	for (int i=0;i<safe_region.size();i++)
+	{
+		for (int j=0;j<safe_region[i]->size();j++)
+		{
+			Segment* seg = new Segment(safe_region[i]->at(j).position_vert[0],
+				safe_region[i]->at(j).position_vert[1]);
+		}
+	}
+	
+	
 }

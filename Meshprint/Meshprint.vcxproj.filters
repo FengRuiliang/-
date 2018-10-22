@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{b548d812-a512-4f14-87ea-00a7d27018e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -122,8 +125,14 @@
     <ClCompile Include="triangle\triangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntersectionPolygon.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Segment.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="SweepLine.cpp">
+      <Filter>Geometry</Filter>
     </ClCompile>
     <ClCompile Include="slicer.cpp">
       <Filter>Source Files</Filter>
@@ -222,8 +231,14 @@
     <ClInclude Include="triangle\triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntersectionPolygon.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Segment.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="SweepLine.h">
+      <Filter>Geometry</Filter>
     </ClInclude>
     <ClInclude Include="slicer.h">
       <Filter>Header Files</Filter>
