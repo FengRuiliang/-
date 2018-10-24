@@ -1781,7 +1781,7 @@ void RenderingWidget::AutoSupport()
 		mycut->CutInPieces();
 	}
 	
-	supportor.construct_by_slices(mycut);
+	Supportor.construct_by_slices(mycut);
 }
 
 void RenderingWidget::setPointD(double diameter)

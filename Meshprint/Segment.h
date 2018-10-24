@@ -1,25 +1,18 @@
 #pragma once
-
-#include "HE_mesh/Vec.h"
-#include "Event.h"
-using namespace trimesh;
+#include "HE_mesh/Mesh3D.h"
 class Segment
 {
-public:
-	Segment() ;
-	~Segment() ;
-	Segment(vec3 p1, vec3 p2);
-	bool operator<(const Segment & right)const   //ÖØÔØ<ÔËËã·û
-	{
-		return this->_middle.x() < right._middle.x();
-		
-	}
+
+protected:
 private:
-	vec3 _front,_back,_middle;
-	float _angle_belong;
-	Segment* _next;
-	Segment* _prev;
+	Vec3f v1, v2;
+	float angle;
+	bool is_vailed;
+public:
+	void set_v1(Vec3f v) { v1 = v; };
+	void set_v2(Vec3f v) { v2 = v; };
+	void set_angle(float a) { angle = a; };
+	bool vailed() { return  v1 != v2; };
+	Vec3f get_v1() { return v1; };
+	Vec3f get_v2() { return v2; };
 };
-
-
-

@@ -184,7 +184,7 @@ public:
 private:
 	int slice_check_id_;
 	int current_face_;
-	Supportbyslice supportor;
+	Supportbyslice Supportor;
 	MSAABB box;
 	
 	void ClearSlice();

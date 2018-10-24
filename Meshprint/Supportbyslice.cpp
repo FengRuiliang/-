@@ -1,5 +1,5 @@
 #include "Supportbyslice.h"
-#include "SweepLine.h"
+
 
 Supportbyslice::Supportbyslice()
 {
@@ -85,8 +85,7 @@ void Supportbyslice::sample_support_point(std::vector < std::vector<cutLine>* > 
 	{
 		for (int j=0;j<safe_region[i]->size();j++)
 		{
-			Segment* seg = new Segment(safe_region[i]->at(j).position_vert[0],
-				safe_region[i]->at(j).position_vert[1]);
+		
 		}
 	}
 	
