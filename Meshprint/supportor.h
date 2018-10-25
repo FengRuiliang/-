@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include "Segment.h"
 class Supportor
 {
 public:

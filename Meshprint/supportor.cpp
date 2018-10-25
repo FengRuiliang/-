@@ -62,34 +62,6 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment>>>
 void Supportor::sample_support_point(std::vector<std::vector<Segment>> uper, std::vector<std::vector<Segment>> under)
 {
 	
-	Paths safe_polygon;
-	for (int i = 0; i < under.size(); i++)
-	{
-		Path polyline;
-		for (int j = 0; j < uper[i].size(); j++)
-		{
-			polyline << IntPoint(under[i][j].get_v1().x()*1e3, under[i][j].get_v1().y()*1e3);
-		}
-		safe_polygon << polyline;
-	}
-	for (int i = 0; i < under.size(); i++)
-	{
-		for (int j=0;j<uper[i].size();j++)
-		{
-			IntPoint p1(uper[i][j].get_v1.x()*1e3, uper[i][j].get_v1().y()*1e3);
-			IntPoint p2(uper[i][j].get_v2.x()*1e3, uper[i][j].get_v2().y()*1e3);
-			for (int m=0;m<safe_polygon.size();m++)
-			{
-				if (PointInPolygon(p1, safe_polygon[m]) != PointInPolygon(p2, safe_polygon[m]))
-				{
-					for (int n=0;)
-					{
-					}
-				}
-
-			}
-			
-		}
-	}
+	
 }
 
