@@ -57,6 +57,7 @@ private:
 	std::set<Event *,ComEvent>   events;
 	std::pair<Vec2f, std::vector<Segment*>>  handle_event_point(Event* param1);
 	void find_new_event(Segment* sl, Segment* sr, Event* param1);
+	std::vector < std::pair<Vec2f, std::vector<Segment*>>> intersection_points;
 public:
 
 	Sweep();
@@ -64,5 +65,6 @@ public:
 	bool set_strongly_intersection(bool param1) { stronglyintersec = param1; }
 	void insert_segment(Segment *seg);
 	void find_intersection();
+	std::vector < std::pair<Vec2f, std::vector<Segment*>>> get_intersection_points(){ return intersection_points; };
 };
 

@@ -2,16 +2,16 @@
 
 
 
-slicer::slicer()
+Slicer::Slicer()
 {
 }
 
 
-slicer::~slicer()
+Slicer::~Slicer()
 {
 }
 
-slicer::slicer(Mesh3D * tar, float in_thickness)
+Slicer::Slicer(Mesh3D * tar, float in_thickness)
 {
 	obj = tar;
 	thickness = in_thickness;
@@ -20,7 +20,7 @@ slicer::slicer(Mesh3D * tar, float in_thickness)
 }
 
 
-void slicer::execute()
+void Slicer::execute()
 {
 	const std::vector<HE_face*>* faces = obj->get_faces_list();
 	std::vector<std::vector<int>> pf(num);// prepare face

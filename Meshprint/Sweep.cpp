@@ -76,7 +76,7 @@ void Sweep::find_intersection()
 	{
 		Event * e_ =* events.begin();
 		events.erase(events.begin());
-		handle_event_point(e_);
+		intersection_points.push_back(handle_event_point(e_));
 		delete e_;
 	}
 }
@@ -89,11 +89,11 @@ std::pair<Vec2f, std::vector<Segment*>>  Sweep::handle_event_point(
 	
 	for each (Segment* var in dbtree)
 	{
+		Vec3f param2;//the intersection point 
 		param1->pos.y();
 		if (var->get_pc().x()!=1e6)
 		{
-			Vec3f param2 //the intersection point 
-				= (var->get_v1() - var->get_v2())
+				param2= (var->get_v1() - var->get_v2())
 				*(param1->pos.y() - var->get_v1().y())
 				/ (var->get_v1().y() - var->get_v2().y())
 				+ var->get_v2();
@@ -103,6 +103,13 @@ std::pair<Vec2f, std::vector<Segment*>>  Sweep::handle_event_point(
 			if (abs(param2.x() - param1->pos.x()) <= 1e-3)
 			{
 				
+				param1->C.push_back(var);
+			}
+		}
+		else
+		{
+			if (var->get_vu().x() > param1->pos.x() && var->get_vl().x() < param1->pos.x())
+			{
 				param1->C.push_back(var);
 			}
 		}

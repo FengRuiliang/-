@@ -209,6 +209,7 @@
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="meshprint.cpp" />
     <ClCompile Include="MSAABB.cpp" />
+    <ClCompile Include="Preprocessor.cpp" />
     <ClCompile Include="renderingwidget.cpp" />
     <ClCompile Include="SliceCut.cpp" />
     <ClCompile Include="slicer.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="Hatch.h" />
     <ClInclude Include="HE_mesh\Mesh3D.h" />
     <ClInclude Include="HE_mesh\Vec.h" />
+    <ClInclude Include="Preprocessor.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="slicer.h" />
     <ClInclude Include="supportor.h" />

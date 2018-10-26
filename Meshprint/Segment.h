@@ -8,7 +8,7 @@ private:
 	Vec3f v1, v2;// the two endpoint of this segment
 	Vec2f vu, vl;// the upper point and the lower point of this segment
 	float angle;//for add support point for FDM, has nothing business with sweep line algorithm
-	
+	Vec3f vout, vin;
 	//the follow variable is used for sweep algorithm
 	Vec2f pc;
 	bool toereas=false;
@@ -21,6 +21,8 @@ public:
 	void set_pc(Vec3f v) { pc.x() = v.x(); pc.y() = v.y(); }
 	void set_vu(Vec3f v) { vu.x() = v.x(); vu.y() = v.y(); }
 	void set_vl(Vec3f v) { vl.x() = v.x(); vl.y() = v.y(); }
+	void set_vout(Vec3f v) { vout = v; }
+	void set_vin(Vec3f v) { vin= v; }
 	void set_angle(float a) { angle = a; };
 	bool vailed() { return  v1 != v2; };
 	Vec3f &get_v1() { return v1; };
