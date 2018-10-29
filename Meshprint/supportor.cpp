@@ -5,6 +5,7 @@
 using namespace ClipperLib;
 Supportor::Supportor()
 {
+	sup_points = new std::vector<Vec3f>;
 }
 
 
@@ -12,51 +13,78 @@ Supportor::~Supportor()
 {
 }
 
-void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>> cnts)
+void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>>* cnts, std::vector<bool> need_sup_sl)
 {
 	Clipper clipper;
 	ClipperOffset offsetor;
-	Paths safe_polygon;
-	Path rec;
-	rec << IntPoint(-1000000, -1000000) << IntPoint(-1000000, 1000000) << IntPoint(1000000, 1000000) << IntPoint(-1000000, 1000000);
-	safe_polygon << rec;
-	Paths cur_polygon;
-	for (size_t i = 1; i < cnts.size(); i++)
+	Paths bridge_region;
+	int safe_slice_id = 1;
+	
+
+	for (int i = 2; i < need_sup_sl.size(); i++)
 	{
-
-		Path polyline;
-		for (int j = 0; j < cnts[i].size(); j++)
+		if (!need_sup_sl[i])
 		{
-			for (int k = 0; k < cnts[i][j].size(); k++)
-			{
-				polyline << IntPoint(cnts[i][j][k]->get_v1().x()*1e3, cnts[i][j][k]->get_v1().y()*1e3);
-			}
-		}
-		cur_polygon.push_back(polyline);
-
-		Paths overhang;
-		clipper.AddPaths(safe_polygon, ptClip, true);
-		clipper.AddPaths(cur_polygon, ptSubject, true);
-		clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
-		if (!overhang.empty())
-		{
-			sample_support_point(cnts[i], cnts[i - 1]);
-			offsetor.Clear();
-			offsetor.AddPaths(cur_polygon, jtMiter, etClosedPolygon);
-			offsetor.Execute(safe_polygon, 3.0);
+			safe_slice_id = i;
 		}
 		else
 		{
-			clipper.Clear();
-			clipper.AddPaths(safe_polygon, ptClip, true);
+			qDebug() << "do support" << i;
+			if (i-1==safe_slice_id)
+			{
+				for (int j = 0; j < cnts->at(safe_slice_id).size(); j++)
+				{
+					Path polyline;
+					for (int k = 0; k < cnts->at(safe_slice_id)[j].size(); k++)
+					{
+						polyline << IntPoint(cnts->at(safe_slice_id)[j][k]->get_v1().x()*1e3, cnts->at(safe_slice_id)[j][k]->get_v1().y()*1e3);
+					}
+					bridge_region.push_back(polyline);
+				}
+				offsetor.Clear();
+				offsetor.AddPaths(bridge_region, jtMiter, etClosedPolygon);
+				offsetor.Execute(bridge_region, 2000);
+			}
+			else
+			{
+				//  bridge region do not change
+			}
+			
+			Paths cur_polygon;
+			for (int j = 0; j < cnts->at(i).size(); j++)
+			{
+				Path polyline;
+				for (int k = 0; k < cnts->at(i)[j].size(); k++)
+				{
+					polyline << IntPoint(cnts->at(i)[j][k]->get_v1().x()*1e3, cnts->at(i)[j][k]->get_v1().y()*1e3);
+				}
+				cur_polygon.push_back(polyline);
+			}
+			Paths overhang;
+			clipper.AddPaths(bridge_region, ptClip, true);
 			clipper.AddPaths(cur_polygon, ptSubject, true);
-			clipper.Execute(ctIntersection, safe_polygon, pftNonZero, pftNonZero);
-			offsetor.Clear();
-			offsetor.AddPaths(safe_polygon, jtMiter, etClosedPolygon);
-			offsetor.Execute(safe_polygon, 3.0);
+			clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
+			if (overhang.empty())
+			{
+				offsetor.Clear();
+				offsetor.AddPaths(cur_polygon, jtMiter, etClosedPolygon);
+				offsetor.Execute(cur_polygon, 2000);
+				clipper.Clear();
+				clipper.AddPaths(bridge_region, ptClip, true);
+				clipper.AddPaths(cur_polygon, ptSubject, true);
+				clipper.Execute(ctIntersection, bridge_region, pftNonZero, pftNonZero);
+			}
+			else
+			{
+				sample_support_point(cnts->at(i));
+				safe_slice_id = i;
+			}
+		}
+		if (i==14)
+		{
+			//break;
 		}
 	}
-
 }
 
 void Supportor::sample_support_point(std::vector<std::vector<Segment*>> uper, std::vector<std::vector<Segment*>> under)
@@ -221,32 +249,61 @@ void Supportor::sample_support_point(std::vector<std::vector<Segment*>> uper, st
 }
 float Supportor::get_sup_length(float angle)
 {
-	return 1 / (0.94 + pow(0.32, 0.26*angle));
-}
-void Supportor::sample_support_point(std::vector<Segment*> upper)
-{
-	std::vector<Vec3f> sup_points;
-	float sum = 0;
-	for each (Segment* seg in upper)
+	//return 1 / (0.94 + 0.32*exp(0.26*angle));
+	if (angle<10)
 	{
-		if (seg->get_angle() < 30)
+		return 1.0 / 3.0;
+	}
+	else if (angle<16)
+	{
+		return 1.0 / 8.0;
+	}
+	else if (angle<20)
+	{
+		return 0.1;
+	}
+	else
+	{
+		return 1/15;
+	}
+
+}
+void Supportor::sample_support_point(std::vector<std::vector<Segment*>> upper)
+{
+	for each (std::vector<Segment*> poly in upper)
+	{
+		float sum = 1;
+		for each(Segment* seg in poly)
 		{
-			float ratio = get_sup_length(seg->get_angle());
-			float length = (seg->get_v2() - seg->get_v1()).length();
-			sum += ratio*length;
-			if (sum > 1) 
+			if (seg->get_angle() < 30)
 			{
-				Vec3f dir = seg->get_v2() - seg->get_v1();
-				dir.normalize();
-				float next=sum-1;
-				sup_points.push_back(seg->get_v1() + (1 - ratio)*dir);
-				sum = next;
+				float ratio = get_sup_length(seg->get_angle());
+				float length = (seg->get_v2() - seg->get_v1()).length();
+				sum += ratio*length;
+				float back_l = sum-1;
+				while (back_l>0)
+				{
+					Vec3f dir = seg->get_v2() - seg->get_v1();
+					dir.normalize();
+					sup_points->push_back(seg->get_v2() -back_l*dir);
+					back_l -= 1;
+				}
+				if (sum > 1)
+				{
+					sum = sum - (int)sum;
+				}
+				
 			}
-		}
-		else
-		{
-			sum = 0;
+			else
+			{
+				sum = 0;
+			}
 		}
 		
 	}
+}
+
+void Supportor::find_sup_region()
+{
+
 }

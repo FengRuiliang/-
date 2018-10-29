@@ -4,6 +4,7 @@
 #include "HE_mesh/Vec.h"
 #include "Hatch.h"
 #include "Segment.h"
+#include "Preprocessor.h"
 class Meshprint;
 class CArcBall;
 class Mesh3D;
@@ -28,9 +29,9 @@ class AMObject
 {
 public:
 	Mesh3D						*ptr_mesh_;
+	Preprocessor					* ppcs;
 	SliceCut* mycut;
 	SliceCut*	mycutsup;
-	std::vector<std::vector<std::vector<Segment*>>>* slices=NULL;
 	Hatch						*myhatch;
 	Hatch						*myhatchsup;
 	//hatch operator

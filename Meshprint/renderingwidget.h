@@ -153,6 +153,7 @@ public:
 	MainWindow					*ptr_mainwindow_;
 	CArcBall					*ptr_arcball_;
 	std::vector<AMObject*>		ctn_obj;
+	Mesh3D						sphere_for_display;
 	GLuint						texture_[1];
 	bool						is_load_texture_;
 	bool						isAddPoint;

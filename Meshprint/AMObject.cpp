@@ -10,6 +10,7 @@ AMObject::AMObject()
 	myhatch = NULL;
 	myhatchsup = NULL;
 	ptr_support_ = NULL;
+	ppcs = NULL;
 }
 
 
@@ -21,4 +22,5 @@ AMObject::~AMObject()
 	delete mycut;
 	delete myhatchsup;
 	delete myhatch;
+	delete ppcs;
 }

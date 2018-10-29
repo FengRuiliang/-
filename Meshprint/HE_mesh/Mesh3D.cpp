@@ -890,7 +890,7 @@ void Mesh3D::Unify(float size)
 	//Vec3f centerPos(xmin_ , ymin_, zmin_);
 	for (size_t i = 0; i != pvertices_list_->size(); i++)
 	{
-		pvertices_list_->at(i)->position_ = (pvertices_list_->at(i)->position_ - centerPos)*scaleT;
+		pvertices_list_->at(i)->position_ = (pvertices_list_->at(i)->position_ - centerPos);
 	}
 	//	update bounding box and average edge length
 	ComputeBoundingBox();
@@ -1249,7 +1249,30 @@ void Mesh3D::meshTranslate(float param1, float param2)
 
 void Mesh3D::scalemesh(float size)
 {
-	Unify(size);
+	float scaleX = xmax_ - xmin_;
+	float scaleY = ymax_ - ymin_;
+	float scaleZ = zmax_ - zmin_;
+	float scaleMax;
+
+	if (scaleX < scaleY)
+	{
+		scaleMax = scaleY;
+	}
+	else
+	{
+		scaleMax = scaleX;
+	}
+	if (scaleMax < scaleZ)
+	{
+		scaleMax = scaleZ;
+	}
+	Vec3f centerPos((xmin_ + xmax_) / 2.0, (ymin_ + ymax_) / 2.0, (zmin_+zmax_)/2.0);
+	for (size_t i = 0; i != pvertices_list_->size(); i++)
+	{
+		pvertices_list_->at(i)->position_ = (pvertices_list_->at(i)->position_ - centerPos)*size;
+	}
+	ComputeBoundingBox();
+	ComputeAvarageEdgeLength();
 }
 
 Mesh3D::~Mesh3D(void)

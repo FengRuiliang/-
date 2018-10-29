@@ -58,6 +58,8 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	eye_direction_[2] = 1.0;
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
+	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
+	sphere_for_display.scalemesh(0.3);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -167,6 +169,11 @@ void RenderingWidget::mousePressEvent(QMouseEvent *e)
 	case Qt::LeftButton:
 	{
 		makeCurrent();
+		ptr_arcball_->MouseDown(e->pos());
+		break;
+
+
+
 		OpenGLProjector myProjector = OpenGLProjector();
 
 		Vec3f myPointN(e->x(), height() - e->y(), -1.0f);
@@ -426,6 +433,7 @@ void RenderingWidget::Render()
 	DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_cutpieces_);
+	DrawSupport(is_draw_support_);
 }
 
 void RenderingWidget::SetLight()
@@ -580,7 +588,7 @@ void RenderingWidget::ReadMesh()
 	QString str = time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式
 	ptr_arcball_->reSetBound(width(), height());
 	ctn_obj.push_back(new AMObject);
-	ctn_obj.back() = new AMObject();
+	//ctn_obj.back() = new AMObject();
 	ctn_obj.back()->ptr_mesh_ = new Mesh3D;
 	
 
@@ -1338,38 +1346,30 @@ void RenderingWidget::DrawSupport(bool bv)
 {
 	if (!bv || ctn_obj.empty())
 		return;
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
+	auto faces = sphere_for_display.get_faces_list();
+	glBegin(GL_TRIANGLES);
+	glColor4ub(228, 26, 28, 255);
+	for (int i = 0; i < ctn_obj.size(); i++)
 	{
-		if (ctn_obj[id_obj]->ptr_support_== NULL || bv == false)
+		if (ctn_obj[i]->ppcs!=NULL&&ctn_obj[i]->ppcs->su!=NULL)
 		{
-			continue;;
-		}
-
-		const std::vector<HE_face *>& faces1 = *(ctn_obj[id_obj]->ptr_support_->GetMeshSupport()->get_faces_list());
-
-		glBegin(GL_TRIANGLES);
-		for (size_t i = 0; i < faces1.size(); ++i)
-		{
-			glColor4f(1.0, 0.0, 0.0, 1.0);
-			HE_edge *pedge(faces1.at(i)->pedge_);
-			do
+			auto points=ctn_obj[i]->ppcs->su->get_sup_points();
+			for (int k=0;k<points->size();k++)
 			{
-				if (pedge == NULL)
+				for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 				{
-					break;
+					HE_edge* sta = (*iterf)->pedge_;
+					HE_edge* cur = sta;
+					do
+					{
+						glVertex3fv(cur->pvert_->position() + points->at(k));
+						cur = cur->pnext_;
+					} while (cur != sta);
 				}
-				if (pedge == NULL || pedge->pface_->id() != faces1.at(i)->id())
-				{
-					faces1.at(i)->pedge_ = NULL;
-					break;
-				}
-				glNormal3fv(pedge->pvert_->normal().data());
-				glVertex3fv((pedge->pvert_->position()*scaleV).data());
-				pedge = pedge->pnext_;
-			} while (pedge != faces1.at(i)->pedge_);
+			}			
 		}
-		glEnd();
 	}
+	glEnd();
 }
 void RenderingWidget::DrawSupFace(bool bv)
 {
@@ -1480,19 +1480,25 @@ void RenderingWidget::DrawCutPieces(bool bv)
 		return;
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
 	{
-		if (ctn_obj[id_obj]->slices!=NULL)
+		if (ctn_obj[id_obj]->ppcs!=NULL)
 		{
 			glColor3f(0.0, 0.0, 0.0);
-			std::vector<std::vector<std::vector<Segment*>>>* sls = ctn_obj[id_obj]->slices;
-			for (int i = slice_check_id_; i < slice_check_id_ + 1&&i<sls->size(); i++)
+			std::vector<std::vector<std::vector<Segment*>>>* cnts = ctn_obj[id_obj]->ppcs->sl->get_contours();
+			std::vector<bool> need_su = ctn_obj[id_obj]->ppcs->sl->get_slice_need_sup();
+			for (int i = 107; i <130; i++)
 			{
+
+// 				if (need_su[i]==false)
+// 				{
+// 					continue;
+// 				}
 				glBegin(GL_LINES);
-				for (int j = 0; j < sls->at(i).size(); j++)
+				for (int j = 0; j < cnts->at(i).size(); j++)
 				{
-					for (int k = 0; k < sls->at(i)[j].size(); k++)
+					for (int k = 0; k < cnts->at(i)[j].size(); k++)
 					{
-						glVertex3fv(ctn_obj[id_obj]->slices->at(i)[j][k]->get_v1());
-						glVertex3fv(ctn_obj[id_obj]->slices->at(i)[j][k]->get_v2());
+						glVertex3fv(cnts->at(i)[j][k]->get_v1());
+						glVertex3fv(cnts->at(i)[j][k]->get_v2());
 					}
 				}
 				glEnd();
@@ -1745,16 +1751,15 @@ void RenderingWidget::DeleteSupport() {
 
 void RenderingWidget::AutoSupport()
 {
-	SliceCut*& mycut = ctn_obj[0]->mycut;
-	Mesh3D*& ptr_mesh_ = ctn_obj[0]->ptr_mesh_;
-	if (mycut == NULL)
+	for (int i = 0; i < ctn_obj.size(); i++)
 	{
-		mycut = new SliceCut(ptr_mesh_);
-		mycut->storeMeshIntoSlice();
-		mycut->CutInPieces();
+		if (ctn_obj[i]->ppcs==NULL)
+		{
+			ctn_obj[i]->ppcs = new Preprocessor(ctn_obj[i]->ptr_mesh_);
+		}
+		ctn_obj[i]->ppcs->add_support();
 	}
-	
-	Supportor.construct_by_slices(mycut);
+	update();
 }
 
 void RenderingWidget::setPointD(double diameter)
@@ -1851,13 +1856,7 @@ void RenderingWidget::SetDirection(int id)
 }
 void RenderingWidget::cutinPieces()
 {
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
-	{
-		Preprocessor ppcs(ctn_obj[id_obj]->ptr_mesh_);
-		ppcs.do_slice();
-		ctn_obj[id_obj]->slices = ppcs.get_slices();
-	}
-	update();
+
 }
 void RenderingWidget::cutinPiecesSup()
 {
@@ -1941,11 +1940,11 @@ void RenderingWidget::SelectFace(int x, int y)
 }
 void RenderingWidget::renderdoHatch()
 {
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
+	for (int i = 0; i < ctn_obj.size(); i++)
 	{
-		Preprocessor ppcs(ctn_obj[id_obj]->ptr_mesh_);
-		ppcs.do_slice();
-		ctn_obj[id_obj]->slices = ppcs.get_slices();
+		if (ctn_obj[i]->ppcs == NULL)
+			ctn_obj[i]->ppcs = new Preprocessor(ctn_obj[i]->ptr_mesh_);
+		ctn_obj[i]->ppcs->do_slice();
 	}
 	update();
 }
