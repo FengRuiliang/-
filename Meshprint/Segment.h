@@ -27,6 +27,7 @@ public:
 	bool vailed() { return  v1 != v2; };
 	Vec3f &get_v1() { return v1; };
 	Vec3f &get_v2() { return v2; };
+	float get_angle() { return angle; }
 	// the following codes is used for sweep algorithm
 	Vec2f &get_pc() { return pc; }
 	Vec2f &get_vu() { return vu; }

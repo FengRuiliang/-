@@ -11,5 +11,6 @@ public:
 private:
 	void sample_support_point(std::vector<std::vector<Segment*>> uper, std::vector<std::vector<Segment*>> under);
 	float get_sup_length(float angle);
+	void sample_support_point(std::vector<Segment*> upper);
 };
 

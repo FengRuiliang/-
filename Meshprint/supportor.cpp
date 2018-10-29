@@ -223,3 +223,30 @@ float Supportor::get_sup_length(float angle)
 {
 	return 1 / (0.94 + pow(0.32, 0.26*angle));
 }
+void Supportor::sample_support_point(std::vector<Segment*> upper)
+{
+	std::vector<Vec3f> sup_points;
+	float sum = 0;
+	for each (Segment* seg in upper)
+	{
+		if (seg->get_angle() < 30)
+		{
+			float ratio = get_sup_length(seg->get_angle());
+			float length = (seg->get_v2() - seg->get_v1()).length();
+			sum += ratio*length;
+			if (sum > 1) 
+			{
+				Vec3f dir = seg->get_v2() - seg->get_v1();
+				dir.normalize();
+				float next=sum-1;
+				sup_points.push_back(seg->get_v1() + (1 - ratio)*dir);
+				sum = next;
+			}
+		}
+		else
+		{
+			sum = 0;
+		}
+		
+	}
+}
