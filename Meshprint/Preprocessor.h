@@ -6,12 +6,13 @@ class Preprocessor
 {
 private:
 	Mesh3D* tar;
-	std::vector<std::vector<std::vector<Segment*>>> cnt;
+	std::vector<std::vector<std::vector<Segment*>>>* cnt;
 public:
 	Preprocessor();
 	Preprocessor(Mesh3D* param1) { tar = param1; }
 	~Preprocessor();
 	void do_slice();
 	void add_support();
+	std::vector<std::vector<std::vector<Segment*>>>* get_slices() { return cnt; }
 };
 

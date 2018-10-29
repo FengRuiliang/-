@@ -22,10 +22,10 @@ void Preprocessor::do_slice()
 
 void Preprocessor::add_support()
 {
-	if (cnt.empty())
+	if (cnt->empty())
 	{
 		do_slice();
 	}
 	Supportor su;
-	su.add_support_point(cnt);
+	su.add_support_point(*cnt);
 }

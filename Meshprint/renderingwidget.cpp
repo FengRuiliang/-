@@ -30,6 +30,7 @@
 #include <QMessageBox>
 #include "maintenance.h"
 #include "Supportbyslice.h"
+#include "Preprocessor.h"
 class Support;
 
 static GLfloat win, hei;
@@ -425,11 +426,6 @@ void RenderingWidget::Render()
 	DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_cutpieces_);
-	DrawCutPiecesSup(is_draw_cutpieces_);
-	DrawHatch(is_draw_hatch_);
-	DrawHatchsup(is_draw_hatch_);
-	DrawSupFace(is_draw_region_);
-	DrawSupport(is_draw_support_);
 }
 
 void RenderingWidget::SetLight()
@@ -477,6 +473,7 @@ void RenderingWidget::SetBackground()
 	//updateGL();
 	update();
 }
+
 void RenderingWidget::ReadSingleMesh()
 {
 	QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
@@ -647,7 +644,7 @@ void RenderingWidget::ReadMesh()
 	s = QString("%1").arg(v3, 0, 'g', 4);
 	a.append(s);
 
-	QMessageBox::information(this, "Read Successfully!", a);
+	//QMessageBox::information(this, "Read Successfully!", a);
 	float x_length = 0; float y_length = 0;
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
@@ -1013,6 +1010,7 @@ void RenderingWidget::Export()
 													//qDebug() << "export AFF file end time :" << str;
 	SafeDeletes(ts);
 }
+
 void RenderingWidget::LoadTexture()
 {
 	QString filename = QFileDialog::getOpenFileName(this, tr("Load Texture"),
@@ -1051,27 +1049,8 @@ void RenderingWidget::LoadTexture()
 
 void RenderingWidget::SetSliceCheckId(int id)
 {
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
-	{
-		SliceCut* mycut = ctn_obj[id_obj]->mycut;
-		SliceCut* mycutsup = ctn_obj[id_obj]->mycutsup;
-		Hatch* myhatch = ctn_obj[id_obj]->myhatch;
-		Hatch* myhatchsup = ctn_obj[id_obj]->myhatchsup;
-		Support* ptr_support_ = ctn_obj[id_obj]->ptr_support_;
-		Mesh3D* ptr_mesh_ = ctn_obj[id_obj]->ptr_mesh_;
-		slice_check_id_ = id;
-		if (mycut != NULL)
-		{
-			
-			if (slice_check_id_ >= mycut->num_pieces_)
-			{
-				slice_check_id_ = mycut->num_pieces_ - 1;
-			}
-			qDebug() << slice_check_id_;
-			update();
-		}
-	}
-	//qDebug() <<id<< mycut->num_pieces_<<slice_check_id_;
+	slice_check_id_ = id;
+	update();
 }
 
 void RenderingWidget::CheckDrawPoint()
@@ -1476,9 +1455,6 @@ void RenderingWidget::DrawSupFace(bool bv)
 	}
 }
 
-
-
-
 void RenderingWidget::DrawGrid(bool bv)
 {
 	if (!bv)
@@ -1504,26 +1480,23 @@ void RenderingWidget::DrawCutPieces(bool bv)
 		return;
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
 	{
-		if (ctn_obj[id_obj]->ptr_mesh_->num_of_vertex_list() == 0 || ctn_obj[id_obj]->mycut == NULL)
+		if (ctn_obj[id_obj]->slices!=NULL)
 		{
-			return;
-		}
-		std::vector < std::vector<cutLine>* >*tc = (ctn_obj[id_obj]->mycut->GetPieces());
-		glColor3f(0.0, 0.0, 0.0);
-		//glPolygonMode(GL_FRONT, GL_LINE); // 设置正面为填充模式
-		//glPolygonMode(GL_BACK, GL_FILL);   // 设置反面为线形模式
-		for (int i = slice_check_id_; i < slice_check_id_+1; i++)
-		{
-			Path poly;
-			for (size_t j = 0; j < tc[i].size(); j++)
+			glColor3f(0.0, 0.0, 0.0);
+			std::vector<std::vector<std::vector<Segment*>>>* sls = ctn_obj[id_obj]->slices;
+			for (int i = slice_check_id_; i < slice_check_id_ + 1&&i<sls->size(); i++)
 			{
-				glBegin(GL_LINE_LOOP);
-				for (int k = 0; k < (tc[i])[j]->size(); k++)
-					glVertex3fv((tc[i])[j]->at(k).position_vert[0]);
+				glBegin(GL_LINES);
+				for (int j = 0; j < sls->at(i).size(); j++)
+				{
+					for (int k = 0; k < sls->at(i)[j].size(); k++)
+					{
+						glVertex3fv(ctn_obj[id_obj]->slices->at(i)[j][k]->get_v1());
+						glVertex3fv(ctn_obj[id_obj]->slices->at(i)[j][k]->get_v2());
+					}
+				}
 				glEnd();
-				
 			}
-			
 		}
 	}
 }
@@ -1880,26 +1853,9 @@ void RenderingWidget::cutinPieces()
 {
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
 	{
-		SliceCut* mycut = ctn_obj[id_obj]->mycut;
-		SliceCut* mycutsup = ctn_obj[id_obj]->mycutsup;
-		Hatch* myhatch = ctn_obj[id_obj]->myhatch;
-		Hatch* myhatchsup = ctn_obj[id_obj]->myhatchsup;
-		Support* ptr_support_ = ctn_obj[id_obj]->ptr_support_;
-		Mesh3D* ptr_mesh_ = ctn_obj[id_obj]->ptr_mesh_;
-
-		if (ptr_mesh_->num_of_vertex_list() == 0)
-		{
-			return;
-		}
-		mycut = new SliceCut(ptr_mesh_);
-		//isAddLine = true;
-		is_draw_face_ = false;
-		//is_draw_point_ = false;
-		is_draw_edge_ = false;
-		//is_draw_cutpieces_ = !is_draw_cutpieces_;
-		mycut->clearcut();
-		mycut->storeMeshIntoSlice();
-		mycut->CutInPieces();
+		Preprocessor ppcs(ctn_obj[id_obj]->ptr_mesh_);
+		ppcs.do_slice();
+		ctn_obj[id_obj]->slices = ppcs.get_slices();
 	}
 	update();
 }
@@ -1987,103 +1943,11 @@ void RenderingWidget::renderdoHatch()
 {
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
 	{
-		SliceCut*& mycut = ctn_obj[id_obj]->mycut;
-		SliceCut*& mycutsup = ctn_obj[id_obj]->mycutsup;
-		Hatch*& myhatch = ctn_obj[id_obj]->myhatch;
-		Hatch*& myhatchsup = ctn_obj[id_obj]->myhatchsup;
-		Support*& ptr_support_ = ctn_obj[id_obj]->ptr_support_;
-		Mesh3D*& ptr_mesh_ = ctn_obj[id_obj]->ptr_mesh_;
-
-		QDateTime start = QDateTime::currentDateTime();//获取系统现在的时间
-
-		if (ptr_mesh_->num_of_vertex_list() == 0)
-		{
-			return;
-		}
-		delete mycut;
-		delete mycutsup;
-		delete  myhatch;
-		delete myhatchsup;
-		mycut = mycutsup = NULL;
-		myhatch = myhatchsup = NULL;
-		myhatch = NULL;
-		myhatchsup = NULL;
-
-		if (mycut == NULL)
-		{
-			mycut = new SliceCut(ptr_mesh_);
-			mycut->storeMeshIntoSlice();
-			mycut->CutInPieces();
-		}
-
-		if (mycutsup == NULL)
-		{
-			mycutsup = new SliceCut(ptr_support_->GetMeshSupport());
-			//isAddLine = true;
-			is_draw_face_ = false;
-			//is_draw_point_ = false;
-			is_draw_edge_ = false;
-			//is_draw_cutpieces_ = !is_draw_cutpieces_;
-			mycutsup->clearcut();
-			mycutsup->storeMeshIntoSlice();
-			mycutsup->CutInPieces();
-		}
-		switch (ctn_obj[id_obj]->hatch_type_)
-		{
-		case NONE:
-			break;
-		case CHESSBOARD:
-			if (mycutsup != NULL)
-			{
-				myhatchsup = new HatchChessboard(mycutsup);
-			}
-
-			myhatch = new HatchChessboard(mycut);
-			break;
-		case OFFSETFILLING:
-			if (mycutsup != NULL)
-			{
-				myhatchsup = new HatchOffsetfilling(mycutsup);
-			}
-			myhatch = new HatchOffsetfilling(mycut);
-
-			break;
-		case X_PARALLEL:
-			myhatch = new HatchMeander(mycut);
-			if (mycutsup != NULL)
-			{
-				myhatchsup = new HatchMeander(mycutsup);
-			}
-			break;
-		case Y_PARALLEL:
-			myhatch = new HatchX(mycut);
-			break;
-		case HYBRID:
-			//myhatch = new HatchMeander(mycut);
-			myhatch = new  HatchHybrid(mycut);
-			break;
-		default:
-			break;
-		}
-		if (myhatch != NULL)
-		{
-			myhatch->doHatch();
-		}
-		if (myhatchsup != NULL)
-		{
-			myhatchsup->doHatch();
-		}
-		has_lighting_ = false;
-		is_draw_face_ = false;
-		is_draw_support_ = false;
-		update();
-		QDateTime end = QDateTime::currentDateTime();//获取系统现在的时间
-		int seconds = start.secsTo(end);
-		QString str = "Path generation use ";
-		str.append(QString::number(seconds, 10));
-		str.append(" seconds");
-		QMessageBox::information(this, "Path Generation Successfully!", str);
+		Preprocessor ppcs(ctn_obj[id_obj]->ptr_mesh_);
+		ppcs.do_slice();
+		ctn_obj[id_obj]->slices = ppcs.get_slices();
 	}
+	update();
 }
 
 //set varible
@@ -2252,7 +2116,6 @@ void RenderingWidget::RecvMsg(QString str) {
 	}
 	update();
 }
-
 
 void RenderingWidget::ApplyMaintenance() {
 	qDebug() << "Maintenance!!!" << "\n";

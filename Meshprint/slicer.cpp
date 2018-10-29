@@ -16,7 +16,8 @@ Slicer::Slicer(Mesh3D * tar, float in_thickness)
 	obj = tar;
 	thickness = in_thickness;
 	num=(int)(obj->getBoundingBox()[0][2]/thickness)+1;
-	contours.resize(num);
+	contours = new std::vector<std::vector<std::vector<Segment *>>>;
+	contours->resize(num);
 }
 
 
@@ -30,14 +31,18 @@ void Slicer::execute()
 		HE_edge* cur = sta;
 		float min_z = 1e6;
 		float max_z = -1e6;
-		do 
+		do
 		{
 			min_z = min_z < cur->pvert_->position().z() ? min_z : cur->pvert_->position().z();
 			max_z = max_z > cur->pvert_->position().z() ? max_z : cur->pvert_->position().z();
-		} while (cur!=sta);
-		for (int j = min_z / thickness; j <= max_z / thickness; j++)
+			cur = cur->pnext_;
+		} while (cur != sta);
+		for (int j = 0; (float)j*thickness - max_z<1e-3; j++)
 		{
-			pf[j].push_back(i);
+			if ((float)j*thickness > min_z)
+			{
+				pf[j].push_back(i);
+			}
 		}
 	}
 	
@@ -87,6 +92,6 @@ void Slicer::execute()
 				polygon.push_back(polyline);
 			}
 		}
-		contours[i]=polygon;
+		contours->at(i)=polygon;
 	}
 }
