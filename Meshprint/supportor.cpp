@@ -23,67 +23,10 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 
 	for (int i = 2; i < need_sup_sl.size(); i++)
 	{
-		if (!need_sup_sl[i])
-		{
-			safe_slice_id = i;
-		}
-		else
-		{
-			qDebug() << "do support" << i;
-			if (i-1==safe_slice_id)
-			{
-				for (int j = 0; j < cnts->at(safe_slice_id).size(); j++)
-				{
-					Path polyline;
-					for (int k = 0; k < cnts->at(safe_slice_id)[j].size(); k++)
-					{
-						polyline << IntPoint(cnts->at(safe_slice_id)[j][k]->get_v1().x()*1e3, cnts->at(safe_slice_id)[j][k]->get_v1().y()*1e3);
-					}
-					bridge_region.push_back(polyline);
-				}
-				offsetor.Clear();
-				offsetor.AddPaths(bridge_region, jtMiter, etClosedPolygon);
-				offsetor.Execute(bridge_region, 2000);
-			}
-			else
-			{
-				//  bridge region do not change
-			}
-			
-			Paths cur_polygon;
-			for (int j = 0; j < cnts->at(i).size(); j++)
-			{
-				Path polyline;
-				for (int k = 0; k < cnts->at(i)[j].size(); k++)
-				{
-					polyline << IntPoint(cnts->at(i)[j][k]->get_v1().x()*1e3, cnts->at(i)[j][k]->get_v1().y()*1e3);
-				}
-				cur_polygon.push_back(polyline);
-			}
-			Paths overhang;
-			clipper.AddPaths(bridge_region, ptClip, true);
-			clipper.AddPaths(cur_polygon, ptSubject, true);
-			clipper.Execute(ctDifference, overhang, pftNonZero, pftNonZero);
-			if (overhang.empty())
-			{
-				offsetor.Clear();
-				offsetor.AddPaths(cur_polygon, jtMiter, etClosedPolygon);
-				offsetor.Execute(cur_polygon, 2000);
-				clipper.Clear();
-				clipper.AddPaths(bridge_region, ptClip, true);
-				clipper.AddPaths(cur_polygon, ptSubject, true);
-				clipper.Execute(ctIntersection, bridge_region, pftNonZero, pftNonZero);
-			}
-			else
-			{
-				sample_support_point(cnts->at(i));
-				safe_slice_id = i;
-			}
-		}
-		if (i==14)
-		{
-			//break;
-		}
+	 if (need_sup_sl[i])
+	 {
+		 sample_support_point(cnts->at(i));
+	 }
 	}
 }
 
@@ -272,7 +215,7 @@ void Supportor::sample_support_point(std::vector<std::vector<Segment*>> upper)
 {
 	for each (std::vector<Segment*> poly in upper)
 	{
-		float sum = 1;
+		float sum = 0;
 		for each(Segment* seg in poly)
 		{
 			if (seg->get_angle() < 30)
