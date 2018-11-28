@@ -15,8 +15,8 @@ public:
 	Slicer();
 	~Slicer();
 	Slicer(Mesh3D* tar,float in_thickness=0.09);
-	void execute();
+	void doslice();
 	std::vector<std::vector<std::vector<Segment*>>>* get_contours() { return contours; }
-	std::vector<bool> get_slice_need_sup() { return slice_need_sup; }
+	std::vector<bool>& get_slice_need_sup() { return slice_need_sup; }
 };
 

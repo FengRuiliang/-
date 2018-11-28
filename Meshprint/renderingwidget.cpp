@@ -1344,8 +1344,8 @@ void RenderingWidget::DrawFace(bool bv)
 }
 void RenderingWidget::DrawSupport(bool bv)
 {
-	if (!bv || ctn_obj.empty())
-		return;
+// 	if (!bv || ctn_obj.empty())
+// 		return;
 	auto faces = sphere_for_display.get_faces_list();
 	glBegin(GL_TRIANGLES);
 	glColor4ub(228, 26, 28, 255);
@@ -1485,20 +1485,50 @@ void RenderingWidget::DrawCutPieces(bool bv)
 			glColor3f(0.0, 0.0, 0.0);
 			std::vector<std::vector<std::vector<Segment*>>>* cnts = ctn_obj[id_obj]->ppcs->sl->get_contours();
 			std::vector<bool> need_su = ctn_obj[id_obj]->ppcs->sl->get_slice_need_sup();
-			for (int i = 107; i <130; i++)
+			for (int i = 1; i <cnts->size(); i++)
 			{
-
-// 				if (need_su[i]==false)
-// 				{
-// 					continue;
-// 				}
+				glLineWidth(2.0);
 				glBegin(GL_LINES);
 				for (int j = 0; j < cnts->at(i).size(); j++)
 				{
 					for (int k = 0; k < cnts->at(i)[j].size(); k++)
 					{
-						glVertex3fv(cnts->at(i)[j][k]->get_v1());
-						glVertex3fv(cnts->at(i)[j][k]->get_v2());
+						int col = cnts->at(i)[j][k]->get_angle() / 5;
+						switch (col)
+						{
+						case 0:
+							glColor3ub(228, 26, 28);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+							break;
+						case 1:
+							glColor3ub(228, 26, 28);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+							break;
+						case 2:
+							glColor3ub(55, 126, 184);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+							break;
+						case 3:
+							glColor3ub(77, 175, 74);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+						case 4:
+							glColor3ub(152, 78, 163);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+							break;
+						case 5:
+							glColor3ub(255, 127, 0);
+							glVertex3fv(cnts->at(i)[j][k]->get_v1());
+							glVertex3fv(cnts->at(i)[j][k]->get_v2());
+							break;
+						default:
+							glColor3ub(0, 0, 0);
+							break;
+						}
 					}
 				}
 				glEnd();
