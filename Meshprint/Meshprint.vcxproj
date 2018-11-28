@@ -211,6 +211,7 @@
     <ClCompile Include="MSAABB.cpp" />
     <ClCompile Include="Preprocessor.cpp" />
     <ClCompile Include="renderingwidget.cpp" />
+    <ClCompile Include="Segment.cpp" />
     <ClCompile Include="SliceCut.cpp" />
     <ClCompile Include="slicer.cpp" />
     <ClCompile Include="space2dKDTree.cpp" />
