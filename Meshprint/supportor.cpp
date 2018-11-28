@@ -215,34 +215,24 @@ void Supportor::sample_support_point(std::vector<std::vector<Segment*>> upper)
 {
 	for each (std::vector<Segment*> poly in upper)
 	{
-		float sum = 0;
+		float length_left = 0;
 		for each(Segment* seg in poly)
 		{
-			if (seg->get_angle() < 30)
+			if (seg->get_angle() < 21)
 			{
-				float ratio = get_sup_length(seg->get_angle());
-				float length = (seg->get_v2() - seg->get_v1()).length();
-				sum += ratio*length;
-				float back_l = sum-1;
-				while (back_l>0)
+				length_left += seg->get_length();
+				while (length_left>3.0)
 				{
-					Vec3f dir = seg->get_v2() - seg->get_v1();
-					dir.normalize();
-					sup_points->push_back(seg->get_v2() -back_l*dir);
-					back_l -= 1;
+					length_left -= 3;
+					Vec3f p = seg->get_v2() - length_left*seg->get_normal();
+					sup_points->push_back(p);
 				}
-				if (sum > 1)
-				{
-					sum = sum - (int)sum;
-				}
-				
 			}
 			else
 			{
-				sum = 0;
+				length_left = 0;
 			}
 		}
-		
 	}
 }
 

@@ -34,5 +34,6 @@ public:
 	Vec2f &get_vl() { return vl; }
 	bool set_to_erease(bool param1) { return toereas = param1; }
 	bool get_to_erease() { return toereas; }
-
+	float get_length() { return (v2 - v1).length(); }
+	Vec3f get_normal();
 };
