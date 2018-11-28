@@ -13,240 +13,281 @@ Supportor::~Supportor()
 {
 }
 
-void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>>* cnts, std::vector<bool> need_sup_sl)
+void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>>* cnts, std::vector<bool>& need_sup_sl)
 {
-	Clipper clipper;
-	ClipperOffset offsetor;
-	Paths bridge_region;
-	int safe_slice_id = 1;
+	ClipperLib::Clipper cli;
+	
+	for (int i = 2; i < cnts->size();i++)
+	{
+		Paths under, upper;
+		for (int j = 0; j < cnts->at(i-1).size(); j++)
+		{
+			Path path;
+			for (int k = 0; k < cnts->at(i-1)[j].size(); k++)
+			{
+				path << IntPoint(cnts->at(i-1)[j][k]->get_v1().x()*1e3,
+					cnts->at(i-1)[j][k]->get_v1().y()*1e3);
+			}
+			under << path;
+		}
+		for (int j = 0; j < cnts->at(i ).size(); j++)
+		{
+			Path path;
+			for (int k = 0; k < cnts->at(i)[j].size(); k++)
+			{
+				path << IntPoint(cnts->at(i)[j][k]->get_v1().x()*1e3,
+					cnts->at(i)[j][k]->get_v1().y()*1e3);
+			}
+			upper << path;
+		}
+		set_angle_of_edge_in_contuor(under, cnts->at(i));
+		ClipperOffset off;
+		for (int j=0;j<2;j++)
+		{
+			off.Clear();
+			off.AddPaths(upper, jtMiter, etClosedPolygon);
+			off.Execute(upper, -j * 510);
+
+		}
+		
+	}
 	
 
-	for (int i = 2; i < need_sup_sl.size(); i++)
-	{
-	 if (need_sup_sl[i])
-	 {
-		 sample_support_point(cnts->at(i));
-	 }
+	for (int i = 0; i < need_sup_sl.size(); i++)
+	{ 
+		sample_support_point(cnts->at(i));
 	}
 }
 
-void Supportor::sample_support_point(std::vector<std::vector<Segment*>> uper, std::vector<std::vector<Segment*>> under)
-{
-
-	Paths under_paths;
-	for each (std::vector<Segment*> var in under)
-	{
-		Path path;
-		for each (Segment* ptr_seg in var)
-		{
-			path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
-		}
-		under_paths << path;
-	}
-
-	Paths upper_paths;
-	for each (std::vector<Segment*> var in uper)
-	{
-		Path path;
-		for each (Segment* ptr_seg in var)
-		{
-			path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
-		}
-		upper_paths << path;
-	}
-	std::vector<std::vector<int>> is_outside_for_upper;	//1 means inside the under polygon,
-												//-1 means cross the under polygon,
-												//0 means outside the under polygon
-	for each (std::vector<Segment*> var in uper)
-	{
-		std::vector<int> cur_outside;
-		for each (Segment* ptr_seg in var)
-		{
-			IntPoint p_1(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
-			IntPoint p_2(ptr_seg->get_v2().x()*1e3, ptr_seg->get_v2().y()*1e3);
-			int pip1 = 0, pip2 = 0;
-			for each (Path path in under_paths)
-			{
-				pip1 += (int)(PointInPolygon(p_1, path) == 1);
-				pip2 += (int)(PointInPolygon(p_2, path) == 1);
-			}
-			if (pip1 % 2 + pip2 % 2 == 1)
-			{
-				cur_outside.push_back(-1);
-			}
-			else if (pip1 % 2 + pip2 % 2 == 0)
-			{
-				cur_outside.push_back(0);
-			}
-			else
-			{
-				cur_outside.push_back(1);
-			}
-		}
-		is_outside_for_upper.push_back(cur_outside);
-	}
-	for (int i = 0; i < is_outside_for_upper.size(); i++)
-	{
-
-
-	}
-
-	std::vector<std::vector<int>> is_outside_for_under;	//1 means inside with the upper polygon,
-														//-1 means cross with the upper polygon,
-														//0 means outside with the upper polygon
-	for each (std::vector<Segment*> var in under)
-	{
-		std::vector<int> cur_outside;
-		for each (Segment* ptr_seg in var)
-		{
-			IntPoint p_1(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
-			IntPoint p_2(ptr_seg->get_v2().x()*1e3, ptr_seg->get_v2().y()*1e3);
-			int pip1 = 0, pip2 = 0;
-			for each (Path path in upper_paths)
-			{
-				pip1 += (int)(PointInPolygon(p_1, path) == 1);
-				pip2 += (int)(PointInPolygon(p_2, path) == 1);
-			}
-			if (pip1 % 2 + pip2 % 2 == 1)
-			{
-				cur_outside.push_back(-1);
-			}
-			else if (pip1 % 2 + pip2 % 2 == 0)
-			{
-				cur_outside.push_back(0);
-			}
-			else
-			{
-				cur_outside.push_back(1);
-			}
-		}
-		is_outside_for_under.push_back(cur_outside);
-	}
-	Sweep sweep_line;
-	for (int i = 0; i < is_outside_for_upper.size(); i++)
-	{
-		for (int j = 0; j < is_outside_for_upper[i].size(); j++)
-		{
-			if (is_outside_for_upper[i][j] == -1)
-			{
-				sweep_line.insert_segment(uper[i][j]);
-			}
-		}
-	}
-	for (int i = 0; i < is_outside_for_under.size(); i++)
-	{
-		for (int j = 0; j < is_outside_for_under[i].size(); j++)
-		{
-			if (is_outside_for_under[i][j] == -1)
-			{
-				sweep_line.insert_segment(under[i][j]);
-			}
-		}
-	}
-
-	sweep_line.find_intersection();
-	//sweep_line.set_strongly_intersection(true);
-	//define lines which are need to be support
-	typedef std::vector < std::pair<Vec2f, std::vector<Segment*>>> Type_itsps;
-	typedef std::pair<Vec2f, std::vector<Segment*>>  Type_itsp;
-	Type_itsps itsps = sweep_line.get_intersection_points();
-	for each (Type_itsp itsp in itsps)
-	{
-		if (itsp.second.size() == 2)
-		{
-			Segment* uper_seg, *under_seg;
-			if (itsp.second[0]->get_v1().z() - itsp.second[1]->get_v1().z() < -1e-3)
-			{
-				uper_seg = itsp.second[1];
-				under_seg = itsp.second[0];
-			}
-			else
-			{
-				uper_seg = itsp.second[0];
-				under_seg = itsp.second[1];
-			}
-			//judge whether the uper is outer segment or inter segment
-			Vec3f dir_of_under = under_seg->get_v2() - under_seg->get_v1();
-			Vec3f dir_from_uper_to_under = uper_seg->get_v2() - under_seg->get_v1();
-			dir_from_uper_to_under.z() = 0;
-			dir_of_under.z() = 0;
-			if (dir_of_under.cross(dir_from_uper_to_under).z() > 0)
-			{
-
-				uper_seg->set_vin(Vec3f(itsp.first.x(), itsp.first.y(), uper_seg->get_v1().z()));
-			}
-			else
-			{
-
-				uper_seg->set_vout(Vec3f(itsp.first.x(), itsp.first.y(), uper_seg->get_v1().z()));
-
-			}
-
-
-		}
-		else
-		{
-			qDebug() << "itsp contains more than 2 segment";
-		}
-	}
-}
 float Supportor::get_sup_length(float angle)
 {
-	//return 1 / (0.94 + 0.32*exp(0.26*angle));
-	if (angle<10)
+	if (angle < 10)
 	{
 		return 1.0 / 3.0;
 	}
-	else if (angle<16)
+	else if (angle < 15)
 	{
 		return 1.0 / 8.0;
 	}
-	else if (angle<20)
+	else if (angle < 20)
 	{
-		return 0.1;
+		return 1.0 / 10.0;
+	}
+	else if (angle < 25)
+	{
+		return 1 / 15;
+	}
+	else if (angle < 30)
+	{
+		return 1 / 20;
 	}
 	else
 	{
-		return 1/15;
+		return 0.001;
 	}
-
 }
 void Supportor::sample_support_point(std::vector<std::vector<Segment*>> upper)
 {
 	for each (std::vector<Segment*> poly in upper)
 	{
+
 		float sum = 0;
+		if (poly.front()->get_angle()<30)
+		{
+			sum = 1;
+		}
 		for each(Segment* seg in poly)
 		{
-			if (seg->get_angle() < 30)
+			float remain_length = (seg->get_v2() - seg->get_v1()).length();
+			float ratio = get_sup_length(seg->get_angle());
+			Vec3f dir = seg->get_v2() - seg->get_v1();
+			dir.normalize();
+			Vec3f p = seg->get_v1();
+			while (remain_length>(1-sum)/ratio)
 			{
-				float ratio = get_sup_length(seg->get_angle());
-				float length = (seg->get_v2() - seg->get_v1()).length();
-				sum += ratio*length;
-				float back_l = sum-1;
-				while (back_l>0)
-				{
-					Vec3f dir = seg->get_v2() - seg->get_v1();
-					dir.normalize();
-					sup_points->push_back(seg->get_v2() -back_l*dir);
-					back_l -= 1;
-				}
-				if (sum > 1)
-				{
-					sum = sum - (int)sum;
-				}
-				
-			}
-			else
-			{
+				p += (1 - sum) / ratio*dir;
+				sup_points->push_back(p);
+				remain_length -= (1 - sum) / ratio;
 				sum = 0;
 			}
+			sum += ratio*remain_length;
 		}
 		
 	}
 }
 
-void Supportor::find_sup_region()
+void Supportor::set_angle_of_edge_in_contuor(Paths under, std::vector<std::vector<Segment*>> sl)
 {
+	ClipperOffset off;
+	Paths solution;
+	// <30 degree
+	off.Clear();
+	off.AddPaths(under, jtMiter, etClosedPolygon);
+	off.Execute(solution, 156);
+	for (int j = 0; j < sl.size(); j++)
+	{
+		Path path;
+		for (int k = 0; k <sl[j].size(); k++)
+		{
+			IntPoint p1(sl[j][k]->get_v1().x()*1e3,
+				sl[j][k]->get_v1().y()*1e3);
+			IntPoint p2(sl[j][k]->get_v2().x()*1e3,
+				sl[j][k]->get_v2().y()*1e3);
+			path << p1;
+			bool is_in_1 = false;
+			bool is_in_2 = false;
+			for (int m = 0; m < solution.size(); m++)
+			{
+				if (PointInPolygon(p1, solution[m]) == 1)
+				{
+					is_in_1 = !is_in_1;
+				}
+				if (PointInPolygon(p2, solution[m]) == 1)
+				{
+					is_in_2 = !is_in_2;
+				}
+			}
+			if ((!is_in_1) || (!is_in_2))
+			{
 
+				sl[j][k]->set_angle(25);
+			}
+		}
+	}
+	//<25 degree
+	off.Clear();
+	off.AddPaths(under, jtMiter, etClosedPolygon);
+	off.Execute(solution, 193);
+	for (int j = 0; j <sl.size(); j++)
+	{
+		Path path;
+		for (int k = 0; k <sl[j].size(); k++)
+		{
+			IntPoint p1(sl[j][k]->get_v1().x()*1e3,
+				sl[j][k]->get_v1().y()*1e3);
+			IntPoint p2(sl[j][k]->get_v2().x()*1e3,
+				sl[j][k]->get_v2().y()*1e3);
+			path << p1;
+			bool is_in_1 = false;
+			bool is_in_2 = false;
+			for (int m = 0; m < solution.size(); m++)
+			{
+				if (PointInPolygon(p1, solution[m]) == 1)
+				{
+					is_in_1 = !is_in_1;
+				}
+				if (PointInPolygon(p2, solution[m]) == 1)
+				{
+					is_in_2 = !is_in_2;
+				}
+			}
+			if ((!is_in_1) || (!is_in_2))
+			{
+
+				sl[j][k]->set_angle(20);
+			}
+		}
+	}
+	//<20 degree
+	off.Clear();
+	off.AddPaths(under, jtMiter, etClosedPolygon);
+	off.Execute(solution, 247);
+	for (int j = 0; j <sl.size(); j++)
+	{
+		Path path;
+		for (int k = 0; k <sl[j].size(); k++)
+		{
+			IntPoint p1(sl[j][k]->get_v1().x()*1e3,
+				sl[j][k]->get_v1().y()*1e3);
+			IntPoint p2(sl[j][k]->get_v2().x()*1e3,
+				sl[j][k]->get_v2().y()*1e3);
+			path << p1;
+			bool is_in_1 = false;
+			bool is_in_2 = false;
+			for (int m = 0; m < solution.size(); m++)
+			{
+				if (PointInPolygon(p1, solution[m]) == 1)
+				{
+					is_in_1 = !is_in_1;
+				}
+				if (PointInPolygon(p2, solution[m]) == 1)
+				{
+					is_in_2 = !is_in_2;
+				}
+			}
+			if ((!is_in_1) || (!is_in_2))
+			{
+
+				sl[j][k]->set_angle(15);
+			}
+		}
+	}
+	//<15 degree
+	off.Clear();
+	off.AddPaths(under, jtMiter, etClosedPolygon);
+	off.Execute(solution, 336);
+	for (int j = 0; j <sl.size(); j++)
+	{
+		Path path;
+		for (int k = 0; k <sl[j].size(); k++)
+		{
+			IntPoint p1(sl[j][k]->get_v1().x()*1e3,
+				sl[j][k]->get_v1().y()*1e3);
+			IntPoint p2(sl[j][k]->get_v2().x()*1e3,
+				sl[j][k]->get_v2().y()*1e3);
+			path << p1;
+			bool is_in_1 = false;
+			bool is_in_2 = false;
+			for (int m = 0; m < solution.size(); m++)
+			{
+				if (PointInPolygon(p1, solution[m]) == 1)
+				{
+					is_in_1 = !is_in_1;
+				}
+				if (PointInPolygon(p2, solution[m]) == 1)
+				{
+					is_in_2 = !is_in_2;
+				}
+			}
+			if ((!is_in_1) || (!is_in_2))
+			{
+
+				sl[j][k]->set_angle(10);
+			}
+		}
+	}
+	//<10 degree
+	off.Clear();
+	off.AddPaths(under, jtMiter, etClosedPolygon);
+	off.Execute(solution, 510);
+	for (int j = 0; j <sl.size(); j++)
+	{
+		Path path;
+		for (int k = 0; k <sl[j].size(); k++)
+		{
+			IntPoint p1(sl[j][k]->get_v1().x()*1e3,
+				sl[j][k]->get_v1().y()*1e3);
+			IntPoint p2(sl[j][k]->get_v2().x()*1e3,
+				sl[j][k]->get_v2().y()*1e3);
+			path << p1;
+			bool is_in_1 = false;
+			bool is_in_2 = false;
+			for (int m = 0; m < solution.size(); m++)
+			{
+				if (PointInPolygon(p1, solution[m]) == 1)
+				{
+					is_in_1 = !is_in_1;
+				}
+				if (PointInPolygon(p2, solution[m]) == 1)
+				{
+					is_in_2 = !is_in_2;
+				}
+			}
+			if ((!is_in_1) || (!is_in_2))
+			{
+
+				sl[j][k]->set_angle(0);
+			}
+		}
+	}
 }

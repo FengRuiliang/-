@@ -18,7 +18,7 @@ void Preprocessor::do_slice()
 if (sl==NULL)
 {
 	sl = new Slicer(tar);
-	sl->execute();
+	sl->doslice();
 }
 }
 
@@ -28,6 +28,7 @@ void Preprocessor::add_support()
 	su = new Supportor;
 	su->add_support_point(sl->get_contours(),sl->get_slice_need_sup());
 	exportp();
+	qDebug() <<"zhichengdian geshu:"<< su->get_sup_points()->size();
 }
 void Preprocessor::exportp()
 {
@@ -39,12 +40,14 @@ void Preprocessor::exportp()
 	{
 		a[0] = p.x();
 		a[1] = p.y();
-		a[2] = p.z();
-		diaa = 0.5;
-		diab = 1.2;
+		a[2] = p.z()+0.2;
+		diaa = 1.0;
+		diab = 5;
 		b[0] = a[0];
 		b[1] = a[1];
 		b[2] = 0;
+		
+
 		for (int i = 0; i < 3; i++)
 		{
 			axis[i] = b[i] - a[i];

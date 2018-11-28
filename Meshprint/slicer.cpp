@@ -21,17 +21,17 @@ Slicer::Slicer(Mesh3D * tar, float in_thickness)
 }
 
 
-void Slicer::execute()
+void Slicer::doslice()
 {
 	const std::vector<HE_face*>* faces = obj->get_faces_list();
 	std::vector<std::vector<int>> pf(num);// prepare face
+	std::vector<bool> is_need_sup(faces->size());
 	slice_need_sup.resize(num,false);
 	for (int i = 0; i < faces->size(); i++)
 	{
-		bool is_suped = false;
-		if (acos(faces->at(i)->normal().dot(Vec3f(0, 0, -1))) * 180 / 3.14 < 25)
+		if (acos(faces->at(i)->normal().dot(Vec3f(0, 0, -1))) * 180 / 3.14 < 30)
 		{
-			is_suped = true;
+			is_need_sup[i] = true;
 		}
 		HE_edge* sta = faces->at(i)->pedge_;
 		HE_edge* cur = sta;
@@ -48,10 +48,10 @@ void Slicer::execute()
 			if ((float)j*thickness > min_z)
 			{
 				pf[j].push_back(i);
-				if (is_suped)
-				{
-					slice_need_sup[j]=true;
-				}
+// 				if (is_need_sup[i])
+// 				{
+// 					slice_need_sup[j]=true;
+// 				}
 			}
 		}
 	}
@@ -62,7 +62,7 @@ void Slicer::execute()
 		std::vector<std::vector<Segment*>> polygon;
 		for (int j=0;j<pf[i].size();j++)
 		{
-			if (!mark[pf[i][j]])
+			if (!mark[pf[i][j]]&&(!is_need_sup[pf[i][j]]||j==pf[i].size()-1))// make sure first polyline is not need support
 			{
 				std::vector<Segment*> polyline;
 				HE_edge *ejump = faces->at(pf[i][j])->pedge_;
