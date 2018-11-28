@@ -21,6 +21,8 @@ Slicer::Slicer(Mesh3D * tar, float in_thickness)
 }
 
 
+
+
 void Slicer::doslice()
 {
 	const std::vector<HE_face*>* faces = obj->get_faces_list();

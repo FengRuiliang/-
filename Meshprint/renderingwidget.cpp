@@ -135,8 +135,6 @@ void RenderingWidget::paintGL()
 		glOrtho(-eye_distance_ * (GLfloat)win / (GLfloat)hei + eye_goal_[0], eye_distance_ * (GLfloat)win / (GLfloat)hei + eye_goal_[0],
 			-eye_distance_ + eye_goal_[1], eye_distance_ + eye_goal_[1], -200.0, 200.0);
 
-
-
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	if (has_lighting_)
@@ -148,12 +146,9 @@ void RenderingWidget::paintGL()
 		glDisable(GL_LIGHTING);
 		glDisable(GL_LIGHT0);
 	}
-
-	// 	//glPushMatrix();
-
 	glMultMatrixf(ptr_arcball_->GetBallMatrix());
 	Render();
-	//glPopMatrix();
+
 }
 
 void RenderingWidget::timerEvent(QTimerEvent * e)
@@ -698,6 +693,7 @@ void RenderingWidget::WriteMesh()
 
 	}
 }
+
 void RenderingWidget::SaveContour()
 {
 	for (int i = 0; i < ctn_obj.size(); i++)
@@ -1068,6 +1064,7 @@ void RenderingWidget::CheckDrawPoint()
 	update();
 
 }
+
 void RenderingWidget::CheckDrawEdge()
 {
 	is_draw_edge_ = !is_draw_edge_;
@@ -1081,6 +1078,7 @@ void RenderingWidget::CheckDrawEdge()
 	update();
 
 }
+
 void RenderingWidget::CheckDrawFace()
 {
 	is_draw_face_ = !is_draw_face_;
@@ -1097,6 +1095,7 @@ void RenderingWidget::CheckLight()
 	update();
 
 }
+
 void RenderingWidget::CheckGrid()
 {
 	is_draw_grid_ = !is_draw_grid_;
@@ -1105,6 +1104,7 @@ void RenderingWidget::CheckGrid()
 	update();
 
 }
+
 void RenderingWidget::CheckDrawTexture()
 {
 	is_draw_texture_ = !is_draw_texture_;
@@ -1117,6 +1117,7 @@ void RenderingWidget::CheckDrawTexture()
 	update();
 
 }
+
 void RenderingWidget::CheckDrawAxes()
 {
 	is_draw_axes_ = !is_draw_axes_;
@@ -1124,6 +1125,7 @@ void RenderingWidget::CheckDrawAxes()
 	update();
 
 }
+
 void RenderingWidget::CheckDrawCutPieces()
 {
 
@@ -1133,6 +1135,7 @@ void RenderingWidget::CheckDrawCutPieces()
 
 
 }
+
 void RenderingWidget::Checkmoduletranslate()
 {
 	is_move_module_ = !is_move_module_;
@@ -1140,6 +1143,7 @@ void RenderingWidget::Checkmoduletranslate()
 	update();
 
 }
+
 void RenderingWidget::CheckSetFace()
 {
 	is_select_face = !is_select_face;
@@ -1148,12 +1152,14 @@ void RenderingWidget::CheckSetFace()
 
 
 }
+
 void RenderingWidget::CheckRegion(bool bv)
 {
 	is_draw_region_ = bv;
 	//updateGL();
 	update();
 }
+
 void RenderingWidget::CheckSupport(bool bv)
 {
 	is_draw_support_ = bv;
@@ -1161,6 +1167,7 @@ void RenderingWidget::CheckSupport(bool bv)
 	//updateGL();
 	update();
 }
+
 void RenderingWidget::CheckRotateModel(bool bv)
 {
 	is_move_module_ = bv;
