@@ -221,9 +221,9 @@ void Supportor::sample_support_point(std::vector<std::vector<Segment*>> upper)
 			if (seg->get_angle() < 21)
 			{
 				length_left += seg->get_length();
-				while (length_left>3.0)
+				while (length_left>3.5)
 				{
-					length_left -= 3;
+					length_left -= 3.5;
 					Vec3f p = seg->get_v2() - length_left*seg->get_normal();
 					sup_points->push_back(p);
 				}
