@@ -76,8 +76,9 @@ void Slicer::doslice()
 					HE_edge *ecur = ejump;
 					do
 					{
-						Vec3f p1 = ecur->pvert_->position();
-						Vec3f p2 = ecur->pprev_->pvert_->position();
+						
+						Vec3f p1 = ecur->pprev_->pvert_->position();
+						Vec3f p2 = ecur->pvert_->position();
 						if (p1.z()>i*thickness&&p2.z()<i*thickness)
 						{
 							seg->set_v1((i*thickness - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);

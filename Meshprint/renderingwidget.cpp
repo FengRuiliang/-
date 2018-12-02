@@ -59,7 +59,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.3);
+	sphere_for_display.scalemesh(0.5);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -1351,8 +1351,6 @@ void RenderingWidget::DrawFace(bool bv)
 }
 void RenderingWidget::DrawSupport(bool bv)
 {
-// 	if (!bv || ctn_obj.empty())
-// 		return;
 	auto faces = sphere_for_display.get_faces_list();
 	glBegin(GL_TRIANGLES);
 	glColor4ub(228, 26, 28, 255);
