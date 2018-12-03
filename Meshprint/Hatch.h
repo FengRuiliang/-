@@ -5,7 +5,9 @@
 #include <math.h>
 #include "globalFunctions.h"
 #include "clipper.hpp"
+#include "HE_mesh/Vec.h"
 using namespace ClipperLib;
+using namespace trimesh;
 class QLine;
 class cutLine;
 // extern float offset_dis_;
@@ -148,6 +150,7 @@ public:
 	void Ylineforcountor(Paths c, float z);
 	void Xlineforcountor(Paths c, float z);
 	void offsetforcountor(Paths c, float z);
+	std::vector<std::pair<ivec2, ivec2>>   do_hatch_for_contour(Paths cns);
 	virtual void doHatch() {};
 
 };

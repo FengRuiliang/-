@@ -32,7 +32,7 @@
 #include "Supportbyslice.h"
 #include "Preprocessor.h"
 class Support;
-
+using namespace trimesh;
 static GLfloat win, hei;
 RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	: QOpenGLWidget(parent), ptr_mainwindow_(mainwindow), eye_distance_(50.0),
@@ -429,6 +429,7 @@ void RenderingWidget::Render()
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_cutpieces_);
 	DrawSupport(is_draw_support_);
+	DrawHatchsup(true);
 }
 
 void RenderingWidget::SetLight()
@@ -1651,70 +1652,22 @@ void RenderingWidget::DrawHatchsup(bool bv)
 {
 	if (!bv || ctn_obj.empty())
 		return;
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
+	for (int i = 0; i < ctn_obj.size(); i++)
 	{
-		if (ctn_obj[id_obj]->mycutsup == NULL || ctn_obj[id_obj]->myhatchsup == NULL)
+		if (ctn_obj[i]->ppcs != NULL&&ctn_obj[i]->ppcs->su != NULL)
 		{
-			return;
-		}
-		std::vector<Vec3f*>* tc_hatch_ = ctn_obj[id_obj]->myhatchsup->getHatch();
-		std::vector < std::vector<Vec3f>>* tc_offset_ = ctn_obj[id_obj]->myhatchsup->getOffsetVertex();
-		//	std::vector < std::vector<Vec3f>*>* tc_offset_rotate_ = myhatch->getOffsetVertexRotate();
-		if (slice_check_id_ > ctn_obj[id_obj]->myhatchsup->GetNumPieces() - 1)
-		{
-			return;
-		}
-		if (is_show_all)
-		{
-			for (int i = 0; i < ctn_obj[id_obj]->myhatchsup->GetNumPieces(); i++)
-			{
-				for (auto iterline = tc_hatch_[i].begin(); iterline != tc_hatch_[i].end(); iterline++)
-				{
-					glColor3f(0.0, 1.0, 0.0);
-					glBegin(GL_LINES);
-					glVertex3fv(((*iterline)[0] * scaleV));
-					glVertex3fv(((*iterline)[1] * scaleV));
-					glEnd();
-				}
+			glBegin(GL_LINES);
 
-				for (int j = 0; j < tc_offset_[i].size(); j++)
+			auto hatchs = ctn_obj[i]->ppcs->su->hatchs;
+			for (auto iter=hatchs->begin();iter!=hatchs->end();iter++)
+			{
+				for (int j=0;j!=iter->second.size();j++)
 				{
-					glColor3f(0.0, 0.0, 1.0);
-					glBegin(GL_LINE_LOOP);
-					for (int k = 0; k < ((tc_offset_[i])[j]).size(); k++)
-					{
-						//qDebug() << ((tc_offset_[i])[j])->at(k).x() << ((tc_offset_[i])[j])->at(k).y() << ((tc_offset_[i])[j])->at(k).z();
-						glVertex3fv((((tc_offset_[i])[j]).at(k)*scaleV).data());
-					}
-					glEnd();
+					glVertex3f(iter->second[j].first.x()*1e-3, iter->second[j].first.y()*1e-3, iter->first*0.09);
+					glVertex3f(iter->second[j].second.x()*1e-3, iter->second[j].second.y()*1e-3, iter->first*0.09);
 				}
 			}
-		}
-		else
-		{
-			for (int i = slice_check_id_; i < slice_check_id_ + 1; i++)
-			{
-				for (auto iterline = tc_hatch_[i].begin(); iterline != tc_hatch_[i].end(); iterline++)
-				{
-					glColor3f(0.0, 1.0, 0.0);
-					glBegin(GL_LINES);
-					glVertex3fv(((*iterline)[0] * scaleV));
-					glVertex3fv(((*iterline)[1] * scaleV));
-					glEnd();
-				}
-
-				for (int j = 0; j < tc_offset_[i].size(); j++)
-				{
-					glColor3f(0.0, 0.0, 1.0);
-					glBegin(GL_LINE_LOOP);
-					for (int k = 0; k < ((tc_offset_[i])[j]).size(); k++)
-					{
-						//qDebug() << ((tc_offset_[i])[j])->at(k).x() << ((tc_offset_[i])[j])->at(k).y() << ((tc_offset_[i])[j])->at(k).z();
-						glVertex3fv((((tc_offset_[i])[j]).at(k)*scaleV).data());
-					}
-					glEnd();
-				}
-			}
+			glEnd();
 		}
 	}
 }

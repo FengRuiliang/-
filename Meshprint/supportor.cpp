@@ -1,11 +1,9 @@
 #include "supportor.h"
-#include "slicer.h"
-#include <vector>
-#include "clipper.hpp"
-using namespace ClipperLib;
+
 Supportor::Supportor()
 {
 	sup_points = new std::vector<Vec3f>;
+	hatchs = new std::map<int, std::vector<std::pair<ivec2, ivec2>>>;
 }
 
 
@@ -28,7 +26,7 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 	Paths under_paths;
 	Paths upper_paths;
 	Paths mink_sum;
-	for (int i = 2; i < cnts->size(); i++)
+	for (int i = 16; i < cnts->size(); i++)
 	{
 
 		under_paths.clear();
@@ -55,6 +53,7 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 			upper_paths << path;
 		}
 
+		
 		off.Clear();
 		off.AddPaths(under_paths, jtSquare, etClosedPolygon);
 		off.Execute(solution, 384);
@@ -68,7 +67,7 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 			for (int m = 0; m < 1; m++)
 			{
 				off.Clear();
-				off.AddPaths(upper_paths, jtSquare, etClosedPolygon);
+				off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
 				off.Execute(upper_paths, -250 * m);
 
 
@@ -113,13 +112,11 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 					float dis = 0;
 					IntPoint p1, p2;
 					Vec3f v1, v2;
-					Vec3f cur_dir, last_dir;
+					Vec3f cur_dir;
 					p1 = solution[j][0];
 					p2 = solution[j][(0 + 1) % solution[j].size()];
 					v1 = Vec3f(p1.X*1e-3, p1.Y*1e-3, i*0.09);
 					v2 = Vec3f(p2.X*1e-3, p2.Y*1e-3, i*0.09);
-					last_dir = v1 - v2;
-					last_dir.normalize();
 					for (int k = 0; k < solution[j].size(); k++)
 					{
 						p1 = solution[j][k];
@@ -142,21 +139,11 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 							cur_dir = v2 - v1;
 							dis += cur_dir.length();
 							cur_dir.normalize();
-							
-// 							if (!is_on_minkowskisum_1)
-// 							{
-// 								if (acos(cur_dir.dot(last_dir)) > -0.82)
-// 								{
-// 									sup_points->push_back(v1);
-// 									dis = (v2 - v1).length();
-// 								}
-// 							}
 							while (dis > 3)
 							{
 								dis -= 3;
 								sup_points->push_back(v2 - dis*cur_dir);
 							}
-							last_dir = -cur_dir;
 						}
 						else
 						{
@@ -165,6 +152,9 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 					}
 				}
 			}
+			Hatch minkows_hatch;
+			(*hatchs)[i] = minkows_hatch.do_hatch_for_contour(solution);
+			qDebug() << i;
 		}
 	}
 }

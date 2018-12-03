@@ -4,22 +4,9 @@
 #include <QMatrix4x4>
 #include <omp.h>
 //#include <vld.h>
+using namespace trimesh;
 Hatch::~Hatch()
 {
-
-	delete[]offset_vert_;
-	for (int i = 0; i < num_pieces_; i++)
-	{
-		for (int j = 0; j < hatch_[i].size(); j++)
-		{
-			delete hatch_[i][j];
-		}
-
-	}
-	delete[] hatch_;
-	offset_vert_ = NULL;
-	hatch_ = NULL;
-
 }
 
 Hatch::Hatch() {
@@ -1323,8 +1310,6 @@ void HatchHybrid::subareaforcontuor()
 	//////////////////////////////////////////////////////////////////////////
 }
 
-
-
 void HatchX::clearHatch()
 {
 	delete[]offset_vert_;
@@ -1470,4 +1455,68 @@ void HatchX::doHatch()
 	}
 	storeCrossPoint();
 	storeHatchLine();
+}
+ bool cmpIntPoint(IntPoint a,IntPoint b)
+{
+	 if (a.X < b.X)
+	 {
+		 return true;
+	 }
+	 else if (a.X == b.X)
+	 {
+		 return a.Y < b.Y;
+
+	 }	
+}
+
+
+std::vector<std::pair<ivec2, ivec2>>  Hatch::do_hatch_for_contour(Paths cns)
+{
+
+	std::vector<ivec2> cropoint;
+	std::vector<std::pair<ivec2, ivec2>> hatchs;
+	int gap = 500;
+	for (int i=0;i<cns.size();i++)
+	{
+		for (int j=0;j<cns[i].size();j++)
+		{
+			ivec2 p1(cns[i][j].X, cns[i][j].Y);
+			ivec2 p2(cns[i][(j + 1) % cns[i].size()].X, cns[i][(j + 1) % cns[i].size()].Y);
+			if (p2.x()==p1.x())
+			{
+				continue;
+			}
+			
+			int x_max = p1.x() > p2.x() ? p1.x() : p2.x();
+			int x_min = p1.x() < p2.x() ? p1.x() : p2.x();
+			x_min /= gap;
+			if (x_min>0)
+			{
+				x_min++;
+			}
+			for (int k = 0; k*gap + x_min*gap <x_max;k++ )
+			{
+				cropoint.push_back(p1 + (p2 - p1)*((k + x_min)*gap - p1.x()) / (p2.x() - p1.x()));
+			}
+		}
+	}
+	std::sort(cropoint.begin(), cropoint.end());
+	for (auto iter = cropoint.begin();iter!=cropoint.end();)
+	{
+		int  cur_line = iter->x();
+		int last_line = cur_line;
+		ivec2 p1, p2;
+		do
+		{
+			p1 = *iter;
+			if (++iter==cropoint.end())
+			{
+				break;
+			}
+			p2 = *iter;
+			hatchs.push_back(std::make_pair(p1, p2));
+			++iter;
+		} while (iter != cropoint.end() && cur_line == last_line);
+	}
+	return hatchs;
 }
