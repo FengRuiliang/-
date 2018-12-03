@@ -40,9 +40,9 @@ void Preprocessor::exportp()
 	{
 		a[0] = p.x();
 		a[1] = p.y();
-		a[2] = p.z()+0.2;
+		a[2] = p.z();
 		diaa = 1.0;
-		diab = 5;
+		diab = 1.1;
 		b[0] = a[0];
 		b[1] = a[1];
 		b[2] = 0;

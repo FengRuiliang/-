@@ -54,7 +54,7 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 			}
 			upper_paths << path;
 		}
-		
+
 		off.Clear();
 		off.AddPaths(under_paths, jtSquare, etClosedPolygon);
 		off.Execute(solution, 384);
@@ -64,92 +64,107 @@ void Supportor::add_support_point(std::vector<std::vector<std::vector<Segment*>>
 		cliper.Execute(ctDifference, solution, pftNonZero, pftNonZero);
 		if (solution.size())
 		{
-			for (int m = 0; m < 2; m++)
+			MinkowskiSum(pattern, under_paths, mink_sum, true);
+			for (int m = 0; m < 1; m++)
 			{
 				off.Clear();
 				off.AddPaths(upper_paths, jtSquare, etClosedPolygon);
-				off.Execute(upper_paths, -250*m);
-		
-			MinkowskiSum(pattern, under_paths, mink_sum, true);
-			solution.clear();
-			cliper.Clear();
-			cliper.AddPaths(mink_sum, ptClip, true);
-			cliper.AddPaths(upper_paths, ptSubject, true);
-			cliper.Execute(ctDifference, solution, pftNonZero, pftNonZero);
-			for (int j = 0; j < solution.size(); j++)
-			{
+				off.Execute(upper_paths, -250 * m);
 
-				bool is_on_minkowskisum_1 = false;
-				bool is_on_minkowskisum_2 = false;
-				/*		find the first segment whose first point is not need support and second support is need support*/
-				for (int k = 0; k < solution[j].size(); k++)
+
+				solution.clear();
+				cliper.Clear();
+				cliper.AddPaths(mink_sum, ptClip, true);
+				cliper.AddPaths(upper_paths, ptSubject, true);
+				cliper.Execute(ctDifference, solution, pftNonZero, pftNonZero);
+				for (int j = 0; j < solution.size(); j++)
 				{
-					IntPoint p1 = solution[j][k];
-					IntPoint p2 = solution[j][(k + 1) % solution[j].size()];
-					for each(Path poly in mink_sum)
-					{
-						if (PointInPolygon(p1, poly) == -1)
-						{
-							is_on_minkowskisum_1 = true;
 
+					bool is_on_minkowskisum_1 = false;
+					bool is_on_minkowskisum_2 = false;
+					/*		find the first segment whose first point is not need support and second support is need support*/
+					for (int k = 0; k < solution[j].size(); k++)
+					{
+						IntPoint p1 = solution[j][k];
+						IntPoint p2 = solution[j][(k + 1) % solution[j].size()];
+						for each(Path poly in mink_sum)
+						{
+							if (PointInPolygon(p1, poly) == -1)
+							{
+								is_on_minkowskisum_1 = true;
+
+							}
+							if (PointInPolygon(p2, poly) == -1)
+							{
+								is_on_minkowskisum_2 = true;
+							}
 						}
-						if (PointInPolygon(p2, poly) == -1)
+						solution[j].push_back(solution[j].front());
+						solution[j].erase(solution[j].begin());
+						if (is_on_minkowskisum_1 && !is_on_minkowskisum_2)
 						{
-							is_on_minkowskisum_2 = true;
-						}
-					}
-					solution[j].push_back(solution[j].front());
-					solution[j].erase(solution[j].begin());
-					if (is_on_minkowskisum_1 && !is_on_minkowskisum_2)
-					{
-						break;
-					}
-				}
-				if (!is_on_minkowskisum_1)
-				{
-					qDebug() << i << j << "first point is need support";
-					sup_points->push_back(Vec3f(solution[j].front().X*1e-3, solution[j].front().Y*1e-3, i*0.09));
-					qDebug() << sup_points->back().x() << sup_points->back().y() << sup_points->back().z();
-				}
-				float dis = 0;
-				IntPoint p1, p2;
-				Vec3f v1, v2;
-				Vec3f dir;
-				for (int k = 0; k < solution[j].size(); k++)
-				{
-					p1 = solution[j][k];
-					p2 = solution[j][(k + 1) % solution[j].size()];
-					v1 = Vec3f(p1.X*1e-3, p1.Y*1e-3, i*0.09);
-					v2 = Vec3f(p2.X*1e-3, p2.Y*1e-3, i*0.09);
-
-					dis += (v2 - v1).length();
-					dir = v2 - v1;
-					for each(Path poly in mink_sum)
-					{
-						if (PointInPolygon(p1, poly) == -1)
-						{
-							is_on_minkowskisum_1 = true;
-							dis = 0;
 							break;
 						}
 					}
-					while (dis > 3)
+					if (!is_on_minkowskisum_1)
 					{
-						dis -= 3;
-						sup_points->push_back(v2 - dis*dir);
+						sup_points->push_back(Vec3f(solution[j].front().X*1e-3, solution[j].front().Y*1e-3, i*0.09));
+					}
+					float dis = 0;
+					IntPoint p1, p2;
+					Vec3f v1, v2;
+					Vec3f cur_dir, last_dir;
+					p1 = solution[j][0];
+					p2 = solution[j][(0 + 1) % solution[j].size()];
+					v1 = Vec3f(p1.X*1e-3, p1.Y*1e-3, i*0.09);
+					v2 = Vec3f(p2.X*1e-3, p2.Y*1e-3, i*0.09);
+					last_dir = v1 - v2;
+					last_dir.normalize();
+					for (int k = 0; k < solution[j].size(); k++)
+					{
+						p1 = solution[j][k];
+						p2 = solution[j][(k + 1) % solution[j].size()]; 
+						for each(Path poly in mink_sum)
+						{
+							if (PointInPolygon(p1, poly) == -1)
+							{
+								is_on_minkowskisum_1 = true;
+							}
+							if (PointInPolygon(p2, poly) == -1)
+							{
+								is_on_minkowskisum_2 = true;
+							}
+						}
+						if (!is_on_minkowskisum_1 || !is_on_minkowskisum_2)
+						{
+							v1 = Vec3f(p1.X*1e-3, p1.Y*1e-3, i*0.09);
+							v2 = Vec3f(p2.X*1e-3, p2.Y*1e-3, i*0.09);
+							cur_dir = v2 - v1;
+							dis += cur_dir.length();
+							cur_dir.normalize();
+							
+// 							if (!is_on_minkowskisum_1)
+// 							{
+// 								if (acos(cur_dir.dot(last_dir)) > -0.82)
+// 								{
+// 									sup_points->push_back(v1);
+// 									dis = (v2 - v1).length();
+// 								}
+// 							}
+							while (dis > 3)
+							{
+								dis -= 3;
+								sup_points->push_back(v2 - dis*cur_dir);
+							}
+							last_dir = -cur_dir;
+						}
+						else
+						{
+							dis = 0;
+						}
 					}
 				}
 			}
-			}
 		}
-
-
-
-
-
-
-
-
-
 	}
 }
