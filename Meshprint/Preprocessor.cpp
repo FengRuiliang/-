@@ -26,7 +26,7 @@ void Preprocessor::add_support()
 {
 	do_slice();
 	su = new Supportor;
-	su->add_support_point(sl->get_contours());
+	su->add_supportting_point_for_contours(sl->get_contours());
 	exportp();
 	qDebug() <<"zhichengdian geshu:"<< su->get_sup_points()->size();
 }

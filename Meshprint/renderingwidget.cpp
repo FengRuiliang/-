@@ -59,7 +59,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.5);
+	sphere_for_display.scalemesh(0.1);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -425,11 +425,11 @@ void RenderingWidget::Render()
 	DrawAxes(is_draw_axes_);
 	DrawGrid(is_draw_grid_);
 	DrawPoints(is_draw_point_);
-	DrawEdge(is_draw_edge_);
+	//DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
-	DrawCutPieces(is_draw_cutpieces_);
+	DrawCutPieces(true);
 	DrawSupport(is_draw_support_);
-	DrawHatchsup(true);
+	//DrawHatchsup(true);
 }
 
 void RenderingWidget::SetLight()
@@ -1353,14 +1353,16 @@ void RenderingWidget::DrawFace(bool bv)
 void RenderingWidget::DrawSupport(bool bv)
 {
 	auto faces = sphere_for_display.get_faces_list();
-	glBegin(GL_TRIANGLES);
-	glColor4ub(228, 26, 28, 255);
+	
+	
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
 		if (ctn_obj[i]->ppcs!=NULL&&ctn_obj[i]->ppcs->su!=NULL)
 		{
-			auto points=ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int k=0;k<points->size();k++)
+			glColor4ub(228, 26, 28, 255);
+			glBegin(GL_TRIANGLES);
+			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
+			for (int k = 0; k < points->size(); k++)
 			{
 				for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 				{
@@ -1372,10 +1374,38 @@ void RenderingWidget::DrawSupport(bool bv)
 						cur = cur->pnext_;
 					} while (cur != sta);
 				}
-			}			
+			}
+			glEnd();
+			
+			//glColor3ub(55, 126, 184);
+			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
+// 			auto sup_region= ctn_obj[i]->ppcs->su->get_minkowssum();
+// 			for (int u=0;u<sup_region->size();u++)
+// 			{
+// 				for (int v=0;v<sup_region->at(u).size();v++)
+// 				{
+// 					glBegin(GL_LINE_LOOP);
+// 					for (int w=0;w<sup_region->at(u)[v].size();w++)
+// 					{
+// 						glVertex3fv(sup_region->at(u)[v][w]);
+// 					}
+// 					glEnd();
+// 				}
+// 			}
+			for (int k = 0; k < polylines->size(); k++)
+			{
+				//glLineWidth(5.0);
+				glBegin(GL_LINES);
+				for (size_t m = 0; m + 1 < polylines->at(k).size(); m++)
+				{
+					glVertex3fv(polylines->at(k)[m]);
+					glVertex3fv(polylines->at(k)[m + 1]);
+				}
+				glEnd();
+			}
 		}
 	}
-	glEnd();
+
 }
 void RenderingWidget::DrawSupFace(bool bv)
 {
@@ -1482,6 +1512,7 @@ void RenderingWidget::DrawGrid(bool bv)
 }
 void RenderingWidget::DrawCutPieces(bool bv)
 {
+
 	if (!bv || ctn_obj.empty())
 		return;
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
@@ -1490,51 +1521,20 @@ void RenderingWidget::DrawCutPieces(bool bv)
 		{
 			glColor3f(0.0, 0.0, 0.0);
 			std::vector<std::vector<std::vector<Segment*>>>* cnts = ctn_obj[id_obj]->ppcs->sl->get_contours();
-			std::vector<bool> need_su = ctn_obj[id_obj]->ppcs->sl->get_slice_need_sup();
 			for (int i = 1; i <cnts->size(); i++)
 			{
+				if (i!=slice_check_id_&& i!=slice_check_id_+1)
+				{
+					continue;
+				}
 				glLineWidth(2.0);
 				glBegin(GL_LINES);
 				for (int j = 0; j < cnts->at(i).size(); j++)
 				{
 					for (int k = 0; k < cnts->at(i)[j].size(); k++)
 					{
-						int col = cnts->at(i)[j][k]->get_angle() / 5;
-						switch (col)
-						{
-						case 0:
-							glColor3ub(228, 26, 28);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-							break;
-						case 1:
-							glColor3ub(228, 26, 28);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-							break;
-						case 2:
-							glColor3ub(55, 126, 184);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-							break;
-						case 3:
-							glColor3ub(77, 175, 74);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-						case 4:
-							glColor3ub(152, 78, 163);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-							break;
-						case 5:
-							glColor3ub(255, 127, 0);
-							glVertex3fv(cnts->at(i)[j][k]->get_v1());
-							glVertex3fv(cnts->at(i)[j][k]->get_v2());
-							break;
-						default:
-							glColor3ub(0, 0, 0);
-							break;
-						}
+						glVertex3fv(cnts->at(i)[j][k]->get_v1());
+						glVertex3fv(cnts->at(i)[j][k]->get_v2());
 					}
 				}
 				glEnd();
@@ -2120,8 +2120,6 @@ void RenderingWidget::ApplyMaintenance() {
 		dialog->show();
 		qDebug() << "over!!!" << dialog->result();
 	}
-
-
 }  
 
 
