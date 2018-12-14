@@ -5,6 +5,7 @@ Supportor::Supportor()
 	sup_points = new std::vector<Vec3f>;
 	hatchs = new std::map<int, std::vector<std::pair<ivec2, ivec2>>>;
 	polylines = new std::vector<std::vector<Vec3f>>;
+	minkowskisums = new std::vector<std::vector<std::vector<Vec3f>>>;
 }
 
 
@@ -15,7 +16,6 @@ Supportor::~Supportor()
 
 void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::vector<Segment*>>>* cnts)
 {
-
 	ClipperLib::Clipper cliper;
 	ClipperLib::ClipperOffset off;
 	Path pattern;
@@ -69,83 +69,83 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 		cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
 		if (sup_paths.size())
 		{
-			qDebug() << i << "slice need supported";
-		}
+			//std::vector<std::vector<Vec3f>> paths;
 
-		for (int j = 0; j < sup_paths.size(); j++)
-		{
-			bool is_on_minkowskisum_1 = false;
-			/*		find the first segment whose first point is not need support*/
-			for (int k = 0; k < sup_paths[j].size(); k++)
+			for (int j = 0; j < sup_paths.size(); j++)
 			{
-				IntPoint p1 = sup_paths[j][k];
-				for each(Path poly in mink_sum)
+				if (Area(sup_paths[j]) < 300000)
 				{
-					if (PointInPolygon(p1, poly) == -1)
+					continue;
+				}
+				findpolyline(sup_paths,mink_sum);
+				
+				for (int k = 0; k < sup_paths[j].size(); k++)
+				{
+					int re1 = 0;
+
+					IntPoint p1 = sup_paths[j][k];
+
+					for each (Path poly_sum in mink_sum)
 					{
-						is_on_minkowskisum_1 = true;
-						break;
-					}
-				}
-				sup_paths[j].push_back(sup_paths[j].front());
-				sup_paths[j].erase(sup_paths[j].begin());
-				if (is_on_minkowskisum_1)
-				{
-					break;
-				}
-			}
-			std::vector<bool> is_need_supported(sup_paths[j].size(), true);
-			for (int k = 0; k < sup_paths[j].size(); k++)
-			{
-				IntPoint p2 = sup_paths[j][k];
-				for each(Path poly in mink_sum)
-				{
-					if (PointInPolygon(p2, poly) == -1)
-					{
-						is_need_supported[k] = false;
-						break;
-					}
-				}
-			}
-			std::vector<Vec3f> polyline;
-			if (is_need_supported.front())
-			{
-				sup_points->push_back(Vec3f(sup_paths[j].front().X / 1e3, sup_paths[j].front().Y / 1e3, i*0.09));
-				for (auto iter = sup_paths[j].begin(); iter != sup_paths[j].end(); iter++)
-				{
-					polyline.push_back(Vec3f(iter->X / 1e3, iter->Y / 1e3, i*0.09));
-				}
-				polyline.push_back(Vec3f(sup_paths[j].front().X / 1e3, sup_paths[j].front().Y / 1e3, i*0.09));
-				qDebug() << polyline.size();
-				polylines->push_back(polyline);
-				//add_supportting_point_for_polylines(polyline);
-				polyline.clear();
-			}
-			else
-			{
-				for (int k = 1; k +1< is_need_supported.size(); k++)
-				{
-					if (!is_need_supported[k - 1] && !is_need_supported[k] && !is_need_supported[k + 1])
-					{
-						if (polyline.size())
+						if (PointInPolygon(p1, poly_sum) != 0)//若在
 						{
-							polylines->push_back(polyline);
-							qDebug() << polyline.size();
+							re1 = 1;
+							break;
 						}
+					}
+					if (re1 == 0)//若不在
+					{
+					}
+				}
 
-						
-						//add_supportting_point_for_polylines(polyline);
-						polyline.clear();
+
+
+					std::vector<Vec3f> polyline;
+				Vec3f start(sup_paths[j].front().X / 1e3, sup_paths[j].front().Y / 1e3, i*0.09);
+
+				for (int k = 0; k < sup_paths[j].size(); k++)
+				{
+					int re1 = 0;
+
+					IntPoint p1 = sup_paths[j][k];
+
+					for each (Path poly_sum in mink_sum)
+					{
+						if (PointInPolygon(p1, poly_sum) != 0)//若在
+						{
+							re1 = 1;
+							break;
+						}
+					}
+					if (re1 == 0)
+					{
+						if (polyline.size() == 0)
+						{
+							polyline.push_back(start);
+						}
+						polyline.push_back(Vec3f(p1.X / 1e3, p1.Y / 1e3, i*0.09));
+						if (k== sup_paths[j].size()-1)
+						{
+							polyline.push_back(Vec3f(sup_paths[j].front().X / 1e3, sup_paths[j].front().Y / 1e3, i*0.09));
+							polylines->push_back(polyline);
+							add_supportting_point_for_polylines(polyline);
+							polyline.clear();
+						}
 					}
 					else
 					{
-						polyline.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09));
+						polyline.push_back(Vec3f(p1.X / 1e3, p1.Y / 1e3, i*0.09));
+						polylines->push_back(polyline);
+						add_supportting_point_for_polylines(polyline);
+						polyline.clear();
+						start = Vec3f(p1.X / 1e3, p1.Y / 1e3, i*0.09);
 					}
+
 				}
 			}
-
 		}
 	}
+	merge();
 }
 
 void Supportor::add_supportting_point_for_polylines(std::vector<Vec3f> poly)
@@ -181,7 +181,7 @@ void Supportor::add_supportting_point_for_polylines(std::vector<Vec3f> poly)
 						err += pow((poly[j + 1] - poly[i]).length(), 3.0)*dir1.cross(dir2).length() / dir1.dot(dir2);
 					}
 				}
-				if ((poly[i] - A).length() > 3.0 || err > 1.0)
+				if ((poly[i] - A).length() > 3.0 || err > 100)
 				{
 					break;//the current point does not meet the requirement
 				}
@@ -189,4 +189,38 @@ void Supportor::add_supportting_point_for_polylines(std::vector<Vec3f> poly)
 			sup_points->push_back(poly[--i]);
 		}
 	}
+}
+void Supportor::merge()
+{
+	std::vector<bool> merged(sup_points->size());
+	for (int i=0;i<sup_points->size();i++)
+	{
+		for (int j=i+1;j<sup_points->size();j++)
+		{
+			float l = (sup_points->at(j) - sup_points->at(i)).length();
+			if (l<1.0)
+			{
+				merged[j] = true;
+			}
+		}
+	}
+	std::vector<Vec3f> final_points;
+	for (int i=0;i<merged.size();i++)
+	{
+		if (!merged[i])
+		{
+			final_points.push_back(sup_points->at(i));
+		}
+	}
+	sup_points->clear();
+	for (int i = 0; i<final_points.size(); i++)
+	{
+		sup_points->push_back(final_points[i]);
+	}
+}
+
+void Supportor::findpolyline(Paths sup_paths, Paths mink_sum)
+{
+	Segment Seg
+	throw std::logic_error("The method or operation is not implemented.");
 }
