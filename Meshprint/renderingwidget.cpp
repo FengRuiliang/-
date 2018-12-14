@@ -59,7 +59,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.5);
+	sphere_for_display.scalemesh(0.1);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -427,7 +427,7 @@ void RenderingWidget::Render()
 	DrawPoints(is_draw_point_);
 	DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
-	DrawCutPieces(is_draw_cutpieces_);
+	DrawCutPieces(false);
 	DrawSupport(is_draw_support_);
 	DrawHatchsup(true);
 }
@@ -1354,13 +1354,14 @@ void RenderingWidget::DrawSupport(bool bv)
 {
 	auto faces = sphere_for_display.get_faces_list();
 	glBegin(GL_TRIANGLES);
-	glColor4ub(228, 26, 28, 255);
+	
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
 		if (ctn_obj[i]->ppcs!=NULL&&ctn_obj[i]->ppcs->su!=NULL)
 		{
-			auto points=ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int k=0;k<points->size();k++)
+			glColor4ub(228, 26, 28, 255);
+			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
+			for (int k = 0; k < points->size(); k++)
 			{
 				for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 				{
@@ -1372,7 +1373,22 @@ void RenderingWidget::DrawSupport(bool bv)
 						cur = cur->pnext_;
 					} while (cur != sta);
 				}
-			}			
+			}
+
+			glLineWidth(5);
+			glColor3ub(55, 126, 184);
+			
+			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
+			for (int k=0;k<polylines->size();k++)
+			{
+				glBegin(GL_LINES);
+				for (size_t m = 0; m + 1 < polylines->at(k).size(); m++)
+				{
+					glVertex3fv(polylines->at(k)[m]);
+					glVertex3fv(polylines->at(k)[m + 1]);
+				}
+				glEnd();
+			}
 		}
 	}
 	glEnd();
@@ -1493,6 +1509,10 @@ void RenderingWidget::DrawCutPieces(bool bv)
 			std::vector<bool> need_su = ctn_obj[id_obj]->ppcs->sl->get_slice_need_sup();
 			for (int i = 1; i <cnts->size(); i++)
 			{
+				if (i!=slice_check_id_)
+				{
+					continue;
+				}
 				glLineWidth(2.0);
 				glBegin(GL_LINES);
 				for (int j = 0; j < cnts->at(i).size(); j++)
