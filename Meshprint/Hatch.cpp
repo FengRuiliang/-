@@ -1470,53 +1470,52 @@ void HatchX::doHatch()
 }
 
 
-std::vector<std::pair<ivec2, ivec2>>  Hatch::do_hatch_for_contour(Paths cns)
+void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float hei)
 {
-
-	std::vector<ivec2> cropoint;
-	std::vector<std::pair<ivec2, ivec2>> hatchs;
-	int gap = 500;
+	std::map<int, std::vector<int>> lines;
+	int gap = 420;
 	for (int i=0;i<cns.size();i++)
 	{
 		for (int j=0;j<cns[i].size();j++)
 		{
 			ivec2 p1(cns[i][j].X, cns[i][j].Y);
 			ivec2 p2(cns[i][(j + 1) % cns[i].size()].X, cns[i][(j + 1) % cns[i].size()].Y);
-			if (p2.x()==p1.x())
+			int x_min, x_max;
+			if (p1.x()<p2.x())
+			{
+				x_min = p1.x();
+				x_max = p2.x();
+			}
+			else if(p1.x()>p2.x())
+			{
+				x_max = p1.x();
+				x_min = p2.x();
+			}
+			else
 			{
 				continue;
 			}
-			
-			int x_max = p1.x() > p2.x() ? p1.x() : p2.x();
-			int x_min = p1.x() < p2.x() ? p1.x() : p2.x();
-			x_min /= gap;
-			if (x_min>0)
+			int id = x_min / gap - 1;
+			while (id*gap<x_min)
 			{
-				x_min++;
+				id++;
 			}
-			for (int k = 0; k*gap + x_min*gap <x_max;k++ )
+			for (; id*gap < x_max; id++)
 			{
-				cropoint.push_back(p1 + (p2 - p1)*((k + x_min)*gap - p1.x()) / (p2.x() - p1.x()));
+				int x_ = id*gap;
+				int y_ = p1.y() + (p2.y() - p1.y())*(id*gap - p1.x()) / (p2.x() - p1.x());
+				lines[x_].push_back(y_);
 			}
 		}
 	}
-	std::sort(cropoint.begin(), cropoint.end());
-	for (auto iter = cropoint.begin();iter!=cropoint.end();)
+	for (auto iter=lines.begin();iter!=lines.end();iter++)
 	{
-		int  cur_line = iter->x();
-		int last_line = cur_line;
-		ivec2 p1, p2;
-		do
+		std::sort(iter->second.begin(),iter->second.end());
+		for (int j=0;j<iter->second.size()-1;j++)
 		{
-			p1 = *iter;
-			if (++iter==cropoint.end())
-			{
-				break;
-			}
-			p2 = *iter;
-			hatchs.push_back(std::make_pair(p1, p2));
-			++iter;
-		} while (iter != cropoint.end() && cur_line == last_line);
+			Vec3f p1(iter->first/1e3, iter->second[j]/1e3,hei);
+			Vec3f p2(iter->first/1e3, iter->second[j + 1]/1e3,hei);
+			hatch.push_back(Segment (p1, p2));
+		}
 	}
-	return hatchs;
 }

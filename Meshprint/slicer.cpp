@@ -45,7 +45,7 @@ void Slicer::doslice()
 			max_z = max_z > cur->pvert_->position().z() ? max_z : cur->pvert_->position().z();
 			cur = cur->pnext_;
 		} while (cur != sta);
-		for (int j = 0; (float)j*thickness - max_z<1e-3; j++)
+		for (int j = 0; (float)j*thickness - max_z<-1e-3; j++)
 		{
 			if ((float)j*thickness > min_z)
 			{

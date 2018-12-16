@@ -2,7 +2,10 @@
 #include "HE_mesh/Mesh3D.h"
 class Segment
 {
-
+public:
+	Segment() {};
+	Segment(Vec3f p1, Vec3f p2) { v1 = p1; v2 = p2; }
+	~Segment() {};
 protected:
 private:
 	Vec3f v1, v2;// the two endpoint of this segment

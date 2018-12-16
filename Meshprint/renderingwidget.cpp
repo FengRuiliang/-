@@ -439,6 +439,7 @@ void RenderingWidget::SetLight()
 	static GLfloat mat_shininess[] = { 50.0f };
 	static GLfloat light_position0[] = { 0.0, 0.0, 100.0, 0.0f };
 	static GLfloat light_position1[] = { -1.0f, -1.0f, 0.5f, 0.0f };
+	static GLfloat light_position2[] = { 0.0, 0.0, -100.0, 0.0f };
 	static GLfloat bright[] = { 0.8f, 0.8f, 0.8f, 1.0f };
 	static GLfloat dim_light[] = { 0.3f, 0.3f, 0.3f, 1.0f };
 	static GLfloat lmodel_ambient[] = { 0.3f, 0.3f, 0.3f, 1.0f };
@@ -454,13 +455,15 @@ void RenderingWidget::SetLight()
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, dim_light);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, bright);
 	//glLightfv(GL_LIGHT1, GL_SPECULAR, white_light);
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-
+	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
+	glLightfv(GL_LIGHT2, GL_DIFFUSE, bright);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHT1);
+	glEnable(GL_LIGHT2);
 }
 
 bool booladsad = true;
@@ -1069,13 +1072,6 @@ void RenderingWidget::CheckDrawPoint()
 void RenderingWidget::CheckDrawEdge()
 {
 	is_draw_edge_ = !is_draw_edge_;
-	//updateGL();
-	if (is_draw_edge_ == false)
-	{
-		qDebug() << "修复完成";
-		qDebug() << "孔洞个数为：" << 0;
-		qDebug() << "法向面片错误" << sss;
-	}
 	update();
 
 }
@@ -1376,33 +1372,43 @@ void RenderingWidget::DrawSupport(bool bv)
 				}
 			}
 			glEnd();
-			
-			//glColor3ub(55, 126, 184);
 			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
-// 			auto sup_region= ctn_obj[i]->ppcs->su->get_minkowssum();
-// 			for (int u=0;u<sup_region->size();u++)
-// 			{
-// 				for (int v=0;v<sup_region->at(u).size();v++)
-// 				{
-// 					glBegin(GL_LINE_LOOP);
-// 					for (int w=0;w<sup_region->at(u)[v].size();w++)
-// 					{
-// 						glVertex3fv(sup_region->at(u)[v][w]);
-// 					}
-// 					glEnd();
-// 				}
-// 			}
-			for (int k = 0; k < polylines->size(); k++)
+			
+			for (int j = 0; j < polylines->at(slice_check_id_).size(); j++)
 			{
-				//glLineWidth(5.0);
 				glBegin(GL_LINES);
-				for (size_t m = 0; m + 1 < polylines->at(k).size(); m++)
+				for (int k = 0; k < polylines->at(slice_check_id_)[j].size()-1; k++)
 				{
-					glVertex3fv(polylines->at(k)[m]);
-					glVertex3fv(polylines->at(k)[m + 1]);
+					glVertex3fv(polylines->at(slice_check_id_)[j][k]);
+					glVertex3fv(polylines->at(slice_check_id_)[j][k+1]);
 				}
 				glEnd();
 			}
+
+			/*auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
+			for (int u = 0; u < sup_region->size(); u++)
+			{
+				for (int v = 0; v < sup_region->at(u).size(); v++)
+				{
+					glBegin(GL_LINE_LOOP);
+					for (int w = 0; w < sup_region->at(u)[v].size(); w++)
+					{
+						glVertex3fv(sup_region->at(u)[v][w]);
+					}
+					glEnd();
+				}
+			}*/
+
+
+			glColor4ub(77, 175, 74, 255);
+			auto sup_hatch= ctn_obj[i]->ppcs->su->get_hatchs();
+			glBegin(GL_LINES);
+			for (int j=0;j<sup_hatch->at(slice_check_id_).size();j++)
+			{
+				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v1());
+				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v2());			
+			}
+			glEnd();
 		}
 	}
 
@@ -1523,7 +1529,7 @@ void RenderingWidget::DrawCutPieces(bool bv)
 			std::vector<std::vector<std::vector<Segment*>>>* cnts = ctn_obj[id_obj]->ppcs->sl->get_contours();
 			for (int i = 1; i <cnts->size(); i++)
 			{
-				if (i!=slice_check_id_&& i!=slice_check_id_+1)
+				if (i!=slice_check_id_/*&& i!=slice_check_id_+1*/)
 				{
 					continue;
 				}
@@ -1645,29 +1651,6 @@ void RenderingWidget::DrawHatch(bool bv)
 				}
 
 			}
-		}
-	}
-}
-void RenderingWidget::DrawHatchsup(bool bv)
-{
-	if (!bv || ctn_obj.empty())
-		return;
-	for (int i = 0; i < ctn_obj.size(); i++)
-	{
-		if (ctn_obj[i]->ppcs != NULL&&ctn_obj[i]->ppcs->su != NULL)
-		{
-			glBegin(GL_LINES);
-
-			auto hatchs = ctn_obj[i]->ppcs->su->hatchs;
-			for (auto iter=hatchs->begin();iter!=hatchs->end();iter++)
-			{
-				for (int j=0;j!=iter->second.size();j++)
-				{
-					glVertex3f(iter->second[j].first.x()*1e-3, iter->second[j].first.y()*1e-3, iter->first*0.09);
-					glVertex3f(iter->second[j].second.x()*1e-3, iter->second[j].second.y()*1e-3, iter->first*0.09);
-				}
-			}
-			glEnd();
 		}
 	}
 }
