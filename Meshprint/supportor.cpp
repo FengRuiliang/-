@@ -1,11 +1,9 @@
 #include "supportor.h"
+#include <omp.h>
 
 Supportor::Supportor()
 {
 	sup_points = new std::vector<Vec3f>;
-	
-	
-	minkowskisums = new std::vector<std::vector<std::vector<Vec3f>>>;
 }
 
 
@@ -22,9 +20,11 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 {
 	polylines = new std::vector<std::vector<std::vector<Vec3f>>>(cnts->size());
 	hatchs = new std::vector<std::vector<Segment>>(cnts->size());
+	minkowskisums = new std::vector<std::vector<std::vector<Vec3f>>>(cnts->size());
 	ClipperLib::Clipper cliper;
 	ClipperLib::ClipperOffset off;
 	Path pattern;
+	Hatch hatch_;
 	for (int i = 0; i < 18; i++)
 	{
 		pattern << IntPoint(384 * cos(i * 20), 384 * sin(i * 20));
@@ -33,10 +33,11 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	Paths under_paths;
 	Paths upper_paths;
 	Paths mink_sum;
+//#pragma omp parallel for shared(sup_points)
 	for (int i = 3; i < cnts->size(); i++)
 	{
 	
-// 		if (i!=16)
+// 		if (i != 109)
 // 		{
 // 			continue;
 // 		}
@@ -53,7 +54,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			}
 			under_paths << path;
 		}
-
+		
 		for each (std::vector<Segment*> var in cnts->at(i))
 		{
 			Path path;
@@ -63,35 +64,49 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			}
 			upper_paths << path;
 		}
-		sup_paths.clear();
+		Paths temp;
+		off.Clear();
+		off.AddPaths(under_paths, jtMiter, etClosedPolygon);
+		off.Execute(temp, 384);
 		cliper.Clear();
-		cliper.AddPaths(under_paths, ptClip, true);
+		cliper.AddPaths(temp, ptClip, true);
 		cliper.AddPaths(upper_paths, ptSubject, true);
 		cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
 		if (sup_paths.size())
 		{
-			Hatch hatch_;
+			mink_sum.clear();
 			MinkowskiSum(pattern, under_paths, mink_sum, true);
-			for (int j=0;j<2;j++)
+			cliper.Clear();
+			cliper.AddPaths(mink_sum, ptClip, true);
+			cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
+			for (int j = 0; j < 1; j++)
 			{
-				
-				off.Clear();
-				off.AddPaths(upper_paths,jtMiter,etClosedPolygon);
-				off.Execute(upper_paths, -j*420);
-				
+// 				off.Clear();
+// 				off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
+// 				off.Execute(upper_paths, -j * 420);
 				cliper.Clear();
-				sup_paths.clear();
-				cliper.AddPaths(mink_sum, ptClip, true);
+				cliper.AddPaths(under_paths, ptClip, true);
 				cliper.AddPaths(upper_paths, ptSubject, true);
 				cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
 				if (sup_paths.size())
 				{
 					for (int j = 0; j < upper_paths.size(); j++)
 					{
-						findpolyline(upper_paths[j], mink_sum, i);
+						findpolyline(upper_paths[j], under_paths, i);
 					}
 				}
 			}
+			for (int j=0;j<sup_paths.size();j++)
+			{
+				std::vector<Vec3f> path;
+				for (int k=0;k<sup_paths[j].size();k++)
+				{
+					path.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09));
+					
+				}
+				minkowskisums->at(i).push_back(path);
+			}
+			CleanPolygons(sup_paths);
 			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
 			add_supportting_point_for_hatchs(hatchs->at(i));
 		}
@@ -122,11 +137,11 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly)
 					err3 += pow((poly[j + 1] - poly[j]).length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2));
 			}
 			//qDebug() << err3;
-			if (err1 > 8||err2 > 8 || err3 > 0.2 )
+			if (err1 > PBL||err2 > PBL || err3 > ERR )
 			{
 				if (end_id - start_id == 1)
 				{
-					int part = (poly[end_id] - poly[start_id]).length() / 3 + 1;
+					int part = (poly[end_id] - poly[start_id]).length() / PBL + 1;
 					float len = (poly[end_id] - poly[start_id]).length() / part;
 					for (int j = 1; j <= part; j++)
 					{
@@ -206,16 +221,7 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int num)
 		polyline.push_back(Vec3f(target_paths[cur_id].X / 1e3, target_paths[cur_id].Y / 1e3, num*0.09));
 		polylines->at(num).push_back(polyline);
 		add_supportting_point_for_polyline(polyline);
-// 		float sum = 0;
-// 		for (int m=0;m<polyline.size()-1;m++)
-// 		{
-// 			sum += (polyline[m + 1] - polyline[m]).length();
-// 		}
-// 		if (sum > threathod)
-// 		{
-// 			polylines->push_back(polyline);
-// 			add_supportting_point_for_polyline(polyline);
-// 		}
+
 		
 	}
 	else
@@ -266,7 +272,7 @@ void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs)
 {
 	for (int i=0;i<hatchs.size();i++)
 	{
-		int part = hatchs[i].get_length() / 3 + 1;
+		int part = hatchs[i].get_length() / PBL + 1;
 		float len = hatchs[i].get_length() / part;
 		for (int j = 1; j < part; j++)
 		{

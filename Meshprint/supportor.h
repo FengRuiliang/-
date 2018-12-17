@@ -17,7 +17,10 @@ public:
 	std::vector<std::vector<std::vector<Vec3f>>>* get_polylines() { return polylines; };
 	std::vector<std::vector<std::vector<Vec3f>>>* get_minkowssum() { return minkowskisums; };
 	std::vector<std::vector<Segment>>* get_hatchs() { return hatchs; }
+	
 private:
+	float PBL = 6.0;
+	float ERR = 0.2;
 	std::vector<std::vector<Segment>>* hatchs;
 	std::vector<Vec3f>* sup_points;
 	std::vector<std::vector<std::vector<Vec3f>>>* polylines;

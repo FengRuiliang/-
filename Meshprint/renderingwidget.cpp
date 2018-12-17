@@ -1373,32 +1373,34 @@ void RenderingWidget::DrawSupport(bool bv)
 			}
 			glEnd();
 			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
-			
-			for (int j = 0; j < polylines->at(slice_check_id_).size(); j++)
+			for (int u = 0; u < polylines->size(); u++)
 			{
-				glBegin(GL_LINES);
-				for (int k = 0; k < polylines->at(slice_check_id_)[j].size()-1; k++)
+				for (int v = 0; v < polylines->at(u).size(); v++)
 				{
-					glVertex3fv(polylines->at(slice_check_id_)[j][k]);
-					glVertex3fv(polylines->at(slice_check_id_)[j][k+1]);
-				}
-				glEnd();
-			}
-
-			/*auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
-			for (int u = 0; u < sup_region->size(); u++)
-			{
-				for (int v = 0; v < sup_region->at(u).size(); v++)
-				{
-					glBegin(GL_LINE_LOOP);
-					for (int w = 0; w < sup_region->at(u)[v].size(); w++)
+					glBegin(GL_LINES);
+					for (int w = 0; w < polylines->at(u)[v].size() - 1; w++)
 					{
-						glVertex3fv(sup_region->at(u)[v][w]);
+						glVertex3fv(polylines->at(u)[v][w]);
+						glVertex3fv(polylines->at(u)[v][w + 1]);
 					}
 					glEnd();
 				}
-			}*/
 
+			}
+
+			glColor4ub(152, 78, 163, 255);
+			auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
+			
+			for (int j=0;j<sup_region->at(slice_check_id_).size();j++)
+			{
+				glBegin(GL_LINE_LOOP);
+				for (int k = 0; k < sup_region->at(slice_check_id_)[j].size(); k++)
+				{
+					glVertex3fv(sup_region->at(slice_check_id_)[j][k]);
+				}
+				glEnd();
+			}
+			
 
 			glColor4ub(77, 175, 74, 255);
 			auto sup_hatch= ctn_obj[i]->ppcs->su->get_hatchs();
@@ -1518,6 +1520,7 @@ void RenderingWidget::DrawGrid(bool bv)
 }
 void RenderingWidget::DrawCutPieces(bool bv)
 {
+	return;
 
 	if (!bv || ctn_obj.empty())
 		return;

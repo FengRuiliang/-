@@ -1480,31 +1480,31 @@ void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float he
 		{
 			ivec2 p1(cns[i][j].X, cns[i][j].Y);
 			ivec2 p2(cns[i][(j + 1) % cns[i].size()].X, cns[i][(j + 1) % cns[i].size()].Y);
-			int x_min, x_max;
-			if (p1.x()<p2.x())
+			int y_min, y_max;
+			if (p1.y()<p2.y())
 			{
-				x_min = p1.x();
-				x_max = p2.x();
+				y_min = p1.y();
+				y_max = p2.y();
 			}
-			else if(p1.x()>p2.x())
+			else if(p1.y()>p2.y())
 			{
-				x_max = p1.x();
-				x_min = p2.x();
+				y_max = p1.y();
+				y_min = p2.y();
 			}
 			else
 			{
 				continue;
 			}
-			int id = x_min / gap - 1;
-			while (id*gap<x_min)
+			int id = y_min / gap - 2;
+			while (id*gap<y_min)
 			{
 				id++;
 			}
-			for (; id*gap < x_max; id++)
+			for (; id*gap < y_max; id++)
 			{
-				int x_ = id*gap;
-				int y_ = p1.y() + (p2.y() - p1.y())*(id*gap - p1.x()) / (p2.x() - p1.x());
-				lines[x_].push_back(y_);
+				int y_ = id*gap;
+				int x_ = p1.x() + (p2.x() - p1.x())*(id*gap - p1.y()) / (p2.y() - p1.y());
+				lines[y_].push_back(x_);
 			}
 		}
 	}
@@ -1513,9 +1513,9 @@ void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float he
 		std::sort(iter->second.begin(),iter->second.end());
 		for (int j=0;j<iter->second.size()-1;j++)
 		{
-			Vec3f p1(iter->first/1e3, iter->second[j]/1e3,hei);
-			Vec3f p2(iter->first/1e3, iter->second[j + 1]/1e3,hei);
-			hatch.push_back(Segment (p1, p2));
+			Vec3f p1( iter->second[j]/1e3,iter->first/1e3,hei);
+			Vec3f p2( iter->second[++j]/1e3,iter->first/1e3,hei);
+			hatch.push_back(Segment(p1, p2));
 		}
 	}
 }
