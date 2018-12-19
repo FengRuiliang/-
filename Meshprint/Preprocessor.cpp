@@ -15,11 +15,12 @@ Preprocessor::~Preprocessor()
 
 void Preprocessor::do_slice()
 {
-if (sl==NULL)
-{
-	sl = new Slicer(tar);
-	sl->doslice();
-}
+	if (sl == NULL)
+	{
+		sl = new Slicer(tar);
+		sl->doslice();
+
+	}
 }
 
 void Preprocessor::add_support()
@@ -32,7 +33,7 @@ void Preprocessor::add_support()
 }
 void Preprocessor::exportp()
 {
-	std::ofstream fout("D:/grs/sm_area.grs");
+	std::ofstream fout("D:/grs/a.grs");
 
 	fout << "ENTITY/CONE" << std::endl;
 	double a[3], b[3], diaa, diab, axis[3], dis;
@@ -40,7 +41,7 @@ void Preprocessor::exportp()
 	{
 		a[0] = p.x();
 		a[1] = p.y();
-		a[2] = p.z();
+		a[2] = p.z()+0.1;
 		diaa = 1.0;
 		diab = 1.1;
 		b[0] = a[0];

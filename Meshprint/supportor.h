@@ -19,7 +19,7 @@ public:
 	std::vector<std::vector<Segment>>* get_hatchs() { return hatchs; }
 	
 private:
-	float PBL = 6.0;
+	float PBL = 10.0;
 	float ERR = 0.2;
 	std::vector<std::vector<Segment>>* hatchs;
 	std::vector<Vec3f>* sup_points;

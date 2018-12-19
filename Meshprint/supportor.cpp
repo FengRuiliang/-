@@ -33,28 +33,11 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	Paths under_paths;
 	Paths upper_paths;
 	Paths mink_sum;
-//#pragma omp parallel for shared(sup_points)
-	for (int i = 3; i < cnts->size(); i++)
+	Path circle_;
+	std::vector<Paths> regions(cnts->size());
+	for (int i=0;i<cnts->size();i++ )
 	{
-	
-// 		if (i != 109)
-// 		{
-// 			continue;
-// 		}
-		under_paths.clear();
-		sup_paths.clear();
-		upper_paths.clear();
-		mink_sum.clear();
-		for each (std::vector<Segment*> var in cnts->at(i - 1))
-		{
-			Path path;
-			for each (Segment* ptr_seg in var)
-			{
-				path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
-			}
-			under_paths << path;
-		}
-		
+		Paths tem;
 		for each (std::vector<Segment*> var in cnts->at(i))
 		{
 			Path path;
@@ -62,8 +45,46 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			{
 				path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
 			}
-			upper_paths << path;
+			tem << path;
 		}
+		off.Clear();
+		off.AddPaths(tem, jtMiter, etClosedPolygon);
+		off.Execute(regions[i], -384);
+	}
+
+
+	for (int i=0;i<18;i++)
+	{
+		circle_<< IntPoint(500 * cos(i * 20), 500 * sin(i * 20));
+	}
+	for (int i = regions.size()-1; i >2 ; i--)
+	{
+	
+		sup_paths.clear();
+		
+		mink_sum.clear();
+		//for each (std::vector<Segment*> var in cnts->at(i - 1))
+		//{
+		//	Path path;
+		//	for each (Segment* ptr_seg in var)
+		//	{
+		//		path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
+		//	}
+		//	under_paths << path;
+		//}
+		//for each (std::vector<Segment*> var in cnts->at(i))
+		//{
+		//	Path path;
+		//	for each (Segment* ptr_seg in var)
+		//	{
+		//		path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
+		//	}
+		//	upper_paths << path;
+		//}
+
+		upper_paths = regions[i];
+		under_paths = regions[i - 1];
+
 		Paths temp;
 		off.Clear();
 		off.AddPaths(under_paths, jtMiter, etClosedPolygon);
@@ -77,6 +98,15 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			mink_sum.clear();
 			MinkowskiSum(pattern, under_paths, mink_sum, true);
 			cliper.Clear();
+			Paths tem(sup_points->size());
+			for (int j=0;j<sup_points->size();j++)
+			{
+				for (int k=0;k<circle_.size();k++)
+				{
+					tem[j] <<IntPoint(circle_[k].X+sup_points->at(j).x()*1e3, circle_[k].Y + sup_points->at(j).y()*1e3);
+				}
+			}
+			cliper.AddPaths(tem, ptClip, true);
 			cliper.AddPaths(mink_sum, ptClip, true);
 			cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
 			for (int j = 0; j < 1; j++)
@@ -106,11 +136,12 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 				}
 				minkowskisums->at(i).push_back(path);
 			}
-			CleanPolygons(sup_paths);
-			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
-			add_supportting_point_for_hatchs(hatchs->at(i));
+			//CleanPolygons(sup_paths);
+			//hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
+			//add_supportting_point_for_hatchs(hatchs->at(i));
 		}
 	}
+	//merge();
 }
 
 void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly)

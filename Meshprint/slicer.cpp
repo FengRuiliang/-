@@ -45,21 +45,18 @@ void Slicer::doslice()
 			max_z = max_z > cur->pvert_->position().z() ? max_z : cur->pvert_->position().z();
 			cur = cur->pnext_;
 		} while (cur != sta);
-		for (int j = 0; (float)j*thickness - max_z<-1e-3; j++)
+		for (int j = 0; (float)j*thickness+0.04 - max_z<-1e-3; j++)
 		{
-			if ((float)j*thickness > min_z)
+			if ((float)j*thickness+0.04 > min_z)
 			{
 				pf[j].push_back(i);
-// 				if (is_need_sup[i])
-// 				{
-// 					slice_need_sup[j]=true;
-// 				}
 			}
 		}
 	}
-	
-	for (int i=1;i<num;i++)
+	float hei;
+	for (int i=0;i<num;i++)
 	{
+		hei = i*0.09+0.04;
 		std::vector<bool> mark(obj->num_of_face_list(), false);
 		std::vector<std::vector<Segment*>> polygon;
 		for (int j=0;j<pf[i].size();j++)
@@ -79,13 +76,13 @@ void Slicer::doslice()
 						
 						Vec3f p1 = ecur->pprev_->pvert_->position();
 						Vec3f p2 = ecur->pvert_->position();
-						if (p1.z()>i*thickness&&p2.z()<i*thickness)
+						if (p1.z()>hei&&p2.z()<hei)
 						{
-							seg->set_v1((i*thickness - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
+							seg->set_v1((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
 						}
-						else if (p1.z() < i*thickness&&p2.z() > i*thickness)
+						else if (p1.z() < hei&&p2.z() > hei)
 						{
-							seg->set_v2((i*thickness - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
+							seg->set_v2((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
 							ejump = ecur->ppair_;
 						}
 						ecur = ecur->pnext_;
@@ -111,4 +108,31 @@ void Slicer::doslice()
 		}
 		contours->at(i)=polygon;
 	}
+	//offset();
 }
+void Slicer::offset()
+{
+
+	c_paths=new std::vector<Paths>(contours->size());
+
+	ClipperOffset sov;
+		for (int i = 0; i < contours->size(); i++)
+		{
+			Paths paths;
+			for (int j=0;j<contours->at(i).size();j++)
+			{
+				Path path;
+				for (int k=0;k<contours->at(i)[j].size();k++)
+				{
+					path << IntPoint(contours->at(i)[j][k]->get_v1().x()*1e3, contours->at(i)[j][k]->get_v1().y()*1e3);
+				}
+				paths << path;
+			}
+			sov.Clear();
+			sov.AddPaths(paths, jtMiter, etClosedPolygon);
+			Paths re;
+			sov.Execute(re, -384);
+			c_paths->at(i)=re;
+		}
+}
+
