@@ -27,7 +27,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	Hatch hatch_;
 	for (int i = 0; i < 18; i++)
 	{
-		pattern << IntPoint(384 * cos(i * 20), 384 * sin(i * 20));
+		pattern << IntPoint(PBG * cos(i * 20), PBG * sin(i * 20));
 	}
 	Paths sup_paths;
 	Paths under_paths;
@@ -49,7 +49,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 		}
 		off.Clear();
 		off.AddPaths(tem, jtMiter, etClosedPolygon);
-		off.Execute(regions[i], -384);
+		off.Execute(regions[i], -OSD);
 	}
 
 
@@ -88,7 +88,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 		Paths temp;
 		off.Clear();
 		off.AddPaths(under_paths, jtMiter, etClosedPolygon);
-		off.Execute(temp, 384);
+		off.Execute(temp, PBG);
 		cliper.Clear();
 		cliper.AddPaths(temp, ptClip, true);
 		cliper.AddPaths(upper_paths, ptSubject, true);
@@ -131,8 +131,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 				std::vector<Vec3f> path;
 				for (int k=0;k<sup_paths[j].size();k++)
 				{
-					path.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09));
-					
+					path.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09+0.04));
 				}
 				minkowskisums->at(i).push_back(path);
 			}
@@ -192,31 +191,24 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly)
 
 void Supportor::merge()
 {
-	std::vector<bool> merged(sup_points->size());
+	Path circle_;
+	for (int i = 0; i < 18; i++)
+	{
+		circle_ << IntPoint(500 * cos(i * 20), 500 * sin(i * 20));
+	}
+
+	ClipperLib::Clipper cliper;
 	for (int i=0;i<sup_points->size();i++)
 	{
-		for (int j=i+1;j<sup_points->size();j++)
+		Path tem;
+		for (int j = 0; j < circle_.size(); j++)
 		{
-			float l = (sup_points->at(j) - sup_points->at(i)).length();
-			if (l<1.0)
-			{
-				merged[j] = true;
-			}
+			tem << IntPoint(circle_[j].X + sup_points->at(i).x()*1e3, circle_[j].Y + sup_points->at(i).y()*1e3);
 		}
+		cliper.AddPath(tem, ptClip, true);
 	}
-	std::vector<Vec3f> final_points;
-	for (int i=0;i<merged.size();i++)
-	{
-		if (!merged[i])
-		{
-			final_points.push_back(sup_points->at(i));
-		}
-	}
-	sup_points->clear();
-	for (int i = 0; i<final_points.size(); i++)
-	{
-		sup_points->push_back(final_points[i]);
-	}
+	Paths region_;
+	cliper.Execute(ctUnion, region_, pftNonZero, pftNonZero);
 }
 
 inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int num)

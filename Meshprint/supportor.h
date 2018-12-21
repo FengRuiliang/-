@@ -19,8 +19,10 @@ public:
 	std::vector<std::vector<Segment>>* get_hatchs() { return hatchs; }
 	
 private:
-	float PBL = 10.0;
+	float PBL = 4.0;// printable bridge length
 	float ERR = 0.2;
+	int   PBG = 247;//printable bridge gap
+	int   OSD = 384;//offset distance
 	std::vector<std::vector<Segment>>* hatchs;
 	std::vector<Vec3f>* sup_points;
 	std::vector<std::vector<std::vector<Vec3f>>>* polylines;

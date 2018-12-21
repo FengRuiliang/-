@@ -36,7 +36,7 @@ void Preprocessor::exportp()
 	std::ofstream fout("D:/grs/a.grs");
 
 	fout << "ENTITY/CONE" << std::endl;
-	double a[3], b[3], diaa, diab, axis[3], dis;
+	double a[3], b[3], diaa, diab, axis[3], dis, dia;
 	for each(Vec3f p in *(su->get_sup_points()))
 	{
 		a[0] = p.x();
@@ -44,6 +44,7 @@ void Preprocessor::exportp()
 		a[2] = p.z()+0.1;
 		diaa = 1.0;
 		diab = 1.1;
+		dia = 1.0;
 		b[0] = a[0];
 		b[1] = a[1];
 		b[2] = 0;
@@ -54,8 +55,10 @@ void Preprocessor::exportp()
 			axis[i] = b[i] - a[i];
 		}
 		dis = sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
-		fout << "CONE=SOLCON/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl;
-		fout << dis << ",DIAMTR," << diaa << "," << diab << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+		fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << endl << dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << endl;
+
+		//fout << "CONE=SOLCON/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl;
+		//fout << dis << ",DIAMTR," << diaa << "," << diab << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
 	}
 	fout << "halt";
 }
