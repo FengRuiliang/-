@@ -1,7 +1,12 @@
 #ifndef GLOBALFUNCTIONS_H
 #define GLOBALFUNCTIONS_H
+extern   float PBL ;// printable bridge length
+extern float ERR ;
+extern int PBG ;//printable bridge gap
+extern int OSD ;//offset distance
+extern bool is_uniform;
 extern float field_width_;
-extern float field_height_ ;
+extern float field_height_;
 extern float line_width_ ;
 extern float field_overlap_ ;
 extern float unit ;

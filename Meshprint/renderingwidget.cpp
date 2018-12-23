@@ -31,7 +31,9 @@
 #include "maintenance.h"
 #include "Supportbyslice.h"
 #include "Preprocessor.h"
+
 class Support;
+
 using namespace trimesh;
 static GLfloat win, hei;
 RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
@@ -1952,6 +1954,7 @@ void RenderingWidget::setAngle(int angle)
 {
 	increment_angle_ = angle;
 }
+void RenderingWidget::setLineError(double err) { ERR = err; }
 void RenderingWidget::FindRegion()
 {
 	is_draw_region_ = !is_draw_region_;

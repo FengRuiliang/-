@@ -212,6 +212,7 @@
     <ClCompile Include="Preprocessor.cpp" />
     <ClCompile Include="renderingwidget.cpp" />
     <ClCompile Include="Segment.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="SliceCut.cpp" />
     <ClCompile Include="slicer.cpp" />
     <ClCompile Include="space2dKDTree.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="HE_mesh\Vec.h" />
     <ClInclude Include="Preprocessor.h" />
     <ClInclude Include="Segment.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="slicer.h" />
     <ClInclude Include="supportor.h" />
     <ClInclude Include="Sweep.h" />

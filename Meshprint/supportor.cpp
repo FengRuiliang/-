@@ -93,51 +93,67 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 		cliper.AddPaths(temp, ptClip, true);
 		cliper.AddPaths(upper_paths, ptSubject, true);
 		cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
+		
 		if (sup_paths.size())
 		{
 			mink_sum.clear();
 			MinkowskiSum(pattern, under_paths, mink_sum, true);
-			cliper.Clear();
-			Paths tem(sup_points->size());
-			for (int j=0;j<sup_points->size();j++)
+			
+			if (is_uniform)
 			{
-				for (int k=0;k<circle_.size();k++)
-				{
-					tem[j] <<IntPoint(circle_[k].X+sup_points->at(j).x()*1e3, circle_[k].Y + sup_points->at(j).y()*1e3);
-				}
-			}
-			cliper.AddPaths(tem, ptClip, true);
-			cliper.AddPaths(mink_sum, ptClip, true);
-			cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
-			for (int j = 0; j < 1; j++)
-			{
-// 				off.Clear();
-// 				off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
-// 				off.Execute(upper_paths, -j * 420);
+				cliper.Clear();
+				cliper.AddPaths(mink_sum, ptClip, true);
+				cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
 				cliper.Clear();
 				cliper.AddPaths(under_paths, ptClip, true);
 				cliper.AddPaths(upper_paths, ptSubject, true);
 				cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
-				if (sup_paths.size())
+			}
+			else
+			{
+				cliper.Clear();
+				Paths tem(sup_points->size());
+				for (int j = 0; j < sup_points->size(); j++)
 				{
-					for (int j = 0; j < upper_paths.size(); j++)
+					for (int k = 0; k < circle_.size(); k++)
 					{
-						findpolyline(upper_paths[j], under_paths, i);
+						tem[j] << IntPoint(circle_[k].X + sup_points->at(j).x()*1e3, circle_[k].Y + sup_points->at(j).y()*1e3);
+					}
+				}
+				cliper.AddPaths(tem, ptClip, true);
+				cliper.AddPaths(mink_sum, ptClip, true);
+				cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
+				for (int j = 0; j < 1; j++)
+				{
+					// 				off.Clear();
+					// 				off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
+					// 				off.Execute(upper_paths, -j * 420);
+					cliper.Clear();
+					cliper.AddPaths(under_paths, ptClip, true);
+					cliper.AddPaths(upper_paths, ptSubject, true);
+					cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
+					if (sup_paths.size())
+					{
+						for (int j = 0; j < upper_paths.size(); j++)
+						{
+							findpolyline(upper_paths[j], under_paths, i);
+						}
 					}
 				}
 			}
-			for (int j=0;j<sup_paths.size();j++)
-			{
-				std::vector<Vec3f> path;
-				for (int k=0;k<sup_paths[j].size();k++)
-				{
-					path.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09+0.04));
-				}
-				minkowskisums->at(i).push_back(path);
-			}
-			//CleanPolygons(sup_paths);
-			//hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
-			//add_supportting_point_for_hatchs(hatchs->at(i));
+
+			// 			for (int j=0;j<sup_paths.size();j++)
+			// 			{
+			// 				std::vector<Vec3f> path;
+			// 				for (int k=0;k<sup_paths[j].size();k++)
+			// 				{
+			// 					path.push_back(Vec3f(sup_paths[j][k].X / 1e3, sup_paths[j][k].Y / 1e3, i*0.09+0.04));
+			// 				}
+			// 				minkowskisums->at(i).push_back(path);
+			// 			}
+						//CleanPolygons(sup_paths);
+						//hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
+						//add_supportting_point_for_hatchs(hatchs->at(i));
 		}
 	}
 	//merge();
@@ -302,4 +318,9 @@ void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs)
 			sup_points->push_back(hatchs[i].get_v1() + j*len*hatchs[i].get_normal());
 		}
 	}
+}
+
+void Supportor::add_supportting_point_by_uniform()
+{
+
 }

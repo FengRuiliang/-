@@ -78,7 +78,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="usesScrollButtons">
          <bool>false</bool>
@@ -336,6 +336,27 @@
              <widget class="QDoubleSpinBox" name="doubleSpinBox_28">
               <property name="value">
                <double>2.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_28" stretch="1,2">
+            <item>
+             <widget class="QLabel" name="label_Lheight_15">
+              <property name="text">
+               <string>line error</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="line_error">
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.200000000000000</double>
               </property>
              </widget>
             </item>
@@ -1115,6 +1136,7 @@
     <slot>ResetView()</slot>
     <slot>ApplyMaintenance()</slot>
     <slot>ReadSingleMesh()</slot>
+    <slot>setLineError(double)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -1225,8 +1247,8 @@
    <slot>AddLineSupport()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>235</y>
+     <x>114</x>
+     <y>259</y>
     </hint>
     <hint type="destinationlabel">
      <x>821</x>
@@ -1321,8 +1343,8 @@
    <slot>renderdoHatch()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>254</x>
-     <y>814</y>
+     <x>265</x>
+     <y>840</y>
     </hint>
     <hint type="destinationlabel">
      <x>1202</x>
@@ -1337,8 +1359,8 @@
    <slot>setHatchType(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>352</y>
+     <x>183</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
      <x>822</x>
@@ -1354,7 +1376,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>625</y>
+     <y>650</y>
     </hint>
     <hint type="destinationlabel">
      <x>1202</x>
@@ -1370,7 +1392,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>653</y>
+     <y>678</y>
     </hint>
     <hint type="destinationlabel">
      <x>842</x>
@@ -1386,7 +1408,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>681</y>
+     <y>706</y>
     </hint>
     <hint type="destinationlabel">
      <x>515</x>
@@ -1402,7 +1424,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>709</y>
+     <y>734</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
@@ -1418,7 +1440,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>427</y>
+     <y>452</y>
     </hint>
     <hint type="destinationlabel">
      <x>785</x>
@@ -1434,7 +1456,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>455</y>
+     <y>480</y>
     </hint>
     <hint type="destinationlabel">
      <x>781</x>
@@ -1450,7 +1472,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>483</y>
+     <y>508</y>
     </hint>
     <hint type="destinationlabel">
      <x>584</x>
@@ -1466,7 +1488,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>511</y>
+     <y>536</y>
     </hint>
     <hint type="destinationlabel">
      <x>722</x>
@@ -1482,7 +1504,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>765</y>
+     <y>790</y>
     </hint>
     <hint type="destinationlabel">
      <x>597</x>
@@ -1561,8 +1583,8 @@
    <slot>setVerticalgap(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>283</y>
+     <x>315</x>
+     <y>282</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -1577,8 +1599,8 @@
    <slot>AutoSupport()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>291</y>
+     <x>114</x>
+     <y>338</y>
     </hint>
     <hint type="destinationlabel">
      <x>845</x>
@@ -1689,8 +1711,8 @@
    <slot>FindRegion()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>206</y>
+     <x>114</x>
+     <y>230</y>
     </hint>
     <hint type="destinationlabel">
      <x>824</x>
@@ -1754,7 +1776,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>318</x>
-     <y>597</y>
+     <y>622</y>
     </hint>
     <hint type="destinationlabel">
      <x>480</x>
@@ -1769,8 +1791,8 @@
    <slot>SetSliceCheckId(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>909</x>
-     <y>822</y>
+     <x>309</x>
+     <y>878</y>
     </hint>
     <hint type="destinationlabel">
      <x>1202</x>
@@ -1785,8 +1807,8 @@
    <slot>setHatchDis(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>242</x>
-     <y>731</y>
+     <x>318</x>
+     <y>762</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -1801,8 +1823,8 @@
    <slot>SetSliceCheckId(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>353</x>
-     <y>813</y>
+     <x>81</x>
+     <y>877</y>
     </hint>
     <hint type="destinationlabel">
      <x>1083</x>
@@ -1839,6 +1861,22 @@
     <hint type="destinationlabel">
      <x>770</x>
      <y>421</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>line_error</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>openGLWidget</receiver>
+   <slot>setLineError(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>172</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>593</x>
+     <y>403</y>
     </hint>
    </hints>
   </connection>

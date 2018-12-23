@@ -111,6 +111,9 @@ public:
     QHBoxLayout *horizontalLayout_23;
     QLabel *label_Lheight_10;
     QDoubleSpinBox *doubleSpinBox_28;
+    QHBoxLayout *horizontalLayout_28;
+    QLabel *label_Lheight_15;
+    QDoubleSpinBox *line_error;
     QPushButton *pushButton_XYScan_7;
     QComboBox *comboBox_2;
     QGroupBox *stateGroupLayout_6;
@@ -582,6 +585,26 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_23);
 
+        horizontalLayout_28 = new QHBoxLayout();
+        horizontalLayout_28->setSpacing(6);
+        horizontalLayout_28->setObjectName(QStringLiteral("horizontalLayout_28"));
+        label_Lheight_15 = new QLabel(autosupport);
+        label_Lheight_15->setObjectName(QStringLiteral("label_Lheight_15"));
+
+        horizontalLayout_28->addWidget(label_Lheight_15);
+
+        line_error = new QDoubleSpinBox(autosupport);
+        line_error->setObjectName(QStringLiteral("line_error"));
+        line_error->setSingleStep(0.01);
+        line_error->setValue(0.2);
+
+        horizontalLayout_28->addWidget(line_error);
+
+        horizontalLayout_28->setStretch(0, 1);
+        horizontalLayout_28->setStretch(1, 2);
+
+        verticalLayout_2->addLayout(horizontalLayout_28);
+
         pushButton_XYScan_7 = new QPushButton(autosupport);
         pushButton_XYScan_7->setObjectName(QStringLiteral("pushButton_XYScan_7"));
 
@@ -1022,8 +1045,9 @@ public:
         QObject::connect(spinBox_11, SIGNAL(valueChanged(int)), openGLWidget, SLOT(SetSliceCheckId(int)));
         QObject::connect(actionSave_contour, SIGNAL(triggered()), openGLWidget, SLOT(SaveContour()));
         QObject::connect(actionMaintenance, SIGNAL(triggered()), openGLWidget, SLOT(ApplyMaintenance()));
+        QObject::connect(line_error, SIGNAL(valueChanged(double)), openGLWidget, SLOT(setLineError(double)));
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
         comboBox_2->setCurrentIndex(0);
         stackedWidget->setCurrentIndex(0);
 
@@ -1076,6 +1100,7 @@ public:
         label_Lheight_8->setText(QApplication::translate("MeshprintClass", "line length", Q_NULLPTR));
         label_Lheight_9->setText(QApplication::translate("MeshprintClass", "line width", Q_NULLPTR));
         label_Lheight_10->setText(QApplication::translate("MeshprintClass", "line distance", Q_NULLPTR));
+        label_Lheight_15->setText(QApplication::translate("MeshprintClass", "line error", Q_NULLPTR));
         pushButton_XYScan_7->setText(QApplication::translate("MeshprintClass", "Apply", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(autosupport), QApplication::translate("MeshprintClass", "Auto Support", Q_NULLPTR));
         comboBox_2->clear();

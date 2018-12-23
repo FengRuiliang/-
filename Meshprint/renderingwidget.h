@@ -102,6 +102,7 @@ private:
 	void setHatchDis(double value);
 	void setThickness(double thick);
 	void setAngle(int angle);
+	void setLineError(double err);
 	void SetAllHatch(bool bv) { is_show_all = bv; }
 	void FindRegion();
 	void setFildID(int id) {
