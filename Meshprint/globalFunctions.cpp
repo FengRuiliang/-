@@ -1,7 +1,7 @@
 #include "qmath.h"
-float PBL = 4.0;// printable bridge length
+float PBL = 5.0;// printable bridge length
 float ERR = 0.2;
-int PBG = 384;//printable bridge gap
+int PBG = 284;//printable bridge gap
 int OSD = 384;//offset distance
 bool is_uniform = false;
 float field_width_ = 5.0;

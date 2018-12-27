@@ -49,6 +49,7 @@ public:
 	Vec3f	normal_;		//!< vertex normal
 	Vec3f	texCoord_;		//!< texture coord
 	Vec4f	color_;
+	trimesh::ivec3   ipos;
 	HE_edge		*pedge_;		//!< one of the half-edges_list emanating from the vertex
 	int			degree_;
 	BoundaryTag	boundary_flag_;	//!< boundary flag
@@ -267,6 +268,7 @@ private:
 	//! values for the bounding box
 	float xmax_, xmin_, ymax_, ymin_, zmax_, zmin_;
 	std::vector<int> wro_Nor_facets_;
+	void RestoreVertexIntoInt();
 public:
 	std::vector<Triangle> Tria; //用来判断三角面的位置关系
 	std::vector<Triangle> Tri; //用来判断三角面的位置关系

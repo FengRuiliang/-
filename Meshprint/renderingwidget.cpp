@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.1);
+	sphere_for_display.scalemesh(0.2);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -429,7 +429,7 @@ void RenderingWidget::Render()
 	DrawPoints(is_draw_point_);
 	//DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
-	DrawCutPieces(true);
+	DrawCutPieces(is_draw_edge_);
 	DrawSupport(is_draw_support_);
 	//DrawHatchsup(true);
 }
@@ -457,7 +457,7 @@ void RenderingWidget::SetLight()
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, bright);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, dim_light);
 	//glLightfv(GL_LIGHT1, GL_SPECULAR, white_light);
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 	glLightfv(GL_LIGHT2, GL_POSITION, light_position2);
@@ -1360,23 +1360,35 @@ void RenderingWidget::DrawSupport(bool bv)
 			glColor4ub(228, 26, 28, 255);
 			glBegin(GL_TRIANGLES);
 			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int k = 0; k < points->size(); k++)
+			for (int j=0;j<points->size();j++)
 			{
-				for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
+// 				if (j!=slice_check_id_)
+// 				{
+// 					continue;
+// 				}
+				for (int k = 0; k < points->at(j).size(); k++)
 				{
-					HE_edge* sta = (*iterf)->pedge_;
-					HE_edge* cur = sta;
-					do
+					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 					{
-						glVertex3fv(cur->pvert_->position() + points->at(k));
-						cur = cur->pnext_;
-					} while (cur != sta);
+						HE_edge* sta = (*iterf)->pedge_;
+						HE_edge* cur = sta;
+						do
+						{
+							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
+							cur = cur->pnext_;
+						} while (cur != sta);
+					}
 				}
 			}
 			glEnd();
+			glLineWidth(2.0);
 			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
 			for (int u = 0; u < polylines->size(); u++)
 			{
+// 				if (u!=slice_check_id_)
+// 				{
+// 					continue;
+// 				}
 				for (int v = 0; v < polylines->at(u).size(); v++)
 				{
 					glBegin(GL_LINES);
@@ -1522,7 +1534,6 @@ void RenderingWidget::DrawGrid(bool bv)
 }
 void RenderingWidget::DrawCutPieces(bool bv)
 {
-	return;
 
 	if (!bv || ctn_obj.empty())
 		return;
@@ -1954,7 +1965,9 @@ void RenderingWidget::setAngle(int angle)
 {
 	increment_angle_ = angle;
 }
-void RenderingWidget::setLineError(double err) { ERR = err; }
+void RenderingWidget::setLineError(double err) {
+	ERR = err; 
+}
 void RenderingWidget::FindRegion()
 {
 	is_draw_region_ = !is_draw_region_;

@@ -47,7 +47,7 @@ void Slicer::doslice()
 		} while (cur != sta);
 		for (int j = 0; (float)j*thickness+0.04 - max_z<-1e-3; j++)
 		{
-			if ((float)j*thickness+0.04 > min_z)
+			if ((float)j*thickness+0.04 > min_z-1e-3)
 			{
 				pf[j].push_back(i);
 			}
@@ -56,7 +56,7 @@ void Slicer::doslice()
 	float hei;
 	for (int i=0;i<num;i++)
 	{
-		hei = i*0.09+0.04;
+		hei = i*thickness+0.04;
 		std::vector<bool> mark(obj->num_of_face_list(), false);
 		std::vector<std::vector<Segment*>> polygon;
 		for (int j=0;j<pf[i].size();j++)
@@ -76,27 +76,19 @@ void Slicer::doslice()
 						
 						Vec3f p1 = ecur->pprev_->pvert_->position();
 						Vec3f p2 = ecur->pvert_->position();
-						if (p1.z()>hei&&p2.z()<hei)
+
+						if (p1.z()-hei>1e-3&&p2.z()-hei<1e-3)
 						{
 							seg->set_v1((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
 						}
-						else if (p1.z() < hei&&p2.z() > hei)
+						else if (p1.z()-hei <1e-3&&p2.z()-hei >1e-3)
 						{
 							seg->set_v2((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
 							ejump = ecur->ppair_;
 						}
 						ecur = ecur->pnext_;
 					} while (ecur != esta);
-					//判断线段是否合理，如果合理设置角度，并添加到环中。
-					if (seg->vailed())
-					{
-						seg->set_angle(acos(ecur->pface_->normal()*Vec3f(0, 0, -1)) * 180 / 3.14);
-						polyline.push_back(seg);
-					}
-					else
-					{
-						delete seg;
-					}
+					polyline.push_back(seg);
 
 				} while (!mark[ejump->pface_->id()]);
 				if (!polyline.empty())

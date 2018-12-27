@@ -649,6 +649,7 @@ void Mesh3D::UpdateMesh(void)
 	if (input_vertex_list_.size() == 0)
 		SetNeighbors();
 	Unify(1);
+	RestoreVertexIntoInt();
 }
 
 void Mesh3D::SetBoundaryFlag(void)
@@ -1544,6 +1545,16 @@ void Mesh3D::markEdges()
 	}
 }
 
+
+void Mesh3D::RestoreVertexIntoInt()
+{
+	for (size_t i = 0; i != pvertices_list_->size(); i++)
+	{
+		pvertices_list_->at(i)->ipos = trimesh::ivec3(pvertices_list_->at(i)->position_.x()*1e3,
+			pvertices_list_->at(i)->position_.y()*1e3, 
+			pvertices_list_->at(i)->position_.z()*1e3);
+	}
+}
 
 float Mesh3D::getRound(float num) {
 

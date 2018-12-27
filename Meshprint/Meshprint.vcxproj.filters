@@ -44,21 +44,11 @@
     <ClCompile Include="meshprint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_meshprint.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_meshprint.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_meshprint.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_renderingwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_renderingwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
+    
+    
+    
+    
+    
     <ClCompile Include="ArcBall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,12 +85,8 @@
     <ClCompile Include="MeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_MeshInfo.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_MeshInfo.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
+    
+    
     <ClCompile Include="maintenance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -110,12 +96,8 @@
     <ClCompile Include="TriangleglobalFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_maintenance.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_maintenance.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
+    
+    
     <ClCompile Include="AMObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -140,35 +122,32 @@
     <ClCompile Include="Segment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="meshprint.h">
+    <QtMoc Include="meshprint.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="meshprint.ui">
+    </QtMoc>
+    <QtUic Include="meshprint.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="meshprint.qrc">
+    </QtUic>
+    <QtRcc Include="meshprint.qrc">
       <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="renderingwidget.h">
+    </QtRcc>
+    <QtMoc Include="renderingwidget.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="oepndialog.ui">
+    </QtMoc>
+    <QtUic Include="oepndialog.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="MeshInfo.h">
+    </QtUic>
+    <QtMoc Include="MeshInfo.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="maintenance.h">
+    </QtMoc>
+    <QtMoc Include="maintenance.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="maintenance.ui">
+    </QtMoc>
+    <QtUic Include="maintenance.ui">
       <Filter>Form Files</Filter>
-    </CustomBuild>
+    </QtUic>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_meshprint.h">
@@ -250,9 +229,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Preprocessor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

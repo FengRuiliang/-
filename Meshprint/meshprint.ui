@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1213</width>
-    <height>931</height>
+    <height>932</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1247,8 +1247,8 @@
    <slot>AddLineSupport()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>114</x>
-     <y>259</y>
+     <x>102</x>
+     <y>163</y>
     </hint>
     <hint type="destinationlabel">
      <x>821</x>
@@ -1263,8 +1263,8 @@
    <slot>AddPointSupport()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>258</y>
+     <x>120</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>550</x>
@@ -1631,8 +1631,8 @@
    <slot>setPointD(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>314</x>
-     <y>171</y>
+     <x>120</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>810</x>
@@ -1647,8 +1647,8 @@
    <slot>setPointH(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>314</x>
-     <y>199</y>
+     <x>120</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>819</x>
@@ -1663,8 +1663,8 @@
    <slot>setLineD(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>170</y>
+     <x>120</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>839</x>
@@ -1679,8 +1679,8 @@
    <slot>setLineH(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>223</x>
-     <y>198</y>
+     <x>120</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>845</x>
@@ -1695,8 +1695,8 @@
    <slot>FindRegion()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>229</y>
+     <x>120</x>
+     <y>181</y>
     </hint>
     <hint type="destinationlabel">
      <x>865</x>
@@ -1711,8 +1711,8 @@
    <slot>FindRegion()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>114</x>
-     <y>230</y>
+     <x>102</x>
+     <y>159</y>
     </hint>
     <hint type="destinationlabel">
      <x>824</x>
