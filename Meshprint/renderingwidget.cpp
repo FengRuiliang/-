@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.2);
+	sphere_for_display.scalemesh(0.1);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -1381,27 +1381,35 @@ void RenderingWidget::DrawSupport(bool bv)
 				}
 			}
 			glEnd();
-			glLineWidth(2.0);
-			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
-			for (int u = 0; u < polylines->size(); u++)
+			
+			//glColor4ub(55, 126, 184, 255);
+			auto sup_rec = ctn_obj[i]->ppcs->su->get_suprec();
+			for (int u = 0; u < sup_rec->size(); u++)
 			{
-// 				if (u!=slice_check_id_)
-// 				{
-// 					continue;
-// 				}
-				for (int v = 0; v < polylines->at(u).size(); v++)
+				for (int v = 0; v < sup_rec->at(u).size(); v++)
 				{
 					glBegin(GL_LINES);
-					for (int w = 0; w < polylines->at(u)[v].size() - 1; w++)
+					for (int w = 0; w < sup_rec->at(u)[v].size() ; w++)
 					{
-						glVertex3fv(polylines->at(u)[v][w]);
-						glVertex3fv(polylines->at(u)[v][w + 1]);
+						glVertex3fv(sup_rec->at(u)[v][w]);
+						glVertex3fv(sup_rec->at(u)[v][(w + 1)%sup_rec->at(u)[v].size()]);
 					}
 					glEnd();
 				}
 
 			}
+			auto sup_lines = ctn_obj[i]->ppcs->su->get_suplines();
+			for (int u = 0; u < sup_lines->size(); u++)
+			{
+				glBegin(GL_LINES);
+				for (int v = 0; v < sup_lines->at(u).size()-1; v++)
+				{
+					glVertex3fv(sup_lines->at(u)[v]);
+					glVertex3fv(sup_lines->at(u)[v+1]);
 
+				}
+				glEnd();
+			}
 			glColor4ub(152, 78, 163, 255);
 			auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
 			
@@ -1415,9 +1423,27 @@ void RenderingWidget::DrawSupport(bool bv)
 				glEnd();
 			}
 			
-
+		
 			glColor4ub(77, 175, 74, 255);
+			
+			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
+			for (int u = 0; u < polylines->size(); u++)
+			{
+				for (int v = 0; v < polylines->at(u).size(); v++)
+				{	
+					glLineWidth(2.0);
+					glBegin(GL_LINES);
+					for (int w = 0; w < polylines->at(u)[v].size() - 1; w++)
+					{
+						glVertex3fv(polylines->at(u)[v][w]);
+						glVertex3fv(polylines->at(u)[v][w + 1]);
+					}
+					glEnd();
+				}
+
+			}
 			auto sup_hatch= ctn_obj[i]->ppcs->su->get_hatchs();
+			glLineWidth(2.0);
 			glBegin(GL_LINES);
 			for (int j=0;j<sup_hatch->at(slice_check_id_).size();j++)
 			{

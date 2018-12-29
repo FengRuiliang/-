@@ -15,6 +15,7 @@ public:
 	~Preprocessor();
 	void do_slice();
 	void add_support();
-	void exportp();
+	void exportpoint();
+	void exportline();
 };
 

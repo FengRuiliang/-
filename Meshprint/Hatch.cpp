@@ -1470,16 +1470,35 @@ void HatchX::doHatch()
 }
 
 
-void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float hei)
+void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float hei,int id)
 {
 	std::map<int, std::vector<int>> lines;
 	int gap = 420;
+	QMatrix4x4 matrix_;
+	QVector3D rotationAxis(0.0, 0.0, 1.0);
+	matrix_.setToIdentity();
+	float angle ;
+	if (id%2==0)
+	{
+		angle = 45;
+	}
+	else
+	{
+		angle = -45;
+	}
+	matrix_.rotate(angle, rotationAxis);
 	for (int i=0;i<cns.size();i++)
 	{
 		for (int j=0;j<cns[i].size();j++)
 		{
 			ivec2 p1(cns[i][j].X, cns[i][j].Y);
 			ivec2 p2(cns[i][(j + 1) % cns[i].size()].X, cns[i][(j + 1) % cns[i].size()].Y);
+			QVector4D p = QVector4D(p1.x(), p1.y(), 0, 1)*matrix_;
+			p1.x() = (int)p.x();
+			p1.y() = (int)p.y();
+			p = QVector4D(p2.x(), p2.y(), 0, 1)*matrix_;
+			p2.x() = (int)p.x();
+			p2.y() = (int)p.y();
 			int y_min, y_max;
 			if (p1.y()<p2.y())
 			{
@@ -1508,14 +1527,26 @@ void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float he
 			}
 		}
 	}
+	matrix_.setToIdentity();
+	matrix_.rotate(-angle, rotationAxis);
 	for (auto iter=lines.begin();iter!=lines.end();iter++)
 	{
 		std::sort(iter->second.begin(),iter->second.end());
 		for (int j=0;j<iter->second.size()-1;j++)
 		{
-			Vec3f p1( iter->second[j]/1e3,iter->first/1e3,hei);
-			Vec3f p2( iter->second[++j]/1e3,iter->first/1e3,hei);
+
+			Vec3f p1(iter->second[j] / 1e3, iter->first / 1e3, hei);
+			Vec3f p2(iter->second[++j] / 1e3, iter->first / 1e3, hei);
+ 			QVector4D p = QVector4D(p1.x(), p1.y(), 0, 1.0)*matrix_;
+ 			p1.x() = p.x();
+ 			p1.y() = p.y();
+ 
+ 			p = QVector4D(p2.x(), p2.y(), 0, 1.0)*matrix_;
+ 			p2.x() = p.x();
+ 			p2.y() = p.y();
+	
 			hatch.push_back(Segment(p1, p2));
 		}
 	}
+
 }

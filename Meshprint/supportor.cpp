@@ -1,9 +1,9 @@
 #include "supportor.h"
 #include <omp.h>
-
+#include <QMatrix4x4>
 Supportor::Supportor()
 {
-	
+	sup_lines = new std::vector<std::vector<Vec3f>>;
 }
 
 
@@ -23,13 +23,14 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	hatchs = new std::vector<std::vector<Segment>>(cnts->size());
 	minkowskisums = new std::vector<std::vector<std::vector<Vec3f>>>(cnts->size());
 	sup_points = new std::vector<std::vector<Vec3f>>(cnts->size());
+	sup_rectangle = new std::vector<std::vector<std::vector<Vec3f>>>(cnts->size());
 	ClipperLib::Clipper cliper;
 	ClipperLib::ClipperOffset off;
 	Path pattern;
 	Hatch hatch_;
-	for (int i = 0; i < 18; i++)
+	for (int i = 0; i < 36; i++)
 	{
-		pattern << IntPoint(PBG * cos(i * 20), PBG * sin(i * 20));
+		pattern << IntPoint(PBG * cos(i * 10), PBG * sin(i * 10));
 	}
 	Paths sup_paths;
 	Paths under_paths;
@@ -48,15 +49,14 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			{
 				path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
 			}
+			
 			tem << path;
 		}
+		
 		off.Clear();
 		off.AddPaths(tem, jtMiter, etClosedPolygon);
 		off.Execute(regions[i], -OSD);
-		//regions[i] = tem;
 	}
-
-
 	for (int i=0;i<18;i++)
 	{
 		circle_<< IntPoint(500 * cos(i * 20), 500 * sin(i * 20));
@@ -108,46 +108,22 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 				{
 					findpolyline(upper_paths[j], under_paths, i);
 				}
-//				cliper.Clear();
-// 				Paths tem;
-// 				for (int j = 0; j < sup_points->size(); j++)
-// 				{
-// 					Path tem1;
-// 					for (int k=0;k<sup_points->at(j).size();k++)
-// 					{
-// 						for (IntPoint p:circle_)
-// 						{
-// 							tem1 << IntPoint(p.X + sup_points->at(j)[k].x()*1e3, p.Y + sup_points->at(j)[k].y()*1e3);
-// 						}
-// 					}
-// 					tem<<tem1;
-// 				}
-// 				//cliper.AddPaths(tem, ptClip, true);
-// 				cliper.AddPaths(mink_sum, ptClip, true);
-// 				cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
-				//for (int j = 0; j < 1; j++)
-				//{
-				//	// 				off.Clear();
-				//	// 				off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
-				//	// 				off.Execute(upper_paths, -j * 420);
-				//	cliper.Clear();
-				//	cliper.AddPaths(under_paths, ptClip, true);
-				//	cliper.AddPaths(upper_paths, ptSubject, true);
-				//	cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
-				//	if (sup_paths.size())
-				//	{
-				//		
-				//	}
-				//}
 			}
 
-			continue;
+			off.Clear();
+			off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
+			off.Execute(upper_paths, -2 * OSD);
+			cliper.Clear();
+			cliper.AddPaths(under_paths, ptClip, true);
+			cliper.AddPaths(upper_paths, ptSubject, true);
+			cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
 			CleanPolygons(sup_paths);
-			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09);
+			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09,i);
 			add_supportting_point_for_hatchs(hatchs->at(i),i);
 		}
 	}
-	//merge();
+	merge(cnts->size());
+	qDebug() << "finish";
 }
 inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int sliceid)
 {
@@ -235,7 +211,7 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int slicei
 
 void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly,int sliceid)
 {
-	qDebug() << sliceid<<"whole number" << poly.size();
+	//qDebug() << sliceid<<"whole number" << poly.size();
 	int start_id = 0;
 	do
 	{
@@ -290,41 +266,190 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly,int s
 	} while (start_id < poly.size() - 1);
 }
 
-void Supportor::merge()
+void Supportor::merge(int num)
 {
-	Path circle_;
-	for (int i = 0; i < 18; i++)
-	{
-		circle_ << IntPoint(500 * cos(i * 20), 500 * sin(i * 20));
-	}
-
-	ClipperLib::Clipper cliper;
+	
 	for (int i=0;i<sup_points->size();i++)
 	{
 		for (int j=0;j<sup_points->at(i).size();j++)
 		{
-			Path tem;
-			for (int k = 0; k < circle_.size(); k++)
+			Vec3f point = sup_points->at(i)[j];
+			int is_attach_for_ith_line = -1;
+			for (int k = 0; k < sup_lines->size(); k++)
 			{
-				tem << IntPoint(circle_[k].X + sup_points->at(i)[j].x()*1e3,
-					circle_[k].Y + sup_points->at(i)[j].y()*1e3);
+				if (sup_lines->at(k).size()>1)
+				{
+					auto riter = sup_lines->at(k).rbegin();
+					Vec3f dir = *riter - *(riter+1); 
+					dir.normalize();
+					Vec3f dir1 = point - *riter;
+					float length = dir1.length();
+					
+					dir1.normalize();
+					float angle = dir1.dot(dir);
+					if (length<0.9&&angle>.9)
+					{
+						is_attach_for_ith_line = k;
+						break;
+					}
+
+				}
+				else if (( point- sup_lines->at(k).back()).length() < 0.9)
+				{
+					is_attach_for_ith_line = k;
+					break;
+				}
 			}
-			cliper.AddPath(tem, ptClip, true);
+			if (is_attach_for_ith_line == -1)
+			{
+				std::vector<Vec3f> new_line(1, point);
+				sup_lines->push_back(new_line);
+			}
+			else
+			{
+				sup_lines->at(is_attach_for_ith_line).push_back(point);
+			}
 		}
-	
+		sup_points->at(i).clear();
 	}
-	Paths region_;
-	cliper.Execute(ctUnion, region_, pftNonZero, pftNonZero);
+
+	for (auto iter=sup_lines->begin();iter!=sup_lines->end();)
+	{
+
+		if (iter->size()<3)
+		{
+			int id = iter->front().z() / 0.09;
+			sup_points->at(id).push_back(iter->front());
+			iter=sup_lines->erase(iter);
+		}
+		else
+		{
+			float max_ = -1e6;
+			for (Vec3f p:*iter)
+			{
+				max_ = max_ > p.z() ? max_ : p.z();
+			}
+// 			for (Vec3f p:*iter)
+// 			{
+// 				p.z() = max_;
+// 			}
+// 			
+		
+			Path for_extrude;
+			for (int k = 0; k < iter->size(); k++)
+			{
+				for_extrude << IntPoint(iter->at(k).x()*1e3, iter->at(k).y()*1e3);
+				/*iter->at(k).z() -= 0.9;*/
+			}
+			ClipperLib::ClipperOffset off;
+			off.AddPath(for_extrude, jtMiter, etOpenButt);
+			Paths solution;
+			off.Execute(solution, 300);
+			std::vector<Vec3f> line1;
+			for (auto iter1 = solution.begin(); iter1 != solution.end(); iter1++)
+			{
+				for (IntPoint p : *iter1)
+				{
+					line1.push_back(Vec3f(p.X / 1e3, p.Y / 1e3, max_));
+				}
+			}
+			int id = max_ / 0.09 - 10;
+			sup_rectangle->at(max_/.09).push_back(line1);
+			sup_points->at(id).push_back(iter->front());
+			sup_points->at(id).push_back(iter->back());
+			add_supportting_point_for_polyline(*iter, id);
+			++iter;
+		}
+	}
+
 }
 
  
 void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs,int sliceid)
 {
+	Path pattern;
+	std::vector<std::vector<Vec3f>> lines;
+
 	for (int i=0;i<hatchs.size();i++)
 	{
-		for (int j = 1; j*PBL < hatchs[i].get_length(); j++)
+		int num_part = 0;
+		for (; num_part*PBL < hatchs[i].get_length(); num_part++);
+		float len_per = hatchs[i].get_length() / num_part;
+		len_per = PBL;
+		for (int j = 1; j*len_per < hatchs[i].get_length()-1e-3; j++)
 		{
-			sup_points->at(sliceid).push_back(hatchs[i].get_v1() + j*PBL*hatchs[i].get_normal());
+			Vec3f tem = hatchs[i].get_v1() + j*len_per*hatchs[i].get_normal();
+			int is_attach_for_ith_line = -1;
+			for (int k = 0; k < lines.size(); k++)
+			{
+				if ((tem - lines[k].back()).length() < 0.942)
+				{
+					is_attach_for_ith_line = k;
+					break;
+				}
+			}
+			if (is_attach_for_ith_line==-1)
+			{
+				std::vector<Vec3f> new_line(1,tem);
+				lines.push_back(new_line);
+			}
+			else
+			{
+				lines[is_attach_for_ith_line].push_back(tem);
+			}
+			
+		}
+	}
+
+	for (auto iter = lines.begin(); iter!=lines.end();iter++)
+	{
+		if (iter->size() == 1)
+		{
+			sup_points->at(sliceid).push_back(iter->front());
+			//iter=lines->at(sliceid).erase(iter);
+		}
+		else
+		{
+			
+			sup_points->at(sliceid - 50).push_back(iter->front() - Vec3f(0, 0, 0.9));
+			sup_points->at(sliceid - 50).push_back(iter->back() - Vec3f(0, 0, 0.9));
+			//sup_lines->at(sliceid).push_back(*iter);
+			
+			Path for_extrude;
+			for (int k=0;k<iter->size();k++)
+			{
+				for_extrude << IntPoint(iter->at(k).x()*1e3, iter->at(k).y()*1e3);
+				iter->at(k).z() -= 0.9;
+			}
+			add_supportting_point_for_polyline(*iter, sliceid - 10);
+			ClipperLib::ClipperOffset off;
+			off.AddPath(for_extrude, jtMiter, etOpenButt);
+			Paths solution;
+			off.Execute(solution, 300);
+			std::vector<Vec3f> line1;
+			for (auto iter1 = solution.begin(); iter1 != solution.end(); iter1++)
+			{
+				for (IntPoint p:*iter1)
+				{
+					line1.push_back(Vec3f(p.X / 1e3, p.Y / 1e3, sliceid*0.09));
+				}
+			}
+			sup_rectangle->at(sliceid).push_back(line1);
+			continue;
+// 			Paths mink_sum;
+// 			MinkowskiSum(pattern, for_extrude, mink_sum, false);
+// 			//qDebug() << for_extrude.size()<<mink_sum.size();
+// 
+// 			for (int j = 0; j < mink_sum.size(); j++)
+// 			{
+// 				std::vector<Vec3f> linet;
+// 				for (int k = 0; k < mink_sum[j].size(); k++)
+// 				{
+// 					linet.push_back(Vec3f(mink_sum[j][k].X / 1e3, mink_sum[j][k].Y / 1e3, sliceid*0.09));
+// 				}
+// 				sup_lines->at(sliceid).push_back(linet);
+// 			}
+// 			sup_lines->at(sliceid).push_back(*iter);
 		}
 	}
 }

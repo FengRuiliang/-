@@ -648,8 +648,6 @@ void Mesh3D::UpdateMesh(void)
 	ComputeAvarageEdgeLength();
 	if (input_vertex_list_.size() == 0)
 		SetNeighbors();
-	Unify(1);
-	RestoreVertexIntoInt();
 }
 
 void Mesh3D::SetBoundaryFlag(void)
@@ -884,11 +882,7 @@ void Mesh3D::Unify(float size)
 	{
 		scaleMax = scaleZ;
 	}
-	// 	scaleV = size / scaleMax;
-	// 	scaleT = scaleV;
-	// 	scaleV = 1;
-	Vec3f centerPos((xmin_ + xmax_) / 2.0, (ymin_ + ymax_) / 2.0, (zmin_));
-	//Vec3f centerPos(xmin_ , ymin_, zmin_);
+	Vec3f centerPos(0, 0, zmin_);
 	for (size_t i = 0; i != pvertices_list_->size(); i++)
 	{
 		pvertices_list_->at(i)->position_ = (pvertices_list_->at(i)->position_ - centerPos);

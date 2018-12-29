@@ -151,7 +151,7 @@ public:
 	void Ylineforcountor(Paths c, float z);
 	void Xlineforcountor(Paths c, float z);
 	void offsetforcountor(Paths c, float z);
-	void do_hatch_for_contour(Paths cns , std::vector<Segment>& hatch, float hei);
+	void do_hatch_for_contour(Paths cns, std::vector<Segment>& hatch, float hei, int id);
 	virtual void doHatch() {};
 
 };
