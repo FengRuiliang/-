@@ -18,6 +18,7 @@ Supportor::~Supportor()
 
 void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::vector<Segment*>>>* cnts)
 {
+	qDebug() << "PBG" << PBG;
 	bool is_uniform = false;
 	polylines = new std::vector<std::vector<std::vector<Vec3f>>>(cnts->size());
 	hatchs = new std::vector<std::vector<Segment>>(cnts->size());
@@ -56,6 +57,8 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 		off.Clear();
 		off.AddPaths(tem, jtMiter, etClosedPolygon);
 		off.Execute(regions[i], -OSD);
+		CleanPolygons(regions[i]);
+		SimplifyPolygons(regions[i]);
 	}
 	for (int i=0;i<18;i++)
 	{
@@ -63,6 +66,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	}
 	for (int i = regions.size()-1; i >2 ; i--)
 	{
+		
 		sup_paths.clear();
 		
 		mink_sum.clear();
@@ -109,22 +113,23 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 					findpolyline(upper_paths[j], under_paths, i);
 				}
 			}
-
-			off.Clear();
-			off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
-			off.Execute(upper_paths, -2 * OSD);
-			cliper.Clear();
-			cliper.AddPaths(under_paths, ptClip, true);
-			cliper.AddPaths(upper_paths, ptSubject, true);
-			cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
-			CleanPolygons(sup_paths);
-			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09,i);
-			add_supportting_point_for_hatchs(hatchs->at(i),i);
+			
+// 			off.Clear();
+// 			off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
+// 			off.Execute(upper_paths, -2 * OSD);
+// 			cliper.Clear();
+// 			cliper.AddPaths(under_paths, ptClip, true);
+// 			cliper.AddPaths(upper_paths, ptSubject, true);
+// 			cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
+// 			CleanPolygons(sup_paths);
+// 			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09,i);
+// 			add_supportting_point_for_hatchs(hatchs->at(i),i);
 		}
 	}
-	merge(cnts->size());
+	//merge(cnts->size());
 	qDebug() << "finish";
 }
+
 inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int sliceid)
 {
 	
@@ -211,7 +216,6 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int slicei
 
 void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly,int sliceid)
 {
-	//qDebug() << sliceid<<"whole number" << poly.size();
 	int start_id = 0;
 	do
 	{
@@ -361,7 +365,6 @@ void Supportor::merge(int num)
 			++iter;
 		}
 	}
-
 }
 
  
@@ -493,4 +496,11 @@ void Supportor::add_supportting_point_by_uniform(Paths poly,int sliceid)
 			}
 		}
 	}
+}
+
+
+
+void Supportor::buildTreeStructure()
+{
+
 }

@@ -1,7 +1,8 @@
 #include "qmath.h"
+float thickness_ = 0.09;
 float PBL = 4.0;// printable bridge length
 float ERR = 0.2;
-int PBG = 247;//printable bridge gap
+int PBG = 222;//printable bridge gap
 int OSD = 384;//offset distance
 bool is_uniform = false;
 float field_width_ = 5.0;
@@ -11,7 +12,7 @@ float field_overlap_ = 0.09;
 float unit = 0.01;
 int units_y_ = field_height_ / line_width_;
 int units_x_ = field_width_ / line_width_;
-float thickness_ = 0.03;
+
 float offset_dis_ = 0.051;
 int * num_hatch;
 float laser_power_hatch_ = 200;

@@ -45,9 +45,9 @@ void Slicer::doslice()
 			max_z = max_z > cur->pvert_->position().z() ? max_z : cur->pvert_->position().z();
 			cur = cur->pnext_;
 		} while (cur != sta);
-		for (int j = 0; (float)j*thickness+0.04 - max_z<-1e-3; j++)
+		for (int j = 0; (float)j*thickness - max_z<-1e-3; j++)
 		{
-			if ((float)j*thickness+0.04 > min_z-1e-3)
+			if ((float)j*thickness > min_z-1e-3)
 			{
 				pf[j].push_back(i);
 			}
@@ -56,12 +56,12 @@ void Slicer::doslice()
 	float hei;
 	for (int i=0;i<num;i++)
 	{
-		hei = i*thickness+0.04;
+		hei = i*thickness;
 		std::vector<bool> mark(obj->num_of_face_list(), false);
 		std::vector<std::vector<Segment*>> polygon;
 		for (int j=0;j<pf[i].size();j++)
 		{
-			if (!mark[pf[i][j]]&&(!is_need_sup[pf[i][j]]||j==pf[i].size()-1))// make sure first polyline is not need support
+			if (!mark[pf[i][j]])// make sure first polyline is not need support
 			{
 				std::vector<Segment*> polyline;
 				HE_edge *ejump = faces->at(pf[i][j])->pedge_;

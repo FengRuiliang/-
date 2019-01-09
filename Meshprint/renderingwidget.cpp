@@ -394,7 +394,7 @@ void RenderingWidget::wheelEvent(QWheelEvent *e)
 {
 	if (ctn_obj.size())
 	{
-		eye_distance_ -= e->delta()*ctn_obj[0]->ptr_mesh_->getBoundingBox().at(0).at(2)*scaleV / 1000;
+		eye_distance_ -= e->delta()*ctn_obj[0]->ptr_mesh_->getBoundingBox().at(0).at(2) / 1000;
 	}
 	eye_distance_ = eye_distance_ < 0 ? 0 : eye_distance_;
 	update();

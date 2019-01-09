@@ -34,5 +34,6 @@ private:
 	inline void findpolyline(Path target_paths, Paths mink_sum, int num);
 	void add_supportting_point_for_hatchs(std::vector<Segment> hatchs, int sliceid);
 	void add_supportting_point_by_uniform(Paths poly, int sliceid);
+	void buildTreeStructure();
 };
 

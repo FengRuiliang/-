@@ -1,6 +1,7 @@
 #include "Preprocessor.h"
 #include<fstream>
 #include <cmath>
+#include "Support.h"
 
 Preprocessor::Preprocessor()
 {
@@ -45,24 +46,100 @@ void Preprocessor::add_support()
 }
 void Preprocessor::exportpoint()
 {
+	MeshOctree oct;
+	oct.BuildOctree(tar);
 	auto ptr_points = su->get_sup_points();
 	std::ofstream fout("D:/grs/a.grs");
 
 	fout << "ENTITY/OBJ" << std::endl;
 	double a[3], b[3], diaa, diab, axis[3], dis, dia=0.6;
+	//int j = 0;
+	//for (Vec3f p : ptr_points->at(80))
+	//{
+	//	Vec3f point_out = oct.InteractPoint(p, Vec3f(0, 0, -1));
+	//	a[0] = p.x();
+	//	a[1] = p.y();
+	//	a[2] = p.z();
+	//	b[0] = point_out.x();
+	//	b[1] = point_out.y();
+	//	b[2] = point_out.z();
+	//	axis[0] = b[0] - a[0];
+	//	axis[1] = b[1] - a[1];
+	//	axis[2] = b[2] - a[2];
+
+	//	dis = (point_out - p).length();
+	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
+	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+
+	//}
+	//float tem = 0;
+	//for (Vec3f p:ptr_points->at(465))
+	//{
+	//	Vec3f point_out = oct.InteractPoint(p, Vec3f(0, 0, -1));
+	//	a[0] = p.x();
+	//	a[1] = p.y();
+	//	a[2] = p.z();
+	//	b[0] = point_out.x();
+	//	b[1] = point_out.y();
+	//	b[2] = point_out.z();
+	//	axis[0] = b[0] - a[0];
+	//	axis[1] = b[1] - a[1];
+	//	axis[2] = b[2] - a[2];
+	//	dia = 0.6;
+	//	dis = (point_out - p).length()/3;
+	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
+	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2]-dis+0.1 << ",HEIGHT,$" << std::endl
+	//		<< dis*2 << ",DIAMTR," << 1.0 << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+	//	tem = a[2] - dis;
+	//}
+	//
+	//for (Vec3f p : ptr_points->at(460))
+	//{
+	//	dia = 0.6;
+	//	a[0] = p.x();
+	//	a[1] = p.y();
+	//	a[2] = p.z();
+	//	axis[0] = b[0] - a[0];
+	//	axis[1] = b[1] - a[1];
+	//	axis[2] = tem - a[2];
+
+	//	
+	//	dis = sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
+	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
+	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+
+	//}
+	//for (Vec3f p : ptr_points->at(471))
+	//{
+	//	dia = 0.6;
+	//	a[0] = p.x();
+	//	a[1] = p.y();
+	//	a[2] = p.z();
+	//	axis[0] = b[0] - a[0];
+	//	axis[1] = b[1] - a[1];
+	//	axis[2] = tem - a[2];
+	//	dis = sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
+	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
+	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
+
+	//}
+	//fout << "halt";
+	//return;
 	for (int i = 0; i < ptr_points->size(); i++)
 	{
 		for each(Vec3f p in ptr_points->at(i))
 		{
+			Vec3f point_out = oct.InteractPoint(p, Vec3f(0, 0, -1));
 			a[0] = p.x();
 			a[1] = p.y();
 			a[2] = p.z();
 			diaa = 1.0;
 			diab = 1.1;
 
-			b[0] = a[0];
-			b[1] = a[1];
-			b[2] = 0;
+			b[0] = point_out.x();
+			b[1] = point_out.y();
+			b[2] = point_out.z();
 			for (int i = 0; i < 3; i++)
 			{
 				axis[i] = b[i] - a[i];
