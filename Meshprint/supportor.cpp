@@ -64,11 +64,13 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 	{
 		circle_<< IntPoint(500 * cos(i * 20), 500 * sin(i * 20));
 	}
-	for (int i = regions.size()-1; i >2 ; i--)
+
+
+
+	for (int i = regions.size()-1; i >0 ; i--)
 	{
 		
 		sup_paths.clear();
-		
 		mink_sum.clear();
 		upper_paths = regions[i];
 		under_paths = regions[i - 1];
@@ -214,14 +216,30 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int slicei
 	}
 }
 
-void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly,int sliceid)
+void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> polyin,int sliceid)
 {
+	std::vector<Vec3f> poly;
+	poly.push_back(polyin.front());
+	for (int i=1;i<polyin.size()-1;i++)
+	{
+		Vec3f dir1 = polyin[i] - polyin[i - 1];
+		Vec3f dir2 = polyin[i + 1] - polyin[i];
+		dir1.normalize();
+		dir2.normalize();
+		if (abs(dir1.dot(dir2))<0.996)
+		{
+			poly.push_back(polyin[i]);
+		}
+	}
+	poly.push_back(polyin.back());
+	//poly = polyin;
 	int start_id = 0;
 	do
 	{
 		Vec3f A = poly[start_id];
 		int end_id = start_id;
 		Vec3f dir1, dir2;
+		float sumlenth;
 		float err1 = 0, err2 = 0, err3 = 0;
 		//qDebug() << "start at" << start_id;
 		while (++end_id < poly.size())
@@ -229,14 +247,24 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> poly,int s
 			err1 = (poly[end_id] - poly[end_id-1]).length();
 			err2 = (poly[end_id] - poly[start_id]).length();
 
-			dir1 = poly[end_id] - poly[end_id - 1];
+			dir1 = poly[end_id] - poly[start_id];
 			dir1.normalize();
 			for (int j = start_id; j < end_id; j++)
 			{
-				dir2 = poly[end_id] - poly[start_id];
+				dir2 = poly[j+1] - poly[j];
+
+				float length = dir2.length();
+				sumlenth += length;
 				dir2.normalize();
-				if (dir1.dot(dir2) != 0)
-					err3 += pow((poly[j + 1] - poly[j]).length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2));
+				if (dir1.dot(dir2)!=0)
+				{
+					err3 += pow(length, 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
+				}
+				/*err3 /= sumlenth;*/
+				//err3 = std::max(abs(dir2.dot(dir1)), err3);
+// 				dir2.normalize();
+// 				if (dir1.dot(dir2) != 0)
+// 					err3 += pow((poly[j + 1] - poly[j]).length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2));
 			}
 			if (err1 > PBL||err2 > PBL || err3 > ERR )
 			{
