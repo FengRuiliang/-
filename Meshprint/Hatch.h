@@ -153,6 +153,9 @@ public:
 	void offsetforcountor(Paths c, float z);
 	void do_hatch_for_contour(Paths cns, std::vector<Segment>& hatch, float hei, int id);
 	virtual void doHatch() {};
+	void doIslandHathc(std::vector<std::vector<std::vector<Segment*>>>* cns);
+	std::vector<std::vector<Segment>>* hatchs;
+	std::vector<std::vector<Segment>>* get_hatchs() { return hatchs; }
 
 };
 class HatchChessboard :public Hatch

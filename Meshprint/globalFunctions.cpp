@@ -1,5 +1,5 @@
 #include "qmath.h"
-float thickness_ = 0.09;
+float thickness_ = 1.0;
 float PBL = 4.0;// printable bridge length
 float ERR = 0.2;
 int PBG = 222;//printable bridge gap
