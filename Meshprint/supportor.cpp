@@ -69,7 +69,11 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 
 	for (int i = regions.size()-1; i >0 ; i--)
 	{
-		
+
+		if (i != 32)
+		{
+			continue;
+		}
 		sup_paths.clear();
 		mink_sum.clear();
 		upper_paths = regions[i];
@@ -91,15 +95,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			cliper.Clear();
 			cliper.AddPaths(mink_sum, ptClip, true);
 			cliper.Execute(ctUnion, under_paths, pftNonZero, pftNonZero);
-			for (int j = 0; j < under_paths.size(); j++)
-			{
-				std::vector<Vec3f> path;
-				for (int k = 0; k < under_paths[j].size(); k++)
-				{
-					path.push_back(Vec3f(under_paths[j][k].X / 1e3, under_paths[j][k].Y / 1e3, i*0.09));
-				}
-				minkowskisums->at(i).push_back(path);
-			}
+			
 			cliper.Clear();
 			cliper.AddPaths(under_paths, ptClip, true);
 			cliper.AddPaths(upper_paths, ptSubject, true);
@@ -110,22 +106,25 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 			}
 			else
 			{
-				for (int j = 0; j < upper_paths.size(); j++)
+				for (int n=0;n<3;n++)
 				{
-					findpolyline(upper_paths[j], under_paths, i);
+					off.Clear();
+					off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
+					off.Execute(upper_paths, -OSD);
+					for (int j = 0; j < upper_paths.size(); j++)
+					{
+						std::vector<Vec3f> path;
+						for (int k = 0; k < upper_paths[j].size(); k++)
+						{
+							path.push_back(Vec3f(upper_paths[j][k].X / 1e3, upper_paths[j][k].Y / 1e3, i*thickness_));
+						}
+						minkowskisums->at(i).push_back(path);
+						findpolyline(upper_paths[j], under_paths, i);
+					}
 				}
+				hatch_.do_hatch_for_contour(upper_paths, hatchs->at(i), i*thickness_, i);
+				add_supportting_point_for_hatchs(hatchs->at(i), i);
 			}
-			
-// 			off.Clear();
-// 			off.AddPaths(upper_paths, jtMiter, etClosedPolygon);
-// 			off.Execute(upper_paths, -2 * OSD);
-// 			cliper.Clear();
-// 			cliper.AddPaths(under_paths, ptClip, true);
-// 			cliper.AddPaths(upper_paths, ptSubject, true);
-// 			cliper.Execute(ctDifference, sup_paths, pftNonZero, pftNonZero);
-// 			CleanPolygons(sup_paths);
-// 			hatch_.do_hatch_for_contour(sup_paths, hatchs->at(i), i*0.09,i);
-// 			add_supportting_point_for_hatchs(hatchs->at(i),i);
 		}
 	}
 	//merge(cnts->size());
@@ -134,7 +133,7 @@ void Supportor::add_supportting_point_for_contours(std::vector<std::vector<std::
 
 inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int sliceid)
 {
-	
+	mink_sum.clear();
 	std::vector<bool> is_in_minkows(target_paths.size());
 	int num = 0;
 	for (int i=0;i<target_paths.size();i++)
@@ -166,14 +165,14 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int slicei
 	if (num==target_paths.size())
 	{
 		std::vector<Vec3f> polyline;
-		//polyline.push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
+		//polyline.push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*thickness_));
 		for (int i=0;i<target_paths.size();i++)
 		{
-			polyline.push_back(Vec3f(target_paths[i].X / 1e3, target_paths[i].Y / 1e3, sliceid*0.09));
+			polyline.push_back(Vec3f(target_paths[i].X / 1e3, target_paths[i].Y / 1e3, sliceid*thickness_));
 		}
-		polyline.push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
+		polyline.push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*thickness_));
 		polylines->at(sliceid).push_back(polyline);
-		sup_points->at(sliceid).push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
+		sup_points->at(sliceid).push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*thickness_));
 		add_supportting_point_for_polyline(polyline, sliceid);
 	}
 	else if(num!=0)
@@ -193,14 +192,14 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum,int slicei
 		{
 			std::vector<Vec3f> polyline;
 			int last_id = (cur_id - 1 + target_paths.size())%target_paths.size();
-			polyline.push_back(Vec3f(target_paths[last_id].X / 1e3, target_paths[last_id].Y / 1e3, sliceid*0.09));
+			polyline.push_back(Vec3f(target_paths[last_id].X / 1e3, target_paths[last_id].Y / 1e3, sliceid*thickness_));
 			while (!is_in_minkows[cur_id])
 			{
 				//qDebug() << "out"<<cur_id;
-				polyline.push_back(Vec3f(target_paths[cur_id].X / 1e3, target_paths[cur_id].Y / 1e3, sliceid*0.09));
+				polyline.push_back(Vec3f(target_paths[cur_id].X / 1e3, target_paths[cur_id].Y / 1e3, sliceid*thickness_));
 				cur_id = (cur_id + 1) % target_paths.size();
 			}
-			polyline.push_back(Vec3f(target_paths[cur_id].X / 1e3, target_paths[cur_id].Y / 1e3, sliceid*0.09));
+			polyline.push_back(Vec3f(target_paths[cur_id].X / 1e3, target_paths[cur_id].Y / 1e3, sliceid*thickness_));
 			if (polyline.size()>2)
 			{
 				polylines->at(sliceid).push_back(polyline);
@@ -350,7 +349,7 @@ void Supportor::merge(int num)
 
 		if (iter->size()<3)
 		{
-			int id = iter->front().z() / 0.09;
+			int id = iter->front().z() / thickness_;
 			sup_points->at(id).push_back(iter->front());
 			iter=sup_lines->erase(iter);
 		}
@@ -385,7 +384,7 @@ void Supportor::merge(int num)
 					line1.push_back(Vec3f(p.X / 1e3, p.Y / 1e3, max_));
 				}
 			}
-			int id = max_ / 0.09 - 10;
+			int id = max_ / thickness_ - 10;
 			sup_rectangle->at(max_/.09).push_back(line1);
 			sup_points->at(id).push_back(iter->front());
 			sup_points->at(id).push_back(iter->back());
@@ -441,7 +440,6 @@ void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs,int
 		}
 		else
 		{
-			
 			sup_points->at(sliceid - 50).push_back(iter->front() - Vec3f(0, 0, 0.9));
 			sup_points->at(sliceid - 50).push_back(iter->back() - Vec3f(0, 0, 0.9));
 			//sup_lines->at(sliceid).push_back(*iter);
@@ -462,7 +460,7 @@ void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs,int
 			{
 				for (IntPoint p:*iter1)
 				{
-					line1.push_back(Vec3f(p.X / 1e3, p.Y / 1e3, sliceid*0.09));
+					line1.push_back(Vec3f(p.X / 1e3, p.Y / 1e3, sliceid*thickness_));
 				}
 			}
 			sup_rectangle->at(sliceid).push_back(line1);
@@ -476,7 +474,7 @@ void Supportor::add_supportting_point_for_hatchs(std::vector<Segment> hatchs,int
 // 				std::vector<Vec3f> linet;
 // 				for (int k = 0; k < mink_sum[j].size(); k++)
 // 				{
-// 					linet.push_back(Vec3f(mink_sum[j][k].X / 1e3, mink_sum[j][k].Y / 1e3, sliceid*0.09));
+// 					linet.push_back(Vec3f(mink_sum[j][k].X / 1e3, mink_sum[j][k].Y / 1e3, sliceid*thickness_));
 // 				}
 // 				sup_lines->at(sliceid).push_back(linet);
 // 			}
@@ -520,7 +518,7 @@ void Supportor::add_supportting_point_by_uniform(Paths poly,int sliceid)
 			}
 			if (cross_num%2==1)
 			{
-				sup_points->at(sliceid).push_back(Vec3f(x_ / 1e3, y_ / 1e3, sliceid*0.09));
+				sup_points->at(sliceid).push_back(Vec3f(x_ / 1e3, y_ / 1e3, sliceid*thickness_));
 			}
 		}
 	}

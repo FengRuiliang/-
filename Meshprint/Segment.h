@@ -1,10 +1,20 @@
 #pragma once
 #include "HE_mesh/Mesh3D.h"
+#include "QVector4D"
 class Segment
 {
 public:
 	Segment() {};
 	Segment(Vec3f p1, Vec3f p2) { v1 = p1; v2 = p2; }
+	Segment(QVector4D p1, QVector4D p2)
+	{
+		v1.x() = p1.x();
+		v1.y() = p1.y();
+		v1.z() = p1.z();
+		v2.x() = p2.x();
+		v2.y() = p2.y();
+		v2.z() = p2.z();
+	}
 	~Segment() {};
 protected:
 private:
@@ -14,7 +24,7 @@ private:
 	Vec3f vout, vin;
 	//the follow variable is used for sweep algorithm
 	Vec2f pc;
-	bool toereas=false;
+	bool toereas = false;
 	bool belong_u_and_c = false;
 	bool is_vailed;//judge whether this segment can be used for sweep line algorithm
 	//
@@ -25,7 +35,7 @@ public:
 	void set_vu(Vec3f v) { vu.x() = v.x(); vu.y() = v.y(); }
 	void set_vl(Vec3f v) { vl.x() = v.x(); vl.y() = v.y(); }
 	void set_vout(Vec3f v) { vout = v; }
-	void set_vin(Vec3f v) { vin= v; }
+	void set_vin(Vec3f v) { vin = v; }
 	void set_angle(float a) { angle = a; };
 	bool vailed() { return  v1 != v2; };
 	Vec3f &get_v1() { return v1; };

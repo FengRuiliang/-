@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.1);
+	sphere_for_display.scalemesh(0.15);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -431,7 +431,7 @@ void RenderingWidget::Render()
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_edge_);
 	DrawSupport(is_draw_support_);
-	//DrawHatchsup(true);
+	DrawHatch(true);
 }
 
 void RenderingWidget::SetLight()
@@ -1363,10 +1363,10 @@ void RenderingWidget::DrawSupport(bool bv)
 			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
 			for (int j=0;j<points->size();j++)
 			{
-// 				if (j!=slice_check_id_)
-// 				{
-// 					continue;
-// 				}
+				if (j != slice_check_id_)
+				{
+					continue;
+				}
 				for (int k = 0; k < points->at(j).size(); k++)
 				{
 					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
@@ -1382,7 +1382,31 @@ void RenderingWidget::DrawSupport(bool bv)
 				}
 			}
 			glEnd();
-			
+		
+			glColor4ub(152, 78, 163, 255); 
+			auto wall = ctn_obj[i]->ppcs->su->get_minkowssum();
+			for (int j = 0; j < wall->at(slice_check_id_).size(); j++)
+			{
+				glLineWidth(3.0);
+				glBegin(GL_LINE_LOOP);
+				for (int k = 0; k < wall->at(slice_check_id_)[j].size(); k++)
+				{
+					glVertex3fv(wall->at(slice_check_id_)[j][k]);
+				}
+				glEnd();
+			}
+			glColor4ub(77, 175, 74, 255);
+			auto sup_hatch = ctn_obj[i]->ppcs->su->get_hatchs();
+			glLineWidth(3.0);
+			glBegin(GL_LINES);
+			for (int j = 0; j < sup_hatch->at(slice_check_id_).size(); j++)
+			{
+				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v1());
+				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v2());
+			}
+			glEnd();
+			continue;
+
 			//glColor4ub(55, 126, 184, 255);
 			auto sup_rec = ctn_obj[i]->ppcs->su->get_suprec();
 			for (int u = 0; u < sup_rec->size(); u++)
@@ -1411,22 +1435,11 @@ void RenderingWidget::DrawSupport(bool bv)
 				}
 				glEnd();
 			}
-			glColor4ub(152, 78, 163, 255);
-			auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
-			
-			for (int j=0;j<sup_region->at(slice_check_id_).size();j++)
-			{
-				glBegin(GL_LINE_LOOP);
-				for (int k = 0; k < sup_region->at(slice_check_id_)[j].size(); k++)
-				{
-					glVertex3fv(sup_region->at(slice_check_id_)[j][k]);
-				}
-				glEnd();
-			}
-			
+
+		
+		
 		
 			glColor4ub(77, 175, 74, 255);
-			
 			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
 			for (int u = 0; u < polylines->size(); u++)
 			{
@@ -1443,15 +1456,7 @@ void RenderingWidget::DrawSupport(bool bv)
 				}
 
 			}
-			auto sup_hatch= ctn_obj[i]->ppcs->su->get_hatchs();
-			glLineWidth(2.0);
-			glBegin(GL_LINES);
-			for (int j=0;j<sup_hatch->at(slice_check_id_).size();j++)
-			{
-				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v1());
-				glVertex3fv(sup_hatch->at(slice_check_id_)[j].get_v2());			
-			}
-			glEnd();
+		
 		}
 	}
 
@@ -1629,6 +1634,7 @@ void RenderingWidget::DrawHatch(bool bv)
 {
 	if (!bv || ctn_obj.empty())
 		return;
+	glColor3f(0.0, 0.0, 0.0);
 	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
 	{
 		//DrawCutPieces(bv);
@@ -1636,65 +1642,16 @@ void RenderingWidget::DrawHatch(bool bv)
 		{
 			return;
 		}
-		std::vector<Vec3f*>* tc_hatch_ = ctn_obj[id_obj]->myhatch->getHatch();
-		std::vector < std::vector<Vec3f>>* tc_offset_ = ctn_obj[id_obj]->myhatch->getOffsetVertex();
-		if (slice_check_id_ > ctn_obj[id_obj]->myhatch->GetNumPieces() - 1)
+		auto hatchs_ = ctn_obj[id_obj]->myhatch->get_hatchs();
+		glLineWidth(2.0);
+		glBegin(GL_LINES);
+		for (int j = 0; j < hatchs_->at(slice_check_id_).size(); j++)
 		{
-			return;
+			glVertex3fv(hatchs_->at(slice_check_id_)[j].get_v1());
+			glVertex3fv(hatchs_->at(slice_check_id_)[j].get_v2());
 		}
-		if (is_show_all)
-		{
-			for (int i = 0; i < ctn_obj[id_obj]->myhatch->GetNumPieces(); i += 100)
-			{
-				for (auto iterline = tc_hatch_[i].begin(); iterline != tc_hatch_[i].end(); iterline++)
-				{
-					glColor3f(0.0, 1.0, 0.0);
-					glBegin(GL_LINES);
-					glVertex3fv(((*iterline)[0] * scaleV));
-					glVertex3fv(((*iterline)[1] * scaleV));
-					glEnd();
-				}
-				for (int j = 0; j < tc_offset_[i].size(); j++)
-				{
-					glColor3f(0.0, 0.0, 0.0);
-					glBegin(GL_LINE_LOOP);
-					for (int k = 0; k < ((tc_offset_[i])[j]).size(); k++)
-					{
-						glVertex3fv((((tc_offset_[i])[j]).at(k)*scaleV).data());
-					}
-					glEnd();
-				}
-			}
-		}
-		else
-		{
-			for (int i = slice_check_id_; i < slice_check_id_ + 1; i++)
-			{
-				for (auto iterline = tc_hatch_[i].begin(); iterline != tc_hatch_[i].end(); iterline++)
-				{
-					glLineWidth(2.0);
-					glColor3f(1.0, 1.0, 1.0);
-					glBegin(GL_LINES);
-					glVertex3fv(((*iterline)[0] * scaleV));
-					glVertex3fv(((*iterline)[1] * scaleV));
-					glEnd();
-				}
-				//continue;
-				for (int j = 0; j < tc_offset_[i].size(); j++)
-				{
-					glColor3f(0.0, 0.0, 0.0);
-					//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-					glBegin(GL_LINE_LOOP);
-					for (int k = 0; k < ((tc_offset_[i])[j]).size(); k++)
-					{
-						//qDebug() << ((tc_offset_[i])[j])->at(k).x() << ((tc_offset_[i])[j])->at(k).y() << ((tc_offset_[i])[j])->at(k).z();
-						glVertex3fv((((tc_offset_[i])[j]).at(k)*scaleV).data());
-					}
-					glEnd();
-				}
-
-			}
-		}
+		glEnd();
+		
 	}
 }
 
@@ -1990,7 +1947,14 @@ void RenderingWidget::renderdoHatch()
 	{
 		if (ctn_obj[i]->ppcs == NULL)
 			ctn_obj[i]->ppcs = new Preprocessor(ctn_obj[i]->ptr_mesh_);
-		ctn_obj[i]->ppcs->do_slice();
+		ctn_obj[i]->ppcs->do_slice(); 
+		if (ctn_obj[i]->myhatch !=NULL)
+		{
+			delete ctn_obj[i]->myhatch;
+			
+		}
+		ctn_obj[i]->myhatch = new Hatch();
+		ctn_obj[i]->myhatch->doIslandHathc(ctn_obj[i]->ppcs->sl->get_contours());
 	}
 	update();
 }
