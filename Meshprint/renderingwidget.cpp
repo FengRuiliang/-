@@ -696,12 +696,13 @@ void RenderingWidget::WriteMesh()
 
 		QByteArray byfilename = filename.toLocal8Bit();
 		ctn_obj[i]->ptr_mesh_->WriteToOBJFile(byfilename);
-
 	}
 }
 
+
 void RenderingWidget::SaveContour()
 {
+	
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
 		QString filename = QFileDialog::
@@ -1764,9 +1765,41 @@ void RenderingWidget::DeleteSupport() {
 
 void RenderingWidget::AutoSupport()
 {
+// 	std::ofstream fout("D:/a.stl");
+// 	fout.precision(4);
+// 	fout << "solid \"1\"" << "\n";
+// 	for (int i = 0; i < ctn_obj.size(); i++)
+// 	{
+// 		auto flist = ctn_obj[i]->ptr_mesh_->get_faces_list();
+// 		for (auto iter = flist->begin(); iter != flist->end(); iter++)
+// 		{
+// 			
+// 			Vec3f n = (*iter)->normal();
+// 			if (n.dot(Vec3f(0, 0, -1)) > std::cos(21*3.14/180))
+// 			{
+// 				fout << "  " << "facet normal" <<" "<< n.x() << " " << n.y() << " " << n.z() << " " << "\n";
+// 				fout << "    " << "outer loop" << "\n";
+// 				HE_edge* sta = (*iter)->pedge_;
+// 				HE_edge* cur = sta;
+// 
+// 				do
+// 				{
+// 					Vec3f v = cur->pvert_->position();
+// 					fout << "      " << "vertex"<<" " << v.x() << " " << v.y() << " " << v.z() << "\n";
+// 					cur = cur->pnext_;
+// 				} while (cur != sta);
+// 
+// 				fout << "    " << "endloop" << "\n";
+// 				fout << "  " << "endfacet" << "\n";
+// 			}
+// 		}
+// 	}
+// 	fout << "endsolid \"1\"" << "\n";
+// 	
+// 	fout.close();
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
-		if (ctn_obj[i]->ppcs==NULL)
+		if (ctn_obj[i]->ppcs == NULL)
 		{
 			ctn_obj[i]->ppcs = new Preprocessor(ctn_obj[i]->ptr_mesh_);
 		}
