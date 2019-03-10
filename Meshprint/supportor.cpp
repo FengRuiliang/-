@@ -307,7 +307,7 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> polyin, in
 void Supportor::merge(int num)
 {
 	std::vector<std::pair<std::vector<Vec3f>, int>> lines_count;
-	for (int i = sup_points->size() - 1; i != 0; i--)
+	for (int i = sup_points->size() - 1; i != -1; i--)
 	{
 		//discrete unit disk cover set
 
@@ -347,28 +347,24 @@ void Supportor::merge(int num)
 		{
 			float dis = 1.0;
 			int id = -1;
-			Vec3f p1 = sup_points->at(i)[j];	p1.z() = 0;
 
-			Vec3f p2;
 			for (int k = 0; k < lines_count.size(); k++)
 			{
-				p2 = lines_count[k].first.back();
-				p2.z() = 0;
-				float d = (p2 - p1).length();
-				if (d < dis)
+				Vec3f dis_h = sup_points->at(i)[j] - lines_count[k].first.back();
+				if (dis_h.length() < dis)
 				{
-					dis =d ;
-					id = k;;
+					dis =dis_h.length() ;
+					id = k;
 				}
 			}
 			if (id>-1)
 			{
-				lines_count[id].first.push_back(p1);
+				lines_count[id].first.push_back(sup_points->at(i)[j]);
 				line_is_add[id] = true;
 			}
 			else
 			{
-				std::vector<Vec3f> line(1,p1);
+				std::vector<Vec3f> line(1, sup_points->at(i)[j]);
 				lines_count.push_back(make_pair(line, 0));
 				line_is_add.push_back(true);
 			}
@@ -376,56 +372,65 @@ void Supportor::merge(int num)
 		//generate support point for ribbed plate
 		for (int k = 0; k < lines_count.size(); k++)
 		{
-			if (line_is_add[k] || lines_count[k].first.size()==1)
+			if (line_is_add[k])
 			{
 				lines_count[k].second = 0;
 			}
-			else if (++lines_count[k].second == 1)
+			else if (++lines_count[k].second == 10)
 			{
-
-
-				Vec3f center;
-
-				for (int v = 0; v < lines_count[k].first.size(); v++)
+				if (lines_count[k].first.size()==1)
 				{
-					center += lines_count[k].first[v];
-				}
-				center /= lines_count[k].first.size() + 1;
-				bool canbemerge = true;
-				for (int v = 0; v < lines_count[k].first.size() && canbemerge; v++)
-				{
-					Vec3f temp = (center - lines_count[k].first[v]);
-					temp.z() = 0;
-					canbemerge = temp.length() < 1.0;
-				}
-				if (canbemerge)
-				{
-					center.z() = lines_count[k].first.front().z();
-					sup_lines->at(i).push_back(std::vector<Vec3f>(1, center));
+					sup_lines->at(i).push_back(lines_count[k].first);
 				}
 				else
 				{
-					Vec3f p1 = lines_count[k].first.front();
-					p1.z() = (i - 1)*thickness_;
-					sup_points->at(i - 1).push_back(p1);
-					p1 = lines_count[k].first.back();
-					p1.z() = (i - 1)*thickness_;
-					/*sup_points->at(i - 1).push_back(p1);*/
-					add_supportting_point_for_polyline(lines_count[k].first, i - 1, 1.0);
-					sup_lines->at(i).push_back(lines_count[k].first);
+					Vec3f center;
+					for (int v = 0; v < lines_count[k].first.size(); v++)
+					{
+						center += lines_count[k].first[v];
+					}
+					center /= lines_count[k].first.size();
+					center.z() = 0;
+					bool canbemerge = true;
+					for (int v = 0; v < lines_count[k].first.size() && canbemerge; v++)
+					{
+						Vec3f temp = (center - lines_count[k].first[v]);
+						temp.z() = 0;
+						canbemerge = temp.length() < 1.0;
+					}
+					canbemerge = false;
+					if (canbemerge)
+					{
+						center.z() = lines_count[k].first.front().z();
+						sup_lines->at(i).push_back(std::vector<Vec3f>(1, center));
+					}
+					else
+					{
+						sup_lines->at(i).push_back(lines_count[k].first);
 
+						add_supportting_point_for_polyline(lines_count[k].first, 0, 1.0);
+						while (!sup_points->at(0).empty())
+						{
+							Vec3f p = sup_points->at(0).back();
+							p.z() = i*thickness_;
+							sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
+							sup_points->at(0).pop_back();
+						}
+						Vec3f p = lines_count[k].first.front();
+						p.z() = i*thickness_;
+						sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
+						p = lines_count[k].first.back();
+						p.z() = i*thickness_;
+						sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
+					}
 				}
+			
 				lines_count.erase(lines_count.begin() + k--);
 
 			}
 			
 		}
-		qDebug() << "finish new";
 		//sup_points->at(i).clear();
-	}
-	for (auto iter = lines_count.begin(); iter != lines_count.end(); iter++)
-	{
-		sup_lines->at(0).push_back(iter->first);
 	}
 }
 

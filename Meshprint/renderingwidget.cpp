@@ -1403,12 +1403,12 @@ void RenderingWidget::DrawSupport(bool bv)
 							} while (cur != sta);
 						}
 						glEnd();
-						glBegin(GL_LINE);
-						
-						glVertex3fv(sup_lines->at(j)[u][0]);
-						glVertex3fv(sup_lines->at(j)[u][0]-Vec3f(0,0, sup_lines->at(j)[u][0].z()));
-
-						glEnd();
+// 						glBegin(GL_LINE);
+// 						
+// 						glVertex3fv(sup_lines->at(j)[u][0]);
+// 						glVertex3fv(sup_lines->at(j)[u][0]-Vec3f(0,0, sup_lines->at(j)[u][0].z()));
+// 
+// 						glEnd();
 
 					}
 					else
