@@ -7,11 +7,11 @@
 using namespace trimesh;
 Hatch::~Hatch()
 {
+	delete hatchs;
 }
 
 Hatch::Hatch() {
-
-
+	hatchs = new std::vector<std::vector<Segment>>;
 };
 
 Hatch::Hatch(SliceCut*parent)
@@ -1472,21 +1472,16 @@ void HatchX::doHatch()
 
 void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float hei,int id)
 {
-	std::map<int, std::vector<int>> lines;
+	int island_width = 5000;
+	std::map<int, std::vector<int>> lines_B;
+	std::map<int, std::vector<int>> lines_W;
 	int gap = 420;
 	QMatrix4x4 matrix_;
 	QVector3D rotationAxis(0.0, 0.0, 1.0);
 	matrix_.setToIdentity();
-	float angle ;
-	if (id%2==0)
-	{
-		angle = 45;
-	}
-	else
-	{
-		angle = -45;
-	}
-	matrix_.rotate(angle, rotationAxis);
+	int angle=67 ;
+	matrix_.setToIdentity();
+	matrix_.rotate(angle*id%360, rotationAxis);
 	for (int i=0;i<cns.size();i++)
 	{
 		for (int j=0;j<cns[i].size();j++)
@@ -1499,6 +1494,7 @@ void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float he
 			p = QVector4D(p2.x(), p2.y(), 0, 1)*matrix_;
 			p2.x() = (int)p.x();
 			p2.y() = (int)p.y();
+			// for black island;
 			int y_min, y_max;
 			if (p1.y()<p2.y())
 			{
@@ -1523,30 +1519,136 @@ void  Hatch::do_hatch_for_contour(Paths cns,std::vector<Segment>& hatch,float he
 			{
 				int y_ = id*gap;
 				int x_ = p1.x() + (p2.x() - p1.x())*(id*gap - p1.y()) / (p2.y() - p1.y());
-				lines[y_].push_back(x_);
+				lines_B[y_].push_back(x_);
+			}
+			//for white island;
+			int x_min, x_max;
+			if (p1.x() < p2.x())
+			{
+				x_min = p1.x();
+				x_max = p2.x();
+			}
+			else if (p1.x() > p2.x())
+			{
+				x_max = p1.x();
+				x_min = p2.x();
+			}
+			else
+			{
+				continue;
+			}
+			id = x_min / gap - 2;
+			while (id*gap < x_min)
+			{
+				id++;
+			}
+			for (; id*gap < x_max; id++)
+			{
+				int x_ = id*gap;
+				int y_ = p1.y() + (p2.y() - p1.y())*(id*gap - p1.x()) / (p2.x() - p1.x());
+				lines_W[x_].push_back(y_);
 			}
 		}
 	}
 	matrix_.setToIdentity();
-	matrix_.rotate(-angle, rotationAxis);
-	for (auto iter=lines.begin();iter!=lines.end();iter++)
+	matrix_.rotate(-angle*id % 360, rotationAxis);
+	for (auto iter=lines_B.begin();iter!=lines_B.end();iter++)
 	{
 		std::sort(iter->second.begin(),iter->second.end());
 		for (int j=0;j<iter->second.size()-1;j++)
 		{
+			QVector4D q_p1, q_p2;
+			int x1 = iter->second[j];
+			int x2 = iter->second[++j];
+			int y = iter->first;
+			int x_id = (x1 + 100 * island_width) / island_width - 100;
+			int y_id = (y + 100 * island_width) / island_width - 100;
+			if (y == y_id*island_width)
+			{
+				continue;
+			}
+			std::vector<int> coor;
+			coor.push_back(x1);
+			while (++x_id*island_width < x2)
+			{
+				coor.push_back(x_id*island_width);
+			}
+			coor.push_back(x2);
+			for (int k=0;k<coor.size()-1;k++)
+			{
+				int cur_id=(coor[k] + 100 * island_width) / island_width - 100;
 
-			Vec3f p1(iter->second[j] / 1e3, iter->first / 1e3, hei);
-			Vec3f p2(iter->second[++j] / 1e3, iter->first / 1e3, hei);
- 			QVector4D p = QVector4D(p1.x(), p1.y(), 0, 1.0)*matrix_;
- 			p1.x() = p.x();
- 			p1.y() = p.y();
- 
- 			p = QVector4D(p2.x(), p2.y(), 0, 1.0)*matrix_;
- 			p2.x() = p.x();
- 			p2.y() = p.y();
-	
-			hatch.push_back(Segment(p1, p2));
+				if (abs(cur_id+y_id)%2==1)
+				{
+					q_p1 = QVector4D((coor[k]+100) / 1e3, y / 1e3, id*thickness_, 1.0)*matrix_;
+					q_p2 = QVector4D((coor[k+1]-100) / 1e3, y / 1e3, id*thickness_, 1.0)*matrix_;
+					hatch.push_back(Segment(q_p1, q_p2));
+				}
+
+			}
+		
 		}
 	}
 
+	for (auto iter = lines_W.begin(); iter != lines_W.end(); iter++)
+	{
+		std::sort(iter->second.begin(), iter->second.end());
+		for (int j = 0; j < iter->second.size() - 1; j++)
+		{
+			QVector4D q_p1, q_p2;
+			int y1 = iter->second[j];
+			int y2 = iter->second[++j];
+			int x = iter->first;
+			int y_id = (y1 + 100 * island_width) / island_width - 100;
+			int x_id = (x + 100 * island_width) / island_width - 100;
+			if (x==x_id*island_width)
+			{
+				continue;
+			}
+			std::vector<int> coor;
+			coor.push_back(y1);
+			while (++y_id*island_width < y2)
+			{
+				coor.push_back(y_id*island_width);
+			}
+			coor.push_back(y2);
+			for (int k = 0; k < coor.size() - 1; k++)
+			{
+				int cur_id = (coor[k] + 100 * island_width) / island_width - 100;
+
+				if (abs(cur_id + x_id) % 2 == 0)
+				{
+					q_p1 = QVector4D(x/1e3, (coor[k]+100) / 1e3, id*thickness_, 1.0)*matrix_;
+					q_p2 = QVector4D(x/1e3, (coor[k + 1]-100) / 1e3, id*thickness_, 1.0)*matrix_;
+					hatch.push_back(Segment(q_p1, q_p2));
+				}
+
+			}
+
+		}
+	}
+	
+
+}
+
+void Hatch::doIslandHathc(std::vector<std::vector<std::vector<Segment*>>>* cns)
+{
+	hatchs->clear();
+	hatchs->resize(cns->size());
+	for (int i=1;i<5;i++)
+	{
+		Paths tar;
+		for each (std::vector<Segment*> var in cns->at(i))
+		{
+			Path path;
+			for each (Segment* ptr_seg in var)
+			{
+				path << IntPoint(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
+			}
+
+			tar << path;
+		}
+		do_hatch_for_contour(tar, hatchs->at(i), i*thickness_, i);
+		qDebug() << "hathc" << i;
+	}
 }

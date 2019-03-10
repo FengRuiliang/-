@@ -1,5 +1,5 @@
 #include "slicer.h"
-
+#include "globalFunctions.h"
 
 
 Slicer::Slicer()
@@ -11,10 +11,10 @@ Slicer::~Slicer()
 {
 }
 
-Slicer::Slicer(Mesh3D * tar, float in_thickness)
+Slicer::Slicer(Mesh3D * tar)
 {
 	obj = tar;
-	thickness = in_thickness;
+	thickness = thickness_;
 	num=(int)(obj->getBoundingBox()[0][2]/thickness)+1;
 	contours = new std::vector<std::vector<std::vector<Segment *>>>;
 	contours->resize(num);

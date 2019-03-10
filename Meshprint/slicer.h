@@ -17,7 +17,7 @@ public:
 	
 	Slicer();
 	~Slicer();
-	Slicer(Mesh3D* tar,float in_thickness=0.09);
+	Slicer(Mesh3D* tar);
 	void doslice();
 	std::vector<std::vector<std::vector<Segment*>>>* get_contours() { return contours; }
 	std::vector<Paths>* get_c_paths() { return c_paths; }
