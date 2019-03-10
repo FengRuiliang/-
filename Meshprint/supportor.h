@@ -32,6 +32,7 @@ private:
 	void merge(int num);
 	inline void findpolyline(Path target_paths, Paths mink_sum, int num);
 	void add_supportting_point_for_polyline(std::vector<Vec3f> polyin, int sliceid, float err3=ERR);
+	void add_SP_for_rib(std::vector<Vec3f> polyin, std::vector<std::vector<Vec3f>>& polyout);
 	void add_supportting_point_for_hatchs(std::vector<Segment> hatchs, int sliceid);
 	void add_supportting_point_by_uniform(Paths poly, int sliceid);
 	void buildTreeStructure();

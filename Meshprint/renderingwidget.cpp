@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.5);
+	sphere_for_display.scalemesh(0.1);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -1375,7 +1375,7 @@ void RenderingWidget::DrawSupport(bool bv)
 						HE_edge* cur = sta;
 						do
 						{
-							glVertex3fv(cur->pvert_->position()/3.0f + points->at(j)[k]);
+							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
 							cur = cur->pnext_;
 						} while (cur != sta);
 					}
@@ -1391,6 +1391,7 @@ void RenderingWidget::DrawSupport(bool bv)
 				{
 					if (sup_lines->at(j)[u].size()==1)
 					{
+						continue;
 						glBegin(GL_TRIANGLES);
 						for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 						{

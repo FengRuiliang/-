@@ -149,7 +149,6 @@ private:
 	void DrawCutPieces(bool bv);
 	void DrawCutPiecesSup(bool bv);
 	void DrawHatch(bool bv);
-	void DrawHatchsup(bool bv);
 public:
 	MainWindow					*ptr_mainwindow_;
 	CArcBall					*ptr_arcball_;

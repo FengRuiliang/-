@@ -1,7 +1,7 @@
 #include "qmath.h"
 float thickness_ = 0.09;
-float PBL = 4.0;// printable bridge length
-float ERR = 0.2;
+float PBL = 8.0;// printable bridge length
+float ERR = 0.26;
 int PBG = 222;//printable bridge gap
 int OSD = 384;//offset distance
 bool is_uniform = false;
@@ -23,7 +23,7 @@ int increment_angle_ = 67;
 float DEFAULT_L = 0.3f;
 float THRESHOLD = cos(3.1415926 * 45 / 180);
 float THRESHOLD1 = cos(3.1415926 * 70 / 180);
-float GAP = 0.5f;
+float GAP = 1.0f;
 float SEGLENGTH = 1.5f;
 float RESO = 0.5f;
 float VERTICALGAP = 2.f;

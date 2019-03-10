@@ -175,7 +175,7 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum, int slice
 		}
 		polyline.push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
 		polylines->at(sliceid).push_back(polyline);
-		sup_points->at(sliceid).push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
+		//sup_points->at(sliceid).push_back(Vec3f(target_paths.front().X / 1e3, target_paths.front().Y / 1e3, sliceid*0.09));
 		add_supportting_point_for_polyline(polyline, sliceid);
 	}
 	else if (num != 0)
@@ -256,12 +256,12 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> polyin, in
 				dir2 = poly[j + 1] - poly[j];
 
 				float length = dir2.length();
-				sumlenth += length;
 				dir2.normalize();
 				if (dir1.dot(dir2) != 0)
 				{
-					err3 += pow(length, 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
+					err3 += pow(length, 3.0)*pow((dir1.cross(dir2).length() / dir1.dot(dir2)),2.0);
 				}
+				err3 = sqrtf(err3 / 3);
 				/*err3 /= sumlenth;*/
 				//err3 = std::max(abs(dir2.dot(dir1)), err3);
 // 				dir2.normalize();
@@ -304,129 +304,169 @@ void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> polyin, in
 	} while (start_id < poly.size() - 1);
 }
 
-void Supportor::merge(int num)
+void Supportor::add_SP_for_rib(std::vector<Vec3f> polyin, std::vector<std::vector<Vec3f>>& polyout)
 {
-	std::vector<std::pair<std::vector<Vec3f>, int>> lines_count;
-	for (int i = sup_points->size() - 1; i != -1; i--)
+	std::vector<Vec3f> poly;
+	poly.push_back(polyin[0]);
+	poly.push_back(polyin[1]);
+	polyout.push_back(poly);
+	poly.clear();
+	poly.push_back(polyin[polyin.size() - 2]);
+	poly.push_back(polyin[polyin.size() - 1]);
+	polyout.push_back(poly);
+	polyin.erase(polyin.begin());
+	polyin.pop_back();
+	int start_id = 0;
+	do
 	{
-		//discrete unit disk cover set
-
-		std::vector<std::vector<Vec3f>> circles;
-
-		for (int j = 0; j < sup_points->at(i).size(); j++)
+		Vec3f A = polyin[start_id];
+		int end_id = start_id;
+		Vec3f dir1, dir2;
+		float sumlenth;
+		float err1 = 0, err2 = 0, err3 = 0;
+		//qDebug() << "start at" << start_id;
+		while (++end_id < polyin.size())
 		{
-			bool is_added = false;
-			for (int u = 0; u < circles.size()&&!is_added; u++)
+			err1 = (polyin[end_id] - polyin[end_id - 1]).length();
+			err2 = (polyin[end_id] - polyin[start_id]).length();
+
+			dir1 = polyin[end_id] - polyin[start_id];
+			dir1.normalize();
+			for (int j = start_id; j < end_id; j++)
 			{
-				Vec3f center = sup_points->at(i)[j];
-				for (int v=0;v<circles[u].size();v++)
+				dir2 = polyin[j + 1] - polyin[j];
+
+				float length = dir2.length();
+				sumlenth += length;
+				dir2.normalize();
+				if (dir1.dot(dir2) != 0)
 				{
-					center += circles[u][v];
-				}
-				center /= circles[u].size() + 1;
-				bool success = (center-sup_points->at(i)[j]).length()<1.0;
-				for (int v=0;v<circles[u].size()&&success;v++)
-				{
-					success= (center - circles[u][v]).length()<1.0;
-				}
-				if (success)
-				{
-					circles[u].push_back(sup_points->at(i)[j]);
-					is_added = true;
+					err3 += pow(length, 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
 				}
 			}
-			if (!is_added)
+			if (err1 > PBL || err2 > PBL || err3 > 0.2)
 			{
-				circles.push_back(std::vector<Vec3f>(1, sup_points->at(i)[j]));
+				if (end_id - start_id == 1)
+				{
+					float length = (polyin[end_id] - polyin[start_id]).length();
+					Vec3f dir = polyin[end_id] - polyin[start_id];
+					dir.normalize();
+					int num = 0;
+					for (; num*PBL < length; num++);
+					float len = length / num;
+					for (int j = 1; j < num; j++)
+					{
+					}
+				}
+				else
+				{
+					end_id--;
+				}
+				if (end_id != polyin.size() - 1)
+				{
+					poly.clear();
+					for (int s = 0; s < 3; s++)
+					{
+						poly.push_back(polyin[end_id - 1 + s]);
+						poly.back().z() = polyin.back().z();
+					}
+					polyout.push_back(poly);
+				}
+				break;
 			}
 		}
+		start_id = end_id;
+	} while (start_id < polyin.size() - 1);
+}
 
-		std::vector<bool> line_is_add(lines_count.size(),false);
+void Supportor::merge(int num)
+{
+	qDebug() << "GAP" << GAP;
+	std::vector<std::vector<Vec3f>> lines;
+	for (int i = sup_points->size() - 1; i != -1; i--)
+	{
+		std::vector<bool> line_is_add(lines.size(), false);
 		// 连接到已有肋条上
+
 		for (int j = 0; j < sup_points->at(i).size(); j++)
 		{
 			float dis = 1.0;
 			int id = -1;
-
-			for (int k = 0; k < lines_count.size(); k++)
+			for (int k = 0; k < lines.size(); k++)
 			{
-				Vec3f dis_h = sup_points->at(i)[j] - lines_count[k].first.back();
-				if (dis_h.length() < dis)
+
+				if (lines[k].size()==1)
 				{
-					dis =dis_h.length() ;
-					id = k;
+					Vec3f dis_h = sup_points->at(i)[j] - lines[k].back();
+					dis_h.z() = 0;
+					if (dis_h.length()<dis)
+					{
+						dis = dis_h.length();
+						id = k;
+					}
+				}
+				else
+				{
+					Vec3f dir1, dir2;
+					float sumlenth,err3;
+					dir1 = lines[k].back() - lines[k].front(); 
+					dir1.normalize();
+					for (int u = 0; u< lines[k].size()-1; u++)
+					{
+
+						dir2 = lines[k][u + 1] - lines[k][u];
+						float length = dir2.length();
+						dir2.normalize();
+						if (dir1.dot(dir2) !=0)
+						{
+							err3 += pow(length, 3.0)*pow((dir1.cross(dir2).length() / dir1.dot(dir2)), 2.0);
+						}
+						err3 = sqrtf(err3 / 3);
+					}
+					if (err3<GAP)
+					{
+						Vec3f  dis_h = sup_points->at(i)[j] - lines[k].back();
+						dis_h.z() = 0;
+						if (dis_h.length() < dis)
+						{
+							dis = dis_h.length();
+							id = k;
+						}
+					}
 				}
 			}
+
 			if (id>-1)
 			{
-				lines_count[id].first.push_back(sup_points->at(i)[j]);
+				lines[id].push_back(sup_points->at(i)[j]);
 				line_is_add[id] = true;
 			}
 			else
 			{
-				std::vector<Vec3f> line(1, sup_points->at(i)[j]);
-				lines_count.push_back(make_pair(line, 0));
+				lines.push_back(std::vector<Vec3f>(1, sup_points->at(i)[j]));
 				line_is_add.push_back(true);
 			}
 		}
 		//generate support point for ribbed plate
-		for (int k = 0; k < lines_count.size(); k++)
+		for (int k = 0; k < lines.size(); k++)
 		{
-			if (line_is_add[k])
+			if (!line_is_add[k])
 			{
-				lines_count[k].second = 0;
+				sup_lines->at(0).push_back(lines[k]);
+// 				if (lines[k].size() <4)
+// 				{
+// 					sup_lines->at(0).push_back(lines[k]);
+// 				}
+// 				else
+// 				{
+// 					std::vector<std::vector<Vec3f>> supportee;
+// 					add_SP_for_rib(lines[k], supportee);
+// 					sup_lines->at(0).insert(sup_lines->at(i).end(),supportee.begin(),supportee.end());
+// 				}
+				lines.erase(lines.begin() + k);
+				line_is_add.erase(line_is_add.begin() + k);
+				k--;
 			}
-			else if (++lines_count[k].second == 10)
-			{
-				if (lines_count[k].first.size()==1)
-				{
-					sup_lines->at(i).push_back(lines_count[k].first);
-				}
-				else
-				{
-					Vec3f center;
-					for (int v = 0; v < lines_count[k].first.size(); v++)
-					{
-						center += lines_count[k].first[v];
-					}
-					center /= lines_count[k].first.size();
-					bool canbemerge = true;
-					for (int v = 0; v < lines_count[k].first.size() && canbemerge; v++)
-					{
-						Vec3f temp = (center - lines_count[k].first[v]);
-						temp.z() = 0;
-						canbemerge = temp.length() < 1.0;
-					}
-					if (canbemerge)
-					{
-						center.z() = lines_count[k].first.front().z();
-						sup_lines->at(i).push_back(std::vector<Vec3f>(1, center));
-					}
-					else
-					{
-						sup_lines->at(i).push_back(lines_count[k].first);
-
-						add_supportting_point_for_polyline(lines_count[k].first, 0, 0.2);
-						while (!sup_points->at(0).empty())
-						{
-							Vec3f p = sup_points->at(0).back();
-							p.z() = i*thickness_;
-							sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
-							sup_points->at(0).pop_back();
-						}
-						Vec3f p = lines_count[k].first.front();
-						p.z() = i*thickness_;
-						sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
-						p = lines_count[k].first.back();
-						p.z() = i*thickness_;
-						sup_lines->at(i).push_back(std::vector<Vec3f>(1, p));
-					}
-				}
-			
-				lines_count.erase(lines_count.begin() + k--);
-
-			}
-			
 		}
 		//sup_points->at(i).clear();
 	}
