@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.15);
+	sphere_for_display.scalemesh(0.5);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -427,7 +427,7 @@ void RenderingWidget::Render()
 	DrawAxes(is_draw_axes_);
 	DrawGrid(is_draw_grid_);
 	DrawPoints(is_draw_point_);
-	//DrawEdge(is_draw_edge_);
+	DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_edge_);
 	DrawSupport(is_draw_support_);
@@ -1281,8 +1281,8 @@ void RenderingWidget::DrawEdge(bool bv)
 		glColor4ub(255, 255, 255, 255);
 		for (size_t i = 0; i != edges.size(); ++i)
 		{
-			glVertex3f(edges[i]->start_->position().x(), edges[i]->start_->position().y(),0);
-			glVertex3f(edges[i]->pvert_->position().x(), edges[i]->pvert_->position().y(), 0);
+			glVertex3fv(edges[i]->start_->position());
+			glVertex3fv(edges[i]->pvert_->position());
 
 		}
 		glEnd();
@@ -1375,7 +1375,7 @@ void RenderingWidget::DrawSupport(bool bv)
 						HE_edge* cur = sta;
 						do
 						{
-							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
+							glVertex3fv(cur->pvert_->position()/3.0f + points->at(j)[k]);
 							cur = cur->pnext_;
 						} while (cur != sta);
 					}
@@ -1383,6 +1383,7 @@ void RenderingWidget::DrawSupport(bool bv)
 
 			}
 			glEnd();
+			glColor4ub(152, 78, 163, 255);
 			auto sup_lines = ctn_obj[i]->ppcs->su->get_suplines();
 			for (int j=0;j<sup_lines->size();j++)
 			{
@@ -1401,6 +1402,12 @@ void RenderingWidget::DrawSupport(bool bv)
 								cur = cur->pnext_;
 							} while (cur != sta);
 						}
+						glEnd();
+						glBegin(GL_LINE);
+						
+						glVertex3fv(sup_lines->at(j)[u][0]);
+						glVertex3fv(sup_lines->at(j)[u][0]-Vec3f(0,0, sup_lines->at(j)[u][0].z()));
+
 						glEnd();
 
 					}

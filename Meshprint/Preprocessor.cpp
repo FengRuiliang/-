@@ -7,7 +7,7 @@ void Preprocessor::exportToUG(std::vector<std::vector<std::vector<Vec3f>>>* line
 {
 	MeshOctree oct;
 	oct.BuildOctree(tar);
-	std::ofstream fout("D:/grs/a.grs");
+	std::ofstream fout("D:/OneDrive/бшнд/ugpart/a.grs");
 	fout << "ENTITY/OBJ,LINES(4)" << std::endl;
 	for (int i = 0; i < lines->size(); i++)
 	{
@@ -32,17 +32,17 @@ void Preprocessor::exportToUG(std::vector<std::vector<std::vector<Vec3f>>>* line
 				for (int k = 0; k < lines->at(i)[j].size() - 1; k++)
 				{
 					fout << "LINES(1)=line/"
-						<< lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << i*thickness_
+						<< lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << (i-1)*thickness_
 						<< "," << lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << lines->at(i)[j][k].z() << std::endl;
 					fout << "LINES(2)=line/" 
 						 << lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << lines->at(i)[j][k].z() 
 						<< "," << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << lines->at(i)[j][k + 1].z()  << std::endl;
 					fout << "LINES(3)=line/" 
 						 << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << lines->at(i)[j][k + 1].z()
-						<< "," << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << i*thickness_ << std::endl;
+						<< "," << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << (i - 1)*thickness_ << std::endl;
 					fout << "LINES(4)=line/"
-						<< lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << i*thickness_
-						<< "," << lines->at(i)[j][k].x() <<  ","<<lines->at(i)[j][k].y() << "," << i*thickness_ << std::endl;
+						<< lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << (i - 1)*thickness_
+						<< "," << lines->at(i)[j][k].x() <<  ","<<lines->at(i)[j][k].y() << "," << (i - 1)*thickness_ << std::endl;
 					fout << "OBJ=BPLANE/LINES" << std::endl;
 				}
 			}

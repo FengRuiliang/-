@@ -221,20 +221,20 @@ inline void Supportor::findpolyline(Path target_paths, Paths mink_sum, int slice
 void Supportor::add_supportting_point_for_polyline(std::vector<Vec3f> polyin, int sliceid, float err)
 {
 	std::vector<Vec3f> poly;
-	poly.push_back(polyin.front());
-	for (int i = 1; i < polyin.size() - 1; i++)
-	{
-		Vec3f dir1 = polyin[i] - polyin[i - 1];
-		Vec3f dir2 = polyin[i + 1] - polyin[i];
-		dir1.normalize();
-		dir2.normalize();
-		if (abs(dir1.dot(dir2)) < 0.996)
-		{
-			poly.push_back(polyin[i]);
-		}
-	}
-	poly.push_back(polyin.back());
-	//poly = polyin;
+ 	poly.push_back(polyin.front());
+ 	for (int i = 1; i < polyin.size() - 1; i++)
+ 	{
+ 		Vec3f dir1 = polyin[i] - polyin[i - 1];
+ 		Vec3f dir2 = polyin[i + 1] - polyin[i];
+ 		dir1.normalize();
+ 		dir2.normalize();
+ 		if (abs(dir1.dot(dir2)) < 0.995)
+ 		{
+ 			poly.push_back(polyin[i]);
+ 		}
+ 	}
+ 	poly.push_back(polyin.back());
+ 	//poly = polyin;
 	int start_id = 0;
 	do
 	{
@@ -309,99 +309,116 @@ void Supportor::merge(int num)
 	std::vector<std::pair<std::vector<Vec3f>, int>> lines_count;
 	for (int i = sup_points->size() - 1; i != 0; i--)
 	{
-	
-		std::vector<bool> line_is_add(lines_count.size(),false);
-// 合并掉同一层内的支撑点
-		// 连接到已有肋条上
-		for (int j=0;j<sup_points->at(i).size();j++ )
+		//discrete unit disk cover set
+
+		std::vector<std::vector<Vec3f>> circles;
+
+		for (int j = 0; j < sup_points->at(i).size(); j++)
 		{
-			for (int k = j+1; k < sup_points->at(i).size(); k++)
+			bool is_added = false;
+			for (int u = 0; u < circles.size()&&!is_added; u++)
 			{
-				if ((sup_points->at(i)[j]- sup_points->at(i)[k]).length()<1.0)
+				Vec3f center = sup_points->at(i)[j];
+				for (int v=0;v<circles[u].size();v++)
 				{
-					sup_points->at(i)[j] = 0.5f*(sup_points->at(i)[j] + sup_points->at(i)[k]);
-					sup_points->at(i).erase(sup_points->at(i).begin() + k);
+					center += circles[u][v];
+				}
+				center /= circles[u].size() + 1;
+				bool success = (center-sup_points->at(i)[j]).length()<1.0;
+				for (int v=0;v<circles[u].size()&&success;v++)
+				{
+					success= (center - circles[u][v]).length()<1.0;
+				}
+				if (success)
+				{
+					circles[u].push_back(sup_points->at(i)[j]);
+					is_added = true;
 				}
 			}
-			float dis = 0.9,d1,d2;
-			bool is_front = false;
-			std::pair<int, int> re=std::make_pair(-1,-1);
-			for (int k=0;k<lines_count.size();k++)
+			if (!is_added)
 			{
-				d1 = (lines_count[k].first.front() - sup_points->at(i)[j]).length();
-				d2 = (lines_count[k].first.back() - sup_points->at(i)[j]).length();
-				if ( d1< dis)
-				{
-					dis =d1 ;
-					re = std::make_pair(k, 0);
-				}
-				if (d2<dis)
-				{
-					dis = d2;
-					re = std::make_pair(k, lines_count[k].first.size());
-				}
-			}
-			if (re.first!=-1)
-			{
-				lines_count[re.first].first.insert(
-					lines_count[re.first].first.begin() + re.second,
-					sup_points->at(i)[j]);
-				line_is_add[re.first] = true;
-				sup_points->at(i).erase(sup_points->at(i).begin() + j);
-				j--;
+				circles.push_back(std::vector<Vec3f>(1, sup_points->at(i)[j]));
 			}
 		}
-		qDebug() << "finish connect";
+
+		std::vector<bool> line_is_add(lines_count.size(),false);
+		// 连接到已有肋条上
+		for (int j = 0; j < sup_points->at(i).size(); j++)
+		{
+			float dis = 1.0;
+			int id = -1;
+			Vec3f p1 = sup_points->at(i)[j];	p1.z() = 0;
+
+			Vec3f p2;
+			for (int k = 0; k < lines_count.size(); k++)
+			{
+				p2 = lines_count[k].first.back();
+				p2.z() = 0;
+				float d = (p2 - p1).length();
+				if (d < dis)
+				{
+					dis =d ;
+					id = k;;
+				}
+			}
+			if (id>-1)
+			{
+				lines_count[id].first.push_back(p1);
+				line_is_add[id] = true;
+			}
+			else
+			{
+				std::vector<Vec3f> line(1,p1);
+				lines_count.push_back(make_pair(line, 0));
+				line_is_add.push_back(true);
+			}
+		}
 		//generate support point for ribbed plate
 		for (int k = 0; k < lines_count.size(); k++)
 		{
-			if (!line_is_add[k])
-			{
-				if (++lines_count[k].second == 10&& lines_count[k].first.size()>1)
-				{
-					add_supportting_point_for_polyline(lines_count[k].first, i - 1,1.0);
-					Vec3f p1 = lines_count[k].first.front();
-					p1.z() = (i - 1)*thickness_;
-
-					sup_points->at(i - 1).push_back(p1);
-					p1=  lines_count[k].first.back();
-					p1.z() = (i - 1)*thickness_;
-					sup_points->at(i - 1).push_back(p1);
-				}
-			}
-			else
+			if (line_is_add[k] || lines_count[k].first.size()==1)
 			{
 				lines_count[k].second = 0;
 			}
-		}
-		qDebug() << "finish generate";
-		// remove no use line from lines 
-		for (auto iter = lines_count.begin(); iter != lines_count.end();)
-		{
-			if (iter->second == 10)
+			else if (++lines_count[k].second == 1)
 			{
-				sup_lines->at(i).push_back(iter->first);
-				iter = lines_count.erase(iter);
-			}
-			else
-				iter++;
-		}
-		qDebug() << "finish remove";
-		// 将剩余的点生成新肋条
-		for (auto iter = sup_points->at(i).begin(); iter != sup_points->at(i).end(); iter++)
-		{
-			std::vector<Vec3f> line(1, *iter);
 
-			for (auto iter1 = iter + 1; iter1 != sup_points->at(i).end();)
-			{
-				if ((*iter1 - *iter).length() < 0.6)
+
+				Vec3f center;
+
+				for (int v = 0; v < lines_count[k].first.size(); v++)
 				{
-					line.push_back(*iter1);
-					iter1 = sup_points->at(i).erase(iter1);
+					center += lines_count[k].first[v];
 				}
-				iter1++;
+				center /= lines_count[k].first.size() + 1;
+				bool canbemerge = true;
+				for (int v = 0; v < lines_count[k].first.size() && canbemerge; v++)
+				{
+					Vec3f temp = (center - lines_count[k].first[v]);
+					temp.z() = 0;
+					canbemerge = temp.length() < 1.0;
+				}
+				if (canbemerge)
+				{
+					center.z() = lines_count[k].first.front().z();
+					sup_lines->at(i).push_back(std::vector<Vec3f>(1, center));
+				}
+				else
+				{
+					Vec3f p1 = lines_count[k].first.front();
+					p1.z() = (i - 1)*thickness_;
+					sup_points->at(i - 1).push_back(p1);
+					p1 = lines_count[k].first.back();
+					p1.z() = (i - 1)*thickness_;
+					/*sup_points->at(i - 1).push_back(p1);*/
+					add_supportting_point_for_polyline(lines_count[k].first, i - 1, 1.0);
+					sup_lines->at(i).push_back(lines_count[k].first);
+
+				}
+				lines_count.erase(lines_count.begin() + k--);
+
 			}
-			lines_count.push_back(std::make_pair(line, 0));
+			
 		}
 		qDebug() << "finish new";
 		//sup_points->at(i).clear();
