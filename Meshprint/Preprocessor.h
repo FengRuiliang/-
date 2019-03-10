@@ -6,6 +6,7 @@ class Preprocessor
 {
 private:
 	Mesh3D* tar;
+	void exportToUG(std::vector<std::vector<std::vector<Vec3f>>>* param1);
 public:
 	Slicer * sl=NULL;
 	Supportor* su=NULL;

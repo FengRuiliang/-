@@ -3,6 +3,54 @@
 #include <cmath>
 #include "Support.h"
 
+void Preprocessor::exportToUG(std::vector<std::vector<std::vector<Vec3f>>>* lines)
+{
+	MeshOctree oct;
+	oct.BuildOctree(tar);
+	std::ofstream fout("D:/grs/a.grs");
+	fout << "ENTITY/OBJ,LINES(4)" << std::endl;
+	for (int i = 0; i < lines->size(); i++)
+	{
+		for (int j = 0; j < lines->at(i).size(); j++)
+		{
+			if (lines->at(i)[j].size() == 1)
+			{
+				
+				Vec3f point_in=lines->at(i)[j].front();
+				Vec3f point_out = oct.InteractPoint(point_in, Vec3f(0, 0, -1));
+				Vec3f axis = point_out - point_in;
+				axis.normalize();
+				fout << "OBJ=SOLCYL/ORIGIN," 
+					<< point_in.x() << "," << point_in.y() << "," << point_in.z()
+					<< ",HEIGHT,"<< (point_in-point_out).length() 
+					<< ",DIAMTR," << 1.0 
+					<< ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] 
+					<< std::endl;
+			}
+			else
+			{ 
+				for (int k = 0; k < lines->at(i)[j].size() - 1; k++)
+				{
+					fout << "LINES(1)=line/"
+						<< lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << i*thickness_
+						<< "," << lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << lines->at(i)[j][k].z() << std::endl;
+					fout << "LINES(2)=line/" 
+						 << lines->at(i)[j][k].x() << "," << lines->at(i)[j][k].y() << "," << lines->at(i)[j][k].z() 
+						<< "," << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << lines->at(i)[j][k + 1].z()  << std::endl;
+					fout << "LINES(3)=line/" 
+						 << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << lines->at(i)[j][k + 1].z()
+						<< "," << lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << i*thickness_ << std::endl;
+					fout << "LINES(4)=line/"
+						<< lines->at(i)[j][k + 1].x() << "," << lines->at(i)[j][k + 1].y() << "," << i*thickness_
+						<< "," << lines->at(i)[j][k].x() <<  ","<<lines->at(i)[j][k].y() << "," << i*thickness_ << std::endl;
+					fout << "OBJ=BPLANE/LINES" << std::endl;
+				}
+			}
+		}
+	}
+	fout << "halt" << std::endl;
+}
+
 Preprocessor::Preprocessor()
 {
 }
@@ -29,18 +77,22 @@ void Preprocessor::add_support()
 	do_slice();
 	su = new Supportor;
 	su->add_supportting_point_for_contours(sl->get_contours());
-	qDebug() << "successfully add supporting point";
-	exportpoint();
-	exportline();
-	int num = 0;
-	for (int i=0;i<su->get_sup_points()->size();i++)
-	{
-		num += su->get_sup_points()->at(i).size();
-		if (su->get_sup_points()->at(i).size() != 0)
-		{
-			qDebug() << "i" << i << "#" << su->get_sup_points()->at(i).size();
-		}
 
+	exportToUG(su->get_suplines());
+	//exportpoint();
+	//exportline();
+	int num = 0;
+	auto lines = su->get_suplines();
+	for (int i=0;i<lines->size();i++)
+	{
+		for (int j = 0; j < lines->at(i).size(); j++)
+		{
+			num += lines->at(i)[j].size();
+		}
+		if (lines->at(i).size() != 0)
+		{
+			qDebug() << "i" << i << "#" << lines->at(i).size()<<num;
+		}
 	}
 	qDebug() <<"#:"<< num;
 }
@@ -50,7 +102,6 @@ void Preprocessor::exportpoint()
 	oct.BuildOctree(tar);
 	auto ptr_points = su->get_sup_points();
 	std::ofstream fout("D:/grs/a.grs");
-
 	fout << "ENTITY/OBJ" << std::endl;
 	double a[3], b[3], diaa, diab, axis[3], dis, dia=0.6;
 	//int j = 0;
@@ -109,23 +160,7 @@ void Preprocessor::exportpoint()
 	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
 	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
 
-	//}
-	//for (Vec3f p : ptr_points->at(471))
-	//{
-	//	dia = 0.6;
-	//	a[0] = p.x();
-	//	a[1] = p.y();
-	//	a[2] = p.z();
-	//	axis[0] = b[0] - a[0];
-	//	axis[1] = b[1] - a[1];
-	//	axis[2] = tem - a[2];
-	//	dis = sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
-	//	fout << "OBJ=SOLCYL/ORIGIN," << a[0] << "," << a[1] << "," << a[2] << ",HEIGHT,$" << std::endl
-	//		<< dis << ",DIAMTR," << dia << ",AXIS," << axis[0] << "," << axis[1] << "," << axis[2] << std::endl;
 
-	//}
-	//fout << "halt";
-	//return;
 	for (int i = 0; i < ptr_points->size(); i++)
 	{
 		for each(Vec3f p in ptr_points->at(i))

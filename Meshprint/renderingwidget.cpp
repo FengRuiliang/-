@@ -1362,7 +1362,7 @@ void RenderingWidget::DrawSupport(bool bv)
 			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
 			for (int j=0;j<points->size();j++)
 			{
-// 				if (j!=slice_check_id_)
+// 				if (j != slice_check_id_)
 // 				{
 // 					continue;
 // 				}
@@ -1379,37 +1379,62 @@ void RenderingWidget::DrawSupport(bool bv)
 						} while (cur != sta);
 					}
 				}
+
 			}
 			glEnd();
-			
-			//glColor4ub(55, 126, 184, 255);
-			auto sup_rec = ctn_obj[i]->ppcs->su->get_suprec();
-			for (int u = 0; u < sup_rec->size(); u++)
-			{
-				for (int v = 0; v < sup_rec->at(u).size(); v++)
-				{
-					glBegin(GL_LINES);
-					for (int w = 0; w < sup_rec->at(u)[v].size() ; w++)
-					{
-						glVertex3fv(sup_rec->at(u)[v][w]);
-						glVertex3fv(sup_rec->at(u)[v][(w + 1)%sup_rec->at(u)[v].size()]);
-					}
-					glEnd();
-				}
-
-			}
 			auto sup_lines = ctn_obj[i]->ppcs->su->get_suplines();
-			for (int u = 0; u < sup_lines->size(); u++)
+			for (int j=0;j<sup_lines->size();j++)
 			{
-				glBegin(GL_LINES);
-				for (int v = 0; v < sup_lines->at(u).size()-1; v++)
+				for (int u = 0; u < sup_lines->at(j).size(); u++)
 				{
-					glVertex3fv(sup_lines->at(u)[v]);
-					glVertex3fv(sup_lines->at(u)[v+1]);
+					if (sup_lines->at(j)[u].size()==1)
+					{
+						glBegin(GL_TRIANGLES);
+						for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
+						{
+							HE_edge* sta = (*iterf)->pedge_;
+							HE_edge* cur = sta;
+							do
+							{
+								glVertex3fv(cur->pvert_->position() + sup_lines->at(j)[u].front());
+								cur = cur->pnext_;
+							} while (cur != sta);
+						}
+						glEnd();
 
+					}
+					else
+					{
+						glBegin(GL_LINES);
+						for (int v = 0; v < sup_lines->at(j)[u].size() - 1; v++)
+						{
+							glVertex3fv(sup_lines->at(j)[u][v]);
+							glVertex3fv(sup_lines->at(j)[u][v + 1]);
+
+						}
+						glEnd();
+					}
 				}
-				glEnd();
 			}
+			
+			
+// 			//glColor4ub(55, 126, 184, 255);
+// 			auto sup_rec = ctn_obj[i]->ppcs->su->get_suprec();
+// 			for (int u = 0; u < sup_rec->size(); u++)
+// 			{
+// 				for (int v = 0; v < sup_rec->at(u).size(); v++)
+// 				{
+// 					glBegin(GL_LINES);
+// 					for (int w = 0; w < sup_rec->at(u)[v].size() ; w++)
+// 					{
+// 						glVertex3fv(sup_rec->at(u)[v][w]);
+// 						glVertex3fv(sup_rec->at(u)[v][(w + 1)%sup_rec->at(u)[v].size()]);
+// 					}
+// 					glEnd();
+// 				}
+// 
+// 			}
+			
 			glColor4ub(152, 78, 163, 255);
 			auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
 			
