@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'meshprint.ui'
 **
-** Created by: Qt User Interface Compiler version 5.8.0
+** Created by: Qt User Interface Compiler version 5.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -1057,86 +1057,86 @@ public:
 
     void retranslateUi(QMainWindow *MeshprintClass)
     {
-        MeshprintClass->setWindowTitle(QApplication::translate("MeshprintClass", "SLM Print", Q_NULLPTR));
-        actionOpen->setText(QApplication::translate("MeshprintClass", "Open..", Q_NULLPTR));
-        actionOpen->setShortcut(QApplication::translate("MeshprintClass", "Ctrl+O", Q_NULLPTR));
-        actionSave->setText(QApplication::translate("MeshprintClass", "Save", Q_NULLPTR));
-        actionSave_As->setText(QApplication::translate("MeshprintClass", "Save As..", Q_NULLPTR));
-        actionFront_View->setText(QApplication::translate("MeshprintClass", "Front View", Q_NULLPTR));
-        actionLeft_View->setText(QApplication::translate("MeshprintClass", "Left View", Q_NULLPTR));
-        actionTop_View->setText(QApplication::translate("MeshprintClass", "Top View", Q_NULLPTR));
-        actionNew->setText(QApplication::translate("MeshprintClass", "New", Q_NULLPTR));
-        actionNew->setShortcut(QApplication::translate("MeshprintClass", "Ctrl+N", Q_NULLPTR));
-        actionIsometric_View->setText(QApplication::translate("MeshprintClass", "Orthogonal View", Q_NULLPTR));
-        actionCut->setText(QApplication::translate("MeshprintClass", "Cut", Q_NULLPTR));
-        actionLine_View->setText(QApplication::translate("MeshprintClass", "Line View", Q_NULLPTR));
-        actionFace_View->setText(QApplication::translate("MeshprintClass", "FaceView", Q_NULLPTR));
-        actionUndo->setText(QApplication::translate("MeshprintClass", "undo", Q_NULLPTR));
-        actionRedo->setText(QApplication::translate("MeshprintClass", "Redo", Q_NULLPTR));
-        actionTranslation->setText(QApplication::translate("MeshprintClass", "Translate Translation", Q_NULLPTR));
-        actionRotate_Camera->setText(QApplication::translate("MeshprintClass", "Rotate Camera", Q_NULLPTR));
-        actionRotate->setText(QApplication::translate("MeshprintClass", "Rotate", Q_NULLPTR));
-        actionTranslate_Model->setText(QApplication::translate("MeshprintClass", "Translate Model", Q_NULLPTR));
-        actionGrid->setText(QApplication::translate("MeshprintClass", "Grid", Q_NULLPTR));
-        actionBackground->setText(QApplication::translate("MeshprintClass", "Background", Q_NULLPTR));
-        actionALight->setText(QApplication::translate("MeshprintClass", "aLight", Q_NULLPTR));
-        actionSave_contour->setText(QApplication::translate("MeshprintClass", "Save contour", Q_NULLPTR));
-        actionMaintenance->setText(QApplication::translate("MeshprintClass", "Maintenance", Q_NULLPTR));
+        MeshprintClass->setWindowTitle(QApplication::translate("MeshprintClass", "SLM Print", 0));
+        actionOpen->setText(QApplication::translate("MeshprintClass", "Open..", 0));
+        actionOpen->setShortcut(QApplication::translate("MeshprintClass", "Ctrl+O", 0));
+        actionSave->setText(QApplication::translate("MeshprintClass", "Save", 0));
+        actionSave_As->setText(QApplication::translate("MeshprintClass", "Save As..", 0));
+        actionFront_View->setText(QApplication::translate("MeshprintClass", "Front View", 0));
+        actionLeft_View->setText(QApplication::translate("MeshprintClass", "Left View", 0));
+        actionTop_View->setText(QApplication::translate("MeshprintClass", "Top View", 0));
+        actionNew->setText(QApplication::translate("MeshprintClass", "New", 0));
+        actionNew->setShortcut(QApplication::translate("MeshprintClass", "Ctrl+N", 0));
+        actionIsometric_View->setText(QApplication::translate("MeshprintClass", "Orthogonal View", 0));
+        actionCut->setText(QApplication::translate("MeshprintClass", "Cut", 0));
+        actionLine_View->setText(QApplication::translate("MeshprintClass", "Line View", 0));
+        actionFace_View->setText(QApplication::translate("MeshprintClass", "FaceView", 0));
+        actionUndo->setText(QApplication::translate("MeshprintClass", "undo", 0));
+        actionRedo->setText(QApplication::translate("MeshprintClass", "Redo", 0));
+        actionTranslation->setText(QApplication::translate("MeshprintClass", "Translate Translation", 0));
+        actionRotate_Camera->setText(QApplication::translate("MeshprintClass", "Rotate Camera", 0));
+        actionRotate->setText(QApplication::translate("MeshprintClass", "Rotate", 0));
+        actionTranslate_Model->setText(QApplication::translate("MeshprintClass", "Translate Model", 0));
+        actionGrid->setText(QApplication::translate("MeshprintClass", "Grid", 0));
+        actionBackground->setText(QApplication::translate("MeshprintClass", "Background", 0));
+        actionALight->setText(QApplication::translate("MeshprintClass", "aLight", 0));
+        actionSave_contour->setText(QApplication::translate("MeshprintClass", "Save contour", 0));
+        actionMaintenance->setText(QApplication::translate("MeshprintClass", "Maintenance", 0));
         stateGroupLayout->setTitle(QString());
-        label_Lheight_3->setText(QApplication::translate("MeshprintClass", "Scale Size", Q_NULLPTR));
-        pushButton_XYScan_8->setText(QApplication::translate("MeshprintClass", "Apply", Q_NULLPTR));
-        label_pDiameter->setText(QApplication::translate("MeshprintClass", "Width", Q_NULLPTR));
-        label_pHeight->setText(QApplication::translate("MeshprintClass", "Height", Q_NULLPTR));
-        pushButton_3->setText(QApplication::translate("MeshprintClass", "Show Support Region", Q_NULLPTR));
-        applyPointSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Point Support", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(addPointSupport), QApplication::translate("MeshprintClass", "Point Support", Q_NULLPTR));
-        label_LDiameter->setText(QApplication::translate("MeshprintClass", "Width", Q_NULLPTR));
-        label_Lheight->setText(QApplication::translate("MeshprintClass", "Height", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("MeshprintClass", "Show Support Region", Q_NULLPTR));
-        applyLineSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Line Support", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(addLineSupport), QApplication::translate("MeshprintClass", "Line Support", Q_NULLPTR));
-        label_Lheight_2->setText(QApplication::translate("MeshprintClass", "support angle", Q_NULLPTR));
-        label_Lheight_7->setText(QApplication::translate("MeshprintClass", "line gap", Q_NULLPTR));
-        label_Lheight_8->setText(QApplication::translate("MeshprintClass", "line length", Q_NULLPTR));
-        label_Lheight_9->setText(QApplication::translate("MeshprintClass", "line width", Q_NULLPTR));
-        label_Lheight_10->setText(QApplication::translate("MeshprintClass", "line distance", Q_NULLPTR));
-        label_Lheight_15->setText(QApplication::translate("MeshprintClass", "line error", Q_NULLPTR));
-        pushButton_XYScan_7->setText(QApplication::translate("MeshprintClass", "Apply", Q_NULLPTR));
-        tabWidget->setTabText(tabWidget->indexOf(autosupport), QApplication::translate("MeshprintClass", "Auto Support", Q_NULLPTR));
+        label_Lheight_3->setText(QApplication::translate("MeshprintClass", "Scale Size", 0));
+        pushButton_XYScan_8->setText(QApplication::translate("MeshprintClass", "Apply", 0));
+        label_pDiameter->setText(QApplication::translate("MeshprintClass", "Width", 0));
+        label_pHeight->setText(QApplication::translate("MeshprintClass", "Height", 0));
+        pushButton_3->setText(QApplication::translate("MeshprintClass", "Show Support Region", 0));
+        applyPointSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Point Support", 0));
+        tabWidget->setTabText(tabWidget->indexOf(addPointSupport), QApplication::translate("MeshprintClass", "Point Support", 0));
+        label_LDiameter->setText(QApplication::translate("MeshprintClass", "Width", 0));
+        label_Lheight->setText(QApplication::translate("MeshprintClass", "Height", 0));
+        pushButton->setText(QApplication::translate("MeshprintClass", "Show Support Region", 0));
+        applyLineSupportButton->setText(QApplication::translate("MeshprintClass", "Apply Line Support", 0));
+        tabWidget->setTabText(tabWidget->indexOf(addLineSupport), QApplication::translate("MeshprintClass", "Line Support", 0));
+        label_Lheight_2->setText(QApplication::translate("MeshprintClass", "support angle", 0));
+        label_Lheight_7->setText(QApplication::translate("MeshprintClass", "line gap", 0));
+        label_Lheight_8->setText(QApplication::translate("MeshprintClass", "line length", 0));
+        label_Lheight_9->setText(QApplication::translate("MeshprintClass", "line width", 0));
+        label_Lheight_10->setText(QApplication::translate("MeshprintClass", "line distance", 0));
+        label_Lheight_15->setText(QApplication::translate("MeshprintClass", "line error", 0));
+        pushButton_XYScan_7->setText(QApplication::translate("MeshprintClass", "Apply", 0));
+        tabWidget->setTabText(tabWidget->indexOf(autosupport), QApplication::translate("MeshprintClass", "Auto Support", 0));
         comboBox_2->clear();
         comboBox_2->insertItems(0, QStringList()
-         << QApplication::translate("MeshprintClass", "No hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Chessboard hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Offset Filling hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "X_parallel hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Y parallel hatch", Q_NULLPTR)
-         << QApplication::translate("MeshprintClass", "Hybird hatch", Q_NULLPTR)
+         << QApplication::translate("MeshprintClass", "No hatch", 0)
+         << QApplication::translate("MeshprintClass", "Chessboard hatch", 0)
+         << QApplication::translate("MeshprintClass", "Offset Filling hatch", 0)
+         << QApplication::translate("MeshprintClass", "X_parallel hatch", 0)
+         << QApplication::translate("MeshprintClass", "Y parallel hatch", 0)
+         << QApplication::translate("MeshprintClass", "Hybird hatch", 0)
         );
-        comboBox_2->setCurrentText(QApplication::translate("MeshprintClass", "No hatch", Q_NULLPTR));
+        comboBox_2->setCurrentText(QApplication::translate("MeshprintClass", "No hatch", 0));
         stateGroupLayout_6->setTitle(QString());
-        stateGroupLayout_2->setTitle(QApplication::translate("MeshprintClass", "Laser Parameter Setting", Q_NULLPTR));
-        label_pDiameter_2->setText(QApplication::translate("MeshprintClass", "Hatch Laser Power", Q_NULLPTR));
-        label_pDiameter_9->setText(QApplication::translate("MeshprintClass", "Hatch Laser Speed", Q_NULLPTR));
-        label_pDiameter_4->setText(QApplication::translate("MeshprintClass", "Contour Laser Power", Q_NULLPTR));
-        label_pDiameter_6->setText(QApplication::translate("MeshprintClass", "Contour Laser Speed", Q_NULLPTR));
+        stateGroupLayout_2->setTitle(QApplication::translate("MeshprintClass", "Laser Parameter Setting", 0));
+        label_pDiameter_2->setText(QApplication::translate("MeshprintClass", "Hatch Laser Power", 0));
+        label_pDiameter_9->setText(QApplication::translate("MeshprintClass", "Hatch Laser Speed", 0));
+        label_pDiameter_4->setText(QApplication::translate("MeshprintClass", "Contour Laser Power", 0));
+        label_pDiameter_6->setText(QApplication::translate("MeshprintClass", "Contour Laser Speed", 0));
         stateGroupLayout_7->setTitle(QString());
-        stateGroupLayout_5->setTitle(QApplication::translate("MeshprintClass", "Geometric Parameter Setting", Q_NULLPTR));
-        label_pDiameter_37->setText(QApplication::translate("MeshprintClass", "Thickness", Q_NULLPTR));
-        label_pDiameter_8->setText(QApplication::translate("MeshprintClass", "Contour Offset", Q_NULLPTR));
-        label_pDiameter_10->setText(QApplication::translate("MeshprintClass", "Field Width", Q_NULLPTR));
-        label_pDiameter_11->setText(QApplication::translate("MeshprintClass", "Field Height", Q_NULLPTR));
-        label_pDiameter_17->setText(QApplication::translate("MeshprintClass", "Field Space", Q_NULLPTR));
-        label_pDiameter_36->setText(QApplication::translate("MeshprintClass", "Hatch Distance", Q_NULLPTR));
-        label_pDiameter_38->setText(QApplication::translate("MeshprintClass", "Increment angle", Q_NULLPTR));
-        pushButton_XYScan_2->setText(QApplication::translate("MeshprintClass", "Slicing and Path Generation", Q_NULLPTR));
-        menuFile->setTitle(QApplication::translate("MeshprintClass", "File", Q_NULLPTR));
-        menuView->setTitle(QApplication::translate("MeshprintClass", "View", Q_NULLPTR));
-        menuHelp->setTitle(QApplication::translate("MeshprintClass", "Help", Q_NULLPTR));
-        menuEdit->setTitle(QApplication::translate("MeshprintClass", "Edit", Q_NULLPTR));
-        menuTools->setTitle(QApplication::translate("MeshprintClass", "Tools", Q_NULLPTR));
-        menuSets->setTitle(QApplication::translate("MeshprintClass", "Setting", Q_NULLPTR));
-        viewToolBar->setWindowTitle(QApplication::translate("MeshprintClass", "toolBar", Q_NULLPTR));
-        editToolBar->setWindowTitle(QApplication::translate("MeshprintClass", "toolBar", Q_NULLPTR));
+        stateGroupLayout_5->setTitle(QApplication::translate("MeshprintClass", "Geometric Parameter Setting", 0));
+        label_pDiameter_37->setText(QApplication::translate("MeshprintClass", "Thickness", 0));
+        label_pDiameter_8->setText(QApplication::translate("MeshprintClass", "Contour Offset", 0));
+        label_pDiameter_10->setText(QApplication::translate("MeshprintClass", "Field Width", 0));
+        label_pDiameter_11->setText(QApplication::translate("MeshprintClass", "Field Height", 0));
+        label_pDiameter_17->setText(QApplication::translate("MeshprintClass", "Field Space", 0));
+        label_pDiameter_36->setText(QApplication::translate("MeshprintClass", "Hatch Distance", 0));
+        label_pDiameter_38->setText(QApplication::translate("MeshprintClass", "Increment angle", 0));
+        pushButton_XYScan_2->setText(QApplication::translate("MeshprintClass", "Slicing and Path Generation", 0));
+        menuFile->setTitle(QApplication::translate("MeshprintClass", "File", 0));
+        menuView->setTitle(QApplication::translate("MeshprintClass", "View", 0));
+        menuHelp->setTitle(QApplication::translate("MeshprintClass", "Help", 0));
+        menuEdit->setTitle(QApplication::translate("MeshprintClass", "Edit", 0));
+        menuTools->setTitle(QApplication::translate("MeshprintClass", "Tools", 0));
+        menuSets->setTitle(QApplication::translate("MeshprintClass", "Setting", 0));
+        viewToolBar->setWindowTitle(QApplication::translate("MeshprintClass", "toolBar", 0));
+        editToolBar->setWindowTitle(QApplication::translate("MeshprintClass", "toolBar", 0));
     } // retranslateUi
 
 };
