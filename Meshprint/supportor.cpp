@@ -390,7 +390,6 @@ void Supportor::merge(int num)
 						center += lines_count[k].first[v];
 					}
 					center /= lines_count[k].first.size();
-					center.z() = 0;
 					bool canbemerge = true;
 					for (int v = 0; v < lines_count[k].first.size() && canbemerge; v++)
 					{
@@ -398,7 +397,6 @@ void Supportor::merge(int num)
 						temp.z() = 0;
 						canbemerge = temp.length() < 1.0;
 					}
-					canbemerge = false;
 					if (canbemerge)
 					{
 						center.z() = lines_count[k].first.front().z();
@@ -408,7 +406,7 @@ void Supportor::merge(int num)
 					{
 						sup_lines->at(i).push_back(lines_count[k].first);
 
-						add_supportting_point_for_polyline(lines_count[k].first, 0, 1.0);
+						add_supportting_point_for_polyline(lines_count[k].first, 0, 0.2);
 						while (!sup_points->at(0).empty())
 						{
 							Vec3f p = sup_points->at(0).back();
