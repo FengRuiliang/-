@@ -27,6 +27,8 @@ private:
 	bool toereas = false;
 	bool belong_u_and_c = false;
 	bool is_vailed;//judge whether this segment can be used for sweep line algorithm
+
+	HE_edge* edge_;
 	//
 public:
 	void set_v1(Vec3f v) { v1 = v; };
@@ -41,6 +43,7 @@ public:
 	Vec3f &get_v1() { return v1; };
 	Vec3f &get_v2() { return v2; };
 	float get_angle() { return angle; }
+	HE_edge* get_edge() { return edge_; }
 	// the following codes is used for sweep algorithm
 	Vec2f &get_pc() { return pc; }
 	Vec2f &get_vu() { return vu; }
@@ -49,4 +52,5 @@ public:
 	bool get_to_erease() { return toereas; }
 	float get_length() { return (v2 - v1).length(); }
 	Vec3f get_normal();
+	void set_cut_edge(HE_edge * ecur);
 };

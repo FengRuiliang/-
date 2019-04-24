@@ -554,6 +554,7 @@ void RenderingWidget::ReadSingleMesh()
 	a.append(s);
 
 	QMessageBox::information(this, "Read Successfully!", a);
+	return;
 	float x_length = 0; float y_length = 0;
 	for (int i = 0; i < ctn_obj.size(); i++)
 	{
@@ -1265,6 +1266,17 @@ void RenderingWidget::DrawEdge(bool bv)
 
 		const std::vector<HE_edge *>& edges = *(ctn_obj[id_obj]->ptr_mesh_->get_edges_list());
 		const std::vector<HE_edge *>& bedges = *(ctn_obj[id_obj]->ptr_mesh_->get_bedges_list());
+		glBegin(GL_LINES);
+		glColor4ub(0, 255, 255, 255);
+		for (size_t i = 0; i != edges.size(); ++i)
+		{
+			glVertex3fv(edges[i]->start_->position());
+			glVertex3fv(edges[i]->pvert_->position());
+		}
+		glEnd();
+		return;
+
+
 		//glLineWidth(5.0);
 		for (size_t i = 0; i != bedges.size(); ++i)
 		{
@@ -1361,12 +1373,8 @@ void RenderingWidget::DrawSupport(bool bv)
 			glColor4ub(228, 26, 28, 255);
 			glBegin(GL_TRIANGLES);
 			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int j=0;j<points->size();j++)
+			for (int j=10;j<points->size();j++)
 			{
-// 				if (j != slice_check_id_)
-// 				{
-// 					continue;
-// 				}
 				for (int k = 0; k < points->at(j).size(); k++)
 				{
 					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
@@ -1380,8 +1388,35 @@ void RenderingWidget::DrawSupport(bool bv)
 						} while (cur != sta);
 					}
 				}
-
+			}		
+			glEnd();
+		
+		
+			auto edges= ctn_obj[i]->ppcs->su->getEdges();
+			glColor4ub(77, 175, 74, 255);
+			glBegin(GL_LINES);
+			for (auto iter=edges.begin();iter!=edges.end();iter++)
+			{
+				glVertex3fv((*iter)->start_->position());
+				glVertex3fv((*iter)->pvert_->position());
 			}
+			glEnd();
+		
+			auto segments = ctn_obj[i]->ppcs->su->getSegments();
+			glColor4ub(152, 78, 163, 255);
+			glBegin(GL_LINES);
+			for (int j = 0; j < segments->size(); j++)
+			{
+				for (int k = 0; k < segments->at(j).size(); k++)
+				{
+					glVertex3fv(segments->at(j)[k]->get_v1());
+					glVertex3fv(segments->at(j)[k]->get_v2());
+				}
+			}
+			glEnd();
+	continue;
+
+
 			glEnd();
 			glColor4ub(152, 78, 163, 255);
 			auto sup_lines = ctn_obj[i]->ppcs->su->get_suplines();
@@ -2010,6 +2045,7 @@ void RenderingWidget::setAngle(int angle)
 }
 void RenderingWidget::setLineError(double err) {
 	ERR = err; 
+
 }
 void RenderingWidget::FindRegion()
 {

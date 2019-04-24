@@ -288,6 +288,7 @@
     <ClCompile Include="Sweep.cpp" />
     <ClCompile Include="TriangleglobalFunctions.cpp" />
     <ClCompile Include="triangle\triangle.cpp" />
+    <ClCompile Include="Minidisc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="meshprint.h">
@@ -310,6 +311,7 @@
     <ClInclude Include="Hatch.h" />
     <ClInclude Include="HE_mesh\Mesh3D.h" />
     <ClInclude Include="HE_mesh\Vec.h" />
+    <ClInclude Include="Minidisc.h" />
     <ClInclude Include="Preprocessor.h" />
     <ClInclude Include="Segment.h" />
     <ClInclude Include="slicer.h" />

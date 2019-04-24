@@ -633,6 +633,7 @@ bool Mesh3D::LoadFromSTLFile(const char* fins)
 	}
 
 	file.close();
+
 	UpdateMesh();
 	Unify(2.f);
 	return isValid();;
@@ -864,6 +865,7 @@ void Mesh3D::ComputeBoundingBox(void)
 
 void Mesh3D::Unify(float size)
 {
+	return;
 	//qDebug() << "z position" << zmax_;
 	float scaleX = xmax_ - xmin_;
 	float scaleY = ymax_ - ymin_;

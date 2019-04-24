@@ -4,6 +4,7 @@
 #include "globalFunctions.h"
 #include <algorithm>
 #include "Cubes.h"
+
 class Cubes;
 class Cubes::Box;
 class Cubes::sortVec;

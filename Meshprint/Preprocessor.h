@@ -18,5 +18,6 @@ public:
 	void add_support();
 	void exportpoint();
 	void exportline();
+	void exportTriangles();
 };
 

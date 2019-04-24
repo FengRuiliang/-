@@ -44,11 +44,6 @@
     <ClCompile Include="meshprint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    
-    
-    
-    
-    
     <ClCompile Include="ArcBall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,8 +80,6 @@
     <ClCompile Include="MeshInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    
-    
     <ClCompile Include="maintenance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,8 +89,6 @@
     <ClCompile Include="TriangleglobalFunctions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    
-    
     <ClCompile Include="AMObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -120,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Segment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minidisc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -229,6 +223,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Preprocessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Minidisc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

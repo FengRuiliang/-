@@ -6,3 +6,8 @@ Vec3f Segment::get_normal()
 	nor.normalize();
 	return nor;
 }
+
+void Segment::set_cut_edge(HE_edge * ecur)
+{
+	edge_ = ecur;
+}
