@@ -1629,15 +1629,15 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 			glEnd();
 
 			glLineWidth(3.0);
-			auto ribs = ctn_obj[i]->ppcs->su->sup_ribs;
+			auto ribs = ctn_obj[i]->ppcs->su->getRibs();
 			glColor4ub(0, 0, 0, 255);
-			
-			for (auto iter = ribs->begin(); iter != ribs->end(); iter++)
+	
+			for (auto iter = ribs.begin(); iter != ribs.end(); iter++)
 			{
 				glBegin(GL_LINE_STRIP);
-				for (auto iterp = iter->nodes.begin(); iterp != iter->nodes.end(); iterp++)
+				for (auto iterp = (*iter)->Nodes().begin(); iterp != (*iter)->Nodes().end(); iterp++)
 				{
-					glVertex3fv(*iterp);
+					glVertex3fv((*iterp)->getPosition());
 				}
 				glEnd();
 			}

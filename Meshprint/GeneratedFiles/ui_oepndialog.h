@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'oepndialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.2
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -57,8 +57,8 @@ public:
 
     void retranslateUi(QDialog *open_dia)
     {
-        open_dia->setWindowTitle(QApplication::translate("open_dia", "info", 0));
-        label->setText(QApplication::translate("open_dia", "TextLabel", 0));
+        open_dia->setWindowTitle(QApplication::translate("open_dia", "info", Q_NULLPTR));
+        label->setText(QApplication::translate("open_dia", "TextLabel", Q_NULLPTR));
     } // retranslateUi
 
 };

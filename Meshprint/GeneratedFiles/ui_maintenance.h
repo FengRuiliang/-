@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'maintenance.ui'
 **
-** Created by: Qt User Interface Compiler version 5.6.2
+** Created by: Qt User Interface Compiler version 5.8.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -468,43 +468,43 @@ public:
 
     void retranslateUi(QDialog *MyDialog)
     {
-        MyDialog->setWindowTitle(QApplication::translate("MyDialog", "Dialog", 0));
+        MyDialog->setWindowTitle(QApplication::translate("MyDialog", "Dialog", Q_NULLPTR));
         intersect_checkBox->setText(QString());
-        intersect_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_2->setText(QApplication::translate("MyDialog", "intersecting triangles", 0));
-        pushButton_8->setText(QApplication::translate("MyDialog", "Mark", 0));
-        pushButton_15->setText(QApplication::translate("MyDialog", "Remove", 0));
+        intersect_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_2->setText(QApplication::translate("MyDialog", "intersecting triangles", Q_NULLPTR));
+        pushButton_8->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
+        pushButton_15->setText(QApplication::translate("MyDialog", "Remove", Q_NULLPTR));
         overlap_checkBox->setText(QString());
-        overlap_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_5->setText(QApplication::translate("MyDialog", "Overlap Triangles", 0));
-        pushButton_12->setText(QApplication::translate("MyDialog", "Mark", 0));
+        overlap_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_5->setText(QApplication::translate("MyDialog", "Overlap Triangles", Q_NULLPTR));
+        pushButton_12->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
         reverse_checkBox->setText(QString());
-        reverse_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_6->setText(QApplication::translate("MyDialog", "Revers Normal", 0));
-        pushButton_13->setText(QApplication::translate("MyDialog", "Mark", 0));
+        reverse_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_6->setText(QApplication::translate("MyDialog", "Revers Normal", Q_NULLPTR));
+        pushButton_13->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
         badside_checkBox->setText(QString());
-        badside_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_12->setText(QApplication::translate("MyDialog", "Edege error", 0));
-        pushButton_14->setText(QApplication::translate("MyDialog", "Mark", 0));
+        badside_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_12->setText(QApplication::translate("MyDialog", "Edege error", Q_NULLPTR));
+        pushButton_14->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
         hole_checkBox->setText(QString());
-        hole_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_4->setText(QApplication::translate("MyDialog", "Hole", 0));
-        pushButton_18->setText(QApplication::translate("MyDialog", "Mark", 0));
+        hole_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_4->setText(QApplication::translate("MyDialog", "Hole", Q_NULLPTR));
+        pushButton_18->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
         shell_checkBox->setText(QString());
-        shell_label->setText(QApplication::translate("MyDialog", "0", 0));
-        label_3->setText(QApplication::translate("MyDialog", "Shell", 0));
-        pushButton_16->setText(QApplication::translate("MyDialog", "Mark", 0));
-        pushButton_17->setText(QApplication::translate("MyDialog", "Auto Repair", 0));
-        pushButton->setText(QApplication::translate("MyDialog", "Close", 0));
-        pushButton_2->setText(QApplication::translate("MyDialog", "Update", 0));
-        tabWidget->setTabText(tabWidget->indexOf(widget), QApplication::translate("MyDialog", "Diagnose", 0));
-        pushButton_9->setText(QApplication::translate("MyDialog", "auto repair", 0));
-        pushButton_6->setText(QApplication::translate("MyDialog", "choose tirangle", 0));
-        pushButton_5->setText(QApplication::translate("MyDialog", "create triangle", 0));
-        pushButton_4->setText(QApplication::translate("MyDialog", "color", 0));
-        pushButton_11->setText(QApplication::translate("MyDialog", "help", 0));
-        pushButton_10->setText(QApplication::translate("MyDialog", "close", 0));
-        tabWidget->setTabText(tabWidget->indexOf(widget_2), QApplication::translate("MyDialog", "Repair", 0));
+        shell_label->setText(QApplication::translate("MyDialog", "0", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MyDialog", "Shell", Q_NULLPTR));
+        pushButton_16->setText(QApplication::translate("MyDialog", "Mark", Q_NULLPTR));
+        pushButton_17->setText(QApplication::translate("MyDialog", "Auto Repair", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("MyDialog", "Close", Q_NULLPTR));
+        pushButton_2->setText(QApplication::translate("MyDialog", "Update", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(widget), QApplication::translate("MyDialog", "Diagnose", Q_NULLPTR));
+        pushButton_9->setText(QApplication::translate("MyDialog", "auto repair", Q_NULLPTR));
+        pushButton_6->setText(QApplication::translate("MyDialog", "choose tirangle", Q_NULLPTR));
+        pushButton_5->setText(QApplication::translate("MyDialog", "create triangle", Q_NULLPTR));
+        pushButton_4->setText(QApplication::translate("MyDialog", "color", Q_NULLPTR));
+        pushButton_11->setText(QApplication::translate("MyDialog", "help", Q_NULLPTR));
+        pushButton_10->setText(QApplication::translate("MyDialog", "close", Q_NULLPTR));
+        tabWidget->setTabText(tabWidget->indexOf(widget_2), QApplication::translate("MyDialog", "Repair", Q_NULLPTR));
     } // retranslateUi
 
 };

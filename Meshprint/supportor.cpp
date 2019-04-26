@@ -8,7 +8,6 @@ Supportor::Supportor()
 	{
 		pattern << IntPoint(PBG * cos(i * 10), PBG * sin(i * 10));
 	}
-	sup_ribs = new std::vector<Rib>;
 }
 
 
@@ -18,7 +17,6 @@ Supportor::~Supportor()
 	delete polylines;
 	delete hatchs;
 	delete minkowskisums;
-	delete sup_ribs;
 }
 
 void Supportor::generatePointsAndRibs(std::vector<std::vector<std::vector<Segment*>>>* cnts)
@@ -54,9 +52,11 @@ void Supportor::generatePointsAndRibs(std::vector<std::vector<std::vector<Segmen
 			Paths mink_sum;
 			MinkowskiSum(pattern, contour[i - 1], mink_sum, true);
 			SimplifyPolygons(mink_sum);
+			std::vector<Node*> nodes_;
 			for each (std::vector<Segment*> var in cnts->at(i))
 			{
 				std::vector<Segment> polyline;//the end of polyline has been supported
+				
 				for (int j = 0; j < var.size(); j++)
 				{
 					if (var[j]->get_length() == 0)
@@ -75,13 +75,16 @@ void Supportor::generatePointsAndRibs(std::vector<std::vector<std::vector<Segmen
 					{
 						sup_points->at(i).push_back(var[j]->get_v2());
 						polyline.push_back(*var[j]);
-						link_to_ribs(var[j]->get_edge(),var[j]->get_v2());
+						Node * node_ = new Node(var[j]->get_v2(), var[j]->get_edge());
+						nodes_.push_back(node_);
+						
 					}
 					else if (count1 % 2 == 0 && count2 % 2 == 0)
 					{
 						sup_points->at(i).push_back(var[j]->get_v2());
-						link_to_ribs(var[j]->get_edge(), var[j]->get_v2());
 						polyline.push_back(*var[j]);
+						Node * node_ = new Node(var[j]->get_v2(), var[j]->get_edge());
+						nodes_.push_back(node_);
 					}
 					else if (count1 % 2 == 0 && count2 % 2 != 0)
 					{
@@ -96,34 +99,51 @@ void Supportor::generatePointsAndRibs(std::vector<std::vector<std::vector<Segmen
 					sup_paths->at(i).push_back(polyline);
 				}
 			}
+			link_to_ribs(nodes_);
 		}
+	
 	}
 	qDebug() << "finish add support point and ribs";
 }
-void Supportor::link_to_ribs(HE_edge* edge_,  Vec3f node_)
+void Supportor::link_to_ribs(std::vector<Node*> nodes_)
 {
-	bool finded_ = false;
-	for (int i = 0; i < sup_ribs->size(); i++)
+
+	for (int i = 0; i < ribs.size(); i++)
 	{
-		if (sup_ribs->at(i).edge_ == edge_)
+		for (int j = 0; j < nodes_.size(); j++)
 		{
-			finded_ = true;
-			sup_ribs->at(i).nodes.push_back(node_);
-		}
-		else if (sup_ribs->at(i).edge_->pvert_==edge_->start_)
-		{
-			finded_ = true;
-			sup_ribs->at(i).nodes.push_back(node_);
-			sup_ribs->at(i).edge_ = edge_;
+			if (ribs[i]->Edge() == nodes_[j]->Edge() || ribs[i]->Edge()->pvert_ == nodes_[j]->Edge()->start_)
+			{
+				if (ribs[i]->Normal().dot(nodes_[j]->Normal()) > ribs[i]->Angle())
+				{
+					ribs[i]->setAngle(ribs[i]->Normal().dot(nodes_[j]->Normal()));
+					ribs[i]->setCandidateNode(nodes_[j]);
+				}
+			}
+
 		}
 	}
-	if (finded_==false)
+	for (int i=0;i<ribs.size();i++)
 	{
-		Rib rib;
-		rib.edge_ = edge_;
-		rib.nodes.push_back(node_);
-		sup_ribs->push_back(rib);
+		if (ribs[i]->CandidateNode()!=NULL)
+		{
+			ribs[i]->setEdge(ribs[i]->CandidateNode()->Edge());
+			ribs[i]->Nodes().push_back(ribs[i]->CandidateNode());
+			ribs[i]->setAngle(-1);
+			ribs[i]->Normal() = ribs[i]->CandidateNode()->Normal();
+			ribs[i]->CandidateNode()->setRib(ribs[i]);
+			ribs[i]->setCandidateNode(NULL);
+		}
 	}
+	for (int j=0;j<nodes_.size();j++)
+	{
+		if (nodes_[j]->getRib()==NULL)
+		{
+			Rib* rib_=new Rib(nodes_[j]);
+			ribs.push_back(rib_);
+		}
+	}
+
 }
 
 void Supportor::add_supportting_rib_for_contours(std::vector<std::vector<std::vector<Segment*>>>* cnts)
@@ -786,6 +806,7 @@ void Supportor::buildTreeStructure()
 	}
 }
 
+
 Vec3f Supportor::computerIntersection(Paths& mink_sum, Segment* ptr_seg)
 {
 	IntPoint v1(ptr_seg->get_v1().x()*1e3, ptr_seg->get_v1().y()*1e3);
@@ -815,4 +836,3 @@ Vec3f Supportor::computerIntersection(Paths& mink_sum, Segment* ptr_seg)
 		}
 	}
 }
-
