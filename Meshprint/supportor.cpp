@@ -4,12 +4,11 @@
 #include "HE_mesh/Vec.h"
 Supportor::Supportor()
 {
-
-
 	for (int i = 0; i < 36; i++)
 	{
 		pattern << IntPoint(PBG * cos(i * 10), PBG * sin(i * 10));
 	}
+	sup_ribs = new std::vector<Rib>;
 }
 
 
@@ -19,12 +18,14 @@ Supportor::~Supportor()
 	delete polylines;
 	delete hatchs;
 	delete minkowskisums;
+	delete sup_ribs;
 }
 
-void Supportor::generatePoint(std::vector<std::vector<std::vector<Segment*>>>* cnts)
+void Supportor::generatePointsAndRibs(std::vector<std::vector<std::vector<Segment*>>>* cnts)
 {
 	sup_points = new std::vector<std::vector<Vec3f>>(cnts->size());
-	sup_ribs = new std::vector<std::vector<std::vector<Segment>>>(cnts->size());
+	sup_paths = new std::vector<std::vector<std::vector<Segment>>>(cnts->size());// 
+	
 	std::vector<Paths> contour(cnts->size());
 	for (int i = 0; i < cnts->size(); i++)
 	{
@@ -55,7 +56,7 @@ void Supportor::generatePoint(std::vector<std::vector<std::vector<Segment*>>>* c
 			SimplifyPolygons(mink_sum);
 			for each (std::vector<Segment*> var in cnts->at(i))
 			{
-				std::vector<Segment> polyline;
+				std::vector<Segment> polyline;//the end of polyline has been supported
 				for (int j = 0; j < var.size(); j++)
 				{
 					if (var[j]->get_length() == 0)
@@ -70,26 +71,58 @@ void Supportor::generatePoint(std::vector<std::vector<std::vector<Segment*>>>* c
 						count1 = PointInPolygon(v1, poly_sum) == 0 ? count1 : count1 + 1;
 						count2 = PointInPolygon(v2, poly_sum) == 0 ? count2 : count2 + 1;
 					}
-					if (count1 % 2 == 0 && count2 % 2 == 0)
+					if (count1 % 2 != 0 && count2 % 2 == 0)
 					{
-						sup_segments->at(i).push_back(var[j]);
+						sup_points->at(i).push_back(var[j]->get_v2());
+						polyline.push_back(*var[j]);
+						link_to_ribs(var[j]->get_edge(),var[j]->get_v2());
+					}
+					else if (count1 % 2 == 0 && count2 % 2 == 0)
+					{
+						sup_points->at(i).push_back(var[j]->get_v2());
+						link_to_ribs(var[j]->get_edge(), var[j]->get_v2());
 						polyline.push_back(*var[j]);
 					}
-					else
+					else if (count1 % 2 == 0 && count2 % 2 != 0)
 					{
-						if (!polyline.empty())
-						{
-							sup_ribs->at(i).push_back(polyline);
-							polyline.clear();
-						}
+						polyline.push_back(*var[j]);
+						sup_paths->at(i).push_back(polyline);
+						polyline.clear();
 					}
+					
 				}
 				if (!polyline.empty())
 				{
-					sup_ribs->at(i).push_back(polyline);
+					sup_paths->at(i).push_back(polyline);
 				}
 			}
 		}
+	}
+	qDebug() << "finish add support point and ribs";
+}
+void Supportor::link_to_ribs(HE_edge* edge_,  Vec3f node_)
+{
+	bool finded_ = false;
+	for (int i = 0; i < sup_ribs->size(); i++)
+	{
+		if (sup_ribs->at(i).edge_ == edge_)
+		{
+			finded_ = true;
+			sup_ribs->at(i).nodes.push_back(node_);
+		}
+		else if (sup_ribs->at(i).edge_->pvert_==edge_->start_)
+		{
+			finded_ = true;
+			sup_ribs->at(i).nodes.push_back(node_);
+			sup_ribs->at(i).edge_ = edge_;
+		}
+	}
+	if (finded_==false)
+	{
+		Rib rib;
+		rib.edge_ = edge_;
+		rib.nodes.push_back(node_);
+		sup_ribs->push_back(rib);
 	}
 }
 

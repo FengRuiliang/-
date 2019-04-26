@@ -80,12 +80,12 @@ void Slicer::doslice()
 						if (p1.z()-hei>1e-3&&p2.z()-hei<1e-3)
 						{
 							seg->set_v1((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
-							seg->set_cut_edge(ecur);
+						
 						}
 						else if (p1.z()-hei <1e-3&&p2.z()-hei >1e-3)
 						{
 							seg->set_v2((hei - p1.z()) / (p2.z() - p1.z())*(p2 - p1) + p1);
-							
+								seg->set_cut_edge(ecur);
 							ejump = ecur->ppair_;
 						}
 						ecur = ecur->pnext_;

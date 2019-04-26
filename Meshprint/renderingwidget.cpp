@@ -61,7 +61,7 @@ RenderingWidget::RenderingWidget(QWidget *parent, MainWindow* mainwindow)
 	slice_check_id_ = 1;
 	is_draw_support_ = true;
 	sphere_for_display.LoadFromOBJFile("./Resources/models/sp_sim.obj");
-	sphere_for_display.scalemesh(0.1);
+	sphere_for_display.scalemesh(0.05);
 }
 
 RenderingWidget::~RenderingWidget()
@@ -430,7 +430,8 @@ void RenderingWidget::Render()
 	DrawEdge(is_draw_edge_);
 	DrawFace(is_draw_face_);
 	DrawCutPieces(is_draw_edge_);
-	DrawSupport(is_draw_support_);
+	//DrawSupport(false);
+	DrawSupportRibAndPoints(true);
 	DrawHatch(true);
 }
 
@@ -1599,7 +1600,71 @@ void RenderingWidget::DrawSupFace(bool bv)
 
 	}
 }
+void RenderingWidget::DrawSupportRibAndPoints(bool bv)
+{
+	auto faces = sphere_for_display.get_faces_list();
+	for (int i = 0; i < ctn_obj.size(); i++)
+	{
+		if (ctn_obj[i]->ppcs != NULL&&ctn_obj[i]->ppcs->su != NULL)
+		{
+			glColor4ub(228, 26, 28, 255);
+			glBegin(GL_TRIANGLES);
+			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
+			for (int j = 1; j < points->size(); j++)
+			{
+				for (int k = 0; k < points->at(j).size(); k++)
+				{
+					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
+					{
+						HE_edge* sta = (*iterf)->pedge_;
+						HE_edge* cur = sta;
+						do
+						{
+							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
+							cur = cur->pnext_;
+						} while (cur != sta);
+					}
+				}
+			}
+			glEnd();
 
+			glLineWidth(3.0);
+			auto ribs = ctn_obj[i]->ppcs->su->sup_ribs;
+			glColor4ub(0, 0, 0, 255);
+			
+			for (auto iter = ribs->begin(); iter != ribs->end(); iter++)
+			{
+				glBegin(GL_LINE_STRIP);
+				for (auto iterp = iter->nodes.begin(); iterp != iter->nodes.end(); iterp++)
+				{
+					glVertex3fv(*iterp);
+				}
+				glEnd();
+			}
+
+			auto paths = ctn_obj[i]->ppcs->su->getSupPaths();
+			glLineWidth(1.0);
+			glColor4ub(0, 0, 0, 255);
+			
+			for (int j = 0; j < paths->size(); j++)
+			{
+				glBegin(GL_LINES);
+				for (int k = 0; k < paths->at(j).size(); k++)
+				{
+					for each (Segment s in paths->at(j)[k])
+					{
+						glVertex3fv(s.get_v1()); 
+						glVertex3fv(s.get_v2());
+					}
+				}
+				glEnd();
+			}
+		
+			continue;
+		}
+	}
+
+}
 void RenderingWidget::DrawGrid(bool bv)
 {
 	if (!bv)

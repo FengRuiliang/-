@@ -145,6 +145,7 @@ private:
 	void DrawFace(bool);
 	void DrawSupport(bool bv);
 	void DrawSupFace(bool bv);
+	void DrawSupportRibAndPoints(bool bv);
 	void DrawGrid(bool bV);
 	void DrawCutPieces(bool bv);
 	void DrawCutPiecesSup(bool bv);
