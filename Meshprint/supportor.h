@@ -15,19 +15,25 @@ private:
 	Rib * rib;
 	HE_edge* edge_;
 	Vec3f normal_;
+	Segment* seg_;
 public:
-	Node(Vec3f pos_in_, HE_edge* edge_in)
-	{
-		pos = pos_in_;
+	Node(Vec3f in_) { 
+		pos = in_;
 		rib = NULL;
-		edge_ = edge_in;
-		normal_ = edge_in->pvert_->position() - edge_in->start_->position();
-		normal_.normalize();
 	};
 	~Node() {};
+	Node(Segment* in_)
+	{
+		pos = in_->get_v2();
+		seg_ = in_;
+		rib = NULL;
+		edge_ = in_->get_edge();
+		normal_ = seg_->get_normal();
+	};
 	HE_edge* Edge() { return edge_; }
-	Vec3f&    Normal() { return normal_; }
+	Vec3f&    getNormal() { return normal_; }
 	Rib*	getRib() { return rib; }
+	Segment* getSegments() { return seg_; }
 	Vec3f getPosition() { return pos; }
 	void setRib(Rib* rib_in_)
 	{
@@ -41,7 +47,7 @@ public:
 	{
 		edge_ = ni_->Edge();
 
-		normal_ = ni_->Normal();
+		normal_ = ni_->getNormal();
 		candidate_node = NULL;
 		angle_ = -1;
 	};
@@ -62,55 +68,36 @@ private:
 	std::vector<Node*> nodes;
 	float angle_;
 };
-
+class Polyline
+{
+public:
+	std::vector<Node*> paths;
+	Node* p1=NULL, *p2=NULL;
+	void clear() { paths.clear(); p1 = NULL; p2 = NULL; }
+protected:
+private:
+};
 
 class Supportor
 {
 public:
 
+	void opitimizePointsandRibs();
 public:
 	Supportor();
 	~Supportor();
 	void generatePointsAndRibs(std::vector<std::vector<std::vector<Segment*>>>* cnts);
-	void link_to_ribs(std::vector<Node*> nodes_);
-	void add_supportting_rib_for_contours(std::vector<std::vector<std::vector<Segment*>>>* cnts);
-	void add_supportting_point_for_overhangsegments(std::vector<Segment*> segments, int sliceid);
-	
-	void add_supportting_point_for_contours(std::vector<std::vector<std::vector<Segment*>>>* cnts);
-	std::vector<std::vector<Vec3f>>* get_sup_points() { return sup_points; }
-	std::vector<std::vector<std::vector<Vec3f>>>* get_polylines() { return polylines; };
-	std::vector<std::vector<std::vector<Vec3f>>>* get_minkowssum() { return minkowskisums; };
-	std::vector<std::vector<std::vector<Vec3f>>>* get_suprec() { return sup_rectangle; }
-	std::vector<std::vector<std::vector<Vec3f>>>* get_suplines() { return sup_lines; }
-	std::vector<std::vector<std::vector<Segment>>>* getSupPaths() { return sup_paths; }
-	std::vector<std::vector<Segment*>>* getSegments() { return sup_segments; }
-	std::set<HE_edge*> getEdges() { return sup_edges; }
-	std::vector<std::vector<Segment>>* get_hatchs() { return hatchs; }
+	void link_to_ribs(std::vector<Node*> polylines);
+
 	std::vector<Rib*> getRibs() { return ribs; };
 private:
-	
-	std::vector<std::vector<Segment>>* hatchs;
-	std::vector<std::vector<Vec3f>>* sup_points;
-	std::vector<std::vector<std::vector<Segment>>>* sup_paths;
-	std::vector<std::vector<std::vector<Vec3f>>>* sup_lines;
-	std::vector<std::vector<Segment*>>* sup_segments;
-	std::set<HE_edge*> sup_edges;
-	std::vector<std::vector<std::vector<Vec3f>>>* sup_rectangle;
-	std::vector<std::vector<std::vector<Vec3f>>>* polylines;
-	std::vector<std::vector<std::vector<Vec3f>>>* minkowskisums;
+
 	Path pattern;
 	std::vector<Rib*> ribs;
-	void merge(int num);
 	void add_supportting_point_for_hatchs(Paths input, int sliceid);
-	inline void findpolyline(Path target_paths, Paths mink_sum, int num);
-	void add_supportting_point_for_polyline(std::vector<Vec3f> polyin, int sliceid, float err3=ERR);
 	void add_SP_for_rib(std::vector<Vec3f> polyin, std::vector<Vec3f>& polyout);
-	void add_supportting_point_by_uniform(Paths poly, int sliceid);
-	void buildTreeStructure();
-
-	void updateRibs();
-private:
-	Vec3f computerIntersection(Paths& mink_sum, Segment* ptr_seg);
-
+	typedef std::vector<Polyline> Polylines;
+	std::vector<Polylines> sup_paths;
+	std::vector<std::vector<Node*>> sup_nodes_;
 };
 

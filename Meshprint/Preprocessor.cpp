@@ -125,6 +125,7 @@ void Preprocessor::add_support()
 	do_slice();
 	su = new Supportor;
 	su->generatePointsAndRibs(sl->get_contours());
+	su->opitimizePointsandRibs();
 	//su->add_supportting_rib_for_contours(sl->get_contours());
 	//exportTriangles();
 	exportpoint();
