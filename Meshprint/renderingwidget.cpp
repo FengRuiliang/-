@@ -1364,255 +1364,27 @@ void RenderingWidget::DrawFace(bool bv)
 }
 void RenderingWidget::DrawSupport(bool bv)
 {
-	auto faces = sphere_for_display.get_faces_list();
-	
-	
-	for (int i = 0; i < ctn_obj.size(); i++)
-	{
-		if (ctn_obj[i]->ppcs!=NULL&&ctn_obj[i]->ppcs->su!=NULL)
-		{
-			glColor4ub(228, 26, 28, 255);
-			glBegin(GL_TRIANGLES);
-			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int j=10;j<points->size();j++)
-			{
-				for (int k = 0; k < points->at(j).size(); k++)
-				{
-					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
-					{
-						HE_edge* sta = (*iterf)->pedge_;
-						HE_edge* cur = sta;
-						do
-						{
-							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
-							cur = cur->pnext_;
-						} while (cur != sta);
-					}
-				}
-			}		
-			glEnd();
-		
-		
-			auto edges= ctn_obj[i]->ppcs->su->getEdges();
-			glColor4ub(77, 175, 74, 255);
-			glBegin(GL_LINES);
-			for (auto iter=edges.begin();iter!=edges.end();iter++)
-			{
-				glVertex3fv((*iter)->start_->position());
-				glVertex3fv((*iter)->pvert_->position());
-			}
-			glEnd();
-		
-			auto segments = ctn_obj[i]->ppcs->su->getSegments();
-			glColor4ub(152, 78, 163, 255);
-			glBegin(GL_LINES);
-			for (int j = 0; j < segments->size(); j++)
-			{
-				for (int k = 0; k < segments->at(j).size(); k++)
-				{
-					glVertex3fv(segments->at(j)[k]->get_v1());
-					glVertex3fv(segments->at(j)[k]->get_v2());
-				}
-			}
-			glEnd();
-	continue;
-
-
-			glEnd();
-			glColor4ub(152, 78, 163, 255);
-			auto sup_lines = ctn_obj[i]->ppcs->su->get_suplines();
-			for (int j=0;j<sup_lines->size();j++)
-			{
-				for (int u = 0; u < sup_lines->at(j).size(); u++)
-				{
-					if (sup_lines->at(j)[u].size()==1)
-					{
-						continue;
-						glBegin(GL_TRIANGLES);
-						for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
-						{
-							HE_edge* sta = (*iterf)->pedge_;
-							HE_edge* cur = sta;
-							do
-							{
-								glVertex3fv(cur->pvert_->position() + sup_lines->at(j)[u].front());
-								cur = cur->pnext_;
-							} while (cur != sta);
-						}
-						glEnd();
-// 						glBegin(GL_LINE);
-// 						
-// 						glVertex3fv(sup_lines->at(j)[u][0]);
-// 						glVertex3fv(sup_lines->at(j)[u][0]-Vec3f(0,0, sup_lines->at(j)[u][0].z()));
-// 
-// 						glEnd();
-
-					}
-					else
-					{
-						glBegin(GL_LINES);
-						for (int v = 0; v < sup_lines->at(j)[u].size() - 1; v++)
-						{
-							glVertex3fv(sup_lines->at(j)[u][v]);
-							glVertex3fv(sup_lines->at(j)[u][v + 1]);
-
-						}
-						glEnd();
-					}
-				}
-			}
-			
-			
-// 			//glColor4ub(55, 126, 184, 255);
-// 			auto sup_rec = ctn_obj[i]->ppcs->su->get_suprec();
-// 			for (int u = 0; u < sup_rec->size(); u++)
-// 			{
-// 				for (int v = 0; v < sup_rec->at(u).size(); v++)
-// 				{
-// 					glBegin(GL_LINES);
-// 					for (int w = 0; w < sup_rec->at(u)[v].size() ; w++)
-// 					{
-// 						glVertex3fv(sup_rec->at(u)[v][w]);
-// 						glVertex3fv(sup_rec->at(u)[v][(w + 1)%sup_rec->at(u)[v].size()]);
-// 					}
-// 					glEnd();
-// 				}
-// 
-// 			}
-			
-			glColor4ub(152, 78, 163, 255);
-			auto sup_region = ctn_obj[i]->ppcs->su->get_minkowssum();
-			
-			for (int j=0;j<sup_region->at(slice_check_id_).size();j++)
-			{
-				glBegin(GL_LINE_LOOP);
-				for (int k = 0; k < sup_region->at(slice_check_id_)[j].size(); k++)
-				{
-					glVertex3fv(sup_region->at(slice_check_id_)[j][k]);
-				}
-				glEnd();
-			}
-			
-		
-		
-			glColor4ub(77, 175, 74, 255);
-			auto polylines = ctn_obj[i]->ppcs->su->get_polylines();
-			for (int u = 0; u < polylines->size(); u++)
-			{
-				for (int v = 0; v < polylines->at(u).size(); v++)
-				{	
-					glLineWidth(2.0);
-					glBegin(GL_LINES);
-					for (int w = 0; w < polylines->at(u)[v].size() - 1; w++)
-					{
-						glVertex3fv(polylines->at(u)[v][w]);
-						glVertex3fv(polylines->at(u)[v][w + 1]);
-					}
-					glEnd();
-				}
-
-			}
-		
-		}
-	}
 
 }
 void RenderingWidget::DrawSupFace(bool bv)
 {
 	if (!bv || ctn_obj.empty())
 		return;	
-	glLineWidth(5.0);
-	for (int id_obj = 0; id_obj < ctn_obj.size(); id_obj++)
-	{
 
-		std::vector<std::vector<HE_edge*>>& bl = ctn_obj[id_obj]->ptr_support_->wall_mesh.GetBLoop();
-		for (size_t i = 0; i != bl.size(); i++)
-		{
-		
-			if (i!=slice_check_id_)
-			{
-				continue;
-			}
-			Path obj;
-			Paths res;
-			glBegin(GL_LINE_LOOP);
-			glColor3f(0.0, 0.0, 0.0);
-			for (int j = 0; j < bl[i].size(); j++)
-			{
-				glVertex3f(bl[i][j]->pvert_->position().x(), bl[i][j]->pvert_->position().y(), 0);
-				obj << IntPoint(bl[i][j]->pvert_->position().x()*1e3, bl[i][j]->pvert_->position().y()*1e3);
-			}
-			glEnd();
-
-			ClipperOffset  sov;
-			glColor3f(1.0, 0.0, 0.0);
-			sov.AddPath(obj, jtMiter, etClosedPolygon);
-			sov.Execute(res, -2*1e3);
-			for (int m = 0; m < res.size(); m++)
-			{
-				glBegin(GL_LINE_LOOP);
-				for (int n = 0; n < res[m].size(); n++)
-				{
-					glVertex3f(res[m][n].X/1e3,res[m][n].Y/1e3,0);
-				}
-				glEnd();
-			}
-			
-
-
-			continue;
-			auto faces=ctn_obj[id_obj]->ptr_support_->wall_mesh.get_faces_list();
-			glColor4ub(170, 0, 0, 255);
-			
-			glColor3f(1.0, 1.0, 1.0);
-		
-			for (int j = 0; j < bl[i].size(); j++)
-			{
-				glBegin(GL_POLYGON);
-				glVertex3f(bl[i][j]->pvert_->position().x(), bl[i][j]->pvert_->position().y(), bl[i][j]->pvert_->position().z());
-// 				Vec3f p1, p2;
-// 				ctn_obj[id_obj]->ptr_support_->GetMeshInOctree()->hitOctreeNode(this->ctn_obj[0]->ptr_support_->GetMeshInOctree()->oc_root_, bl[i][j]->pvert_->position(),
-// 					p1, Vec3f(0, 0, -1), hitID, temp_t);
-// 				ctn_obj[id_obj]->ptr_support_->GetMeshInOctree()->hitOctreeNode(this->ctn_obj[0]->ptr_support_->GetMeshInOctree()->oc_root_, bl[i][(j + 1) % bl[i].size()]->pvert_->position(),
-// 					p2, Vec3f(0, 0, -1), hitID, temp_t);
-
-				glVertex3fv(bl[i][j]->pvert_->position()-Vec3f(0,0,10));
-				glVertex3fv(bl[i][(j + 1) % bl[i].size()]->pvert_->position()-Vec3f(0,0,10));
-				glVertex3fv(bl[i][(j + 1) % bl[i].size()]->pvert_->position());
-				glEnd();
-			}
-		
-			for (int j=0;j<faces->size();j++)
-			{
-				if (faces->at(i)->com_flag==i)
-				{
-					HE_edge* sta = faces->at(i)->pedge_;
-					HE_edge* cur = sta;
-					do 
-					{
-						glVertex3fv(cur->pvert_->position());
-						cur = cur->pnext_;
-					} while (cur!=sta);
-				}
-			}
-			glEnd();
-		}
-
-	}
 }
 void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 {
 	auto faces = sphere_for_display.get_faces_list();
-	for (int i = 0; i < ctn_obj.size(); i++)
+	for (int id = 0; id < ctn_obj.size(); id++)
 	{
-		if (ctn_obj[i]->ppcs != NULL&&ctn_obj[i]->ppcs->su != NULL)
+		if (ctn_obj[id]->ppcs != NULL&&ctn_obj[id]->ppcs->su != NULL)
 		{
 			glColor4ub(228, 26, 28, 255);
 			glBegin(GL_TRIANGLES);
-			auto points = ctn_obj[i]->ppcs->su->get_sup_points();
-			for (int j = 1; j < points->size(); j++)
+			auto points = ctn_obj[id]->ppcs->su->getNodes();
+			for (int j = 1; j < points.size(); j++)
 			{
-				for (int k = 0; k < points->at(j).size(); k++)
+				for (int k = 0; k < points.at(j).size(); k++)
 				{
 					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
 					{
@@ -1620,7 +1392,7 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 						HE_edge* cur = sta;
 						do
 						{
-							glVertex3fv(cur->pvert_->position() + points->at(j)[k]);
+							glVertex3fv(cur->pvert_->position() + points[j][k]->getPosition());
 							cur = cur->pnext_;
 						} while (cur != sta);
 					}
@@ -1629,7 +1401,7 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 			glEnd();
 
 			glLineWidth(3.0);
-			auto ribs = ctn_obj[i]->ppcs->su->getRibs();
+			auto ribs = ctn_obj[id]->ppcs->su->getRibs();
 			glColor4ub(0, 0, 0, 255);
 	
 			for (auto iter = ribs.begin(); iter != ribs.end(); iter++)
@@ -1642,25 +1414,23 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 				glEnd();
 			}
 
-			auto paths = ctn_obj[i]->ppcs->su->getSupPaths();
+			auto paths = ctn_obj[id]->ppcs->su->getPaths();
 			glLineWidth(1.0);
 			glColor4ub(0, 0, 0, 255);
-			
-			for (int j = 0; j < paths->size(); j++)
+			for (int i = 0; i < paths.size(); i++)
 			{
-				glBegin(GL_LINES);
-				for (int k = 0; k < paths->at(j).size(); k++)
+				for (int j=0;j<paths[i].size();j++)
 				{
-					for each (Segment s in paths->at(j)[k])
+					glBegin(GL_LINES);
+					for (int k = 0; k < paths[i][j].size(); k++)
 					{
-						glVertex3fv(s.get_v1()); 
-						glVertex3fv(s.get_v2());
+						glVertex3fv(paths[i][j][k]->getSegments()->get_v1());
+						glVertex3fv(paths[i][j][k]->getSegments()->get_v2());
 					}
+					glEnd();
 				}
-				glEnd();
+				
 			}
-		
-			continue;
 		}
 	}
 
