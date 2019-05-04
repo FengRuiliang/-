@@ -46,6 +46,7 @@ public:
 	
 	bool isHeadforALlRibs();
 
+	void beRemovedFromRibs();
 };
 class Rib
 {

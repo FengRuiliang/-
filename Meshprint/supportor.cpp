@@ -151,6 +151,7 @@ void Supportor::opitimizePointsandRibs()
 		for (int j=0;j<sup_paths[i].size();j++)
 		{
 			qDebug() << i;
+			std::pair<Vec2f, float> miniDisc(std::vector<Vec2f> pointsin);
 			std::vector<Node*>& polyin = sup_paths[i][j];
 			Node* sta = polyin.front();
 			for (int k=0;k<polyin.size();k++)
@@ -159,29 +160,32 @@ void Supportor::opitimizePointsandRibs()
 				if (!polyin[k]->isHeadforALlRibs())
 				{
 					sta = polyin[k];
-					break;
 				}
 			}
-			Node* las = sta;
-			for (Node* end=sta->getNext();end!=sta;end=end->getNext())
+			
+			Node* las = sta->getNext();
+			Node* end = las;
+			do 
 			{
-				if (!end->isHeadforALlRibs())
+				float err3 = 0;
+				for (Node* cur = las; cur != end->getNext(); cur = cur->getNext())
 				{
-					float err3 = 0;
-					for (Node* cur = las; cur != end; cur = cur->getNext())
-					{
-						Vec3f dir1 = cur->getPosition() - las->getSegments()->get_v1();
-						dir1.normalize();
-						Vec3f dir2 = cur->Normal();
-						err3 += pow(cur->getSegments()->get_length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
-						for (int k = 0; k < cur->getRibs().size(); k++)
-						{
-							cur->getRibs()[k]->popFront();
-						}
-						cur->getRibs().clear();
-					}
-				}		
-			}
+					Vec3f dir1 = end->getPosition() - las->getSegments()->get_v1();
+					dir1.normalize();
+					Vec3f dir2 = cur->Normal();
+					err3 += pow(cur->getSegments()->get_length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
+				}
+				if (!end->isHeadforALlRibs()/*||err3 > ERR*/)
+				{
+					las = end;
+				}
+				else
+				{
+					end->beRemovedFromRibs();
+				}
+				end = end->getNext();
+			} while (end!=sta);
+
 		}
 	}
 }
@@ -190,8 +194,16 @@ bool Node::isHeadforALlRibs()
 	bool is_head_for_all_rib = true;
 	for (int r = 0; r < ribs.size(); r++)
 	{
-		Node* cur = ribs[r]->getHeadNodePtr();
-		is_head_for_all_rib == is_head_for_all_rib &&  this== cur;
+		is_head_for_all_rib = is_head_for_all_rib &&  this == ribs[r]->getHeadNodePtr();
 	}
 	return is_head_for_all_rib;
+}
+
+void Node::beRemovedFromRibs()
+{
+	for (int k = 0; k < ribs.size(); k++)
+	{
+		ribs[k]->popFront();
+	}
+	ribs.clear();
 }
