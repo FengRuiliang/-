@@ -146,7 +146,7 @@ void Supportor::link_to_ribs(std::vector<Node*> nodes)
 }
 void Supportor::opitimizePointsandRibs()
 {
-	for (int i = 298; i < sup_paths.size(); i++)
+	for (int i = 0; i < sup_paths.size(); i++)
 	{
 		for (int j=0;j<sup_paths[i].size();j++)
 		{
@@ -162,34 +162,52 @@ void Supportor::opitimizePointsandRibs()
 					sta = polyin[k];
 				}
 			}
-			
-			Node* las = sta->getNext();
-			Node* end = las;
-			do 
+			for (Node* cur = sta->getNext(); cur != sta; cur = cur->getNext())
 			{
-				float err3 = 0;
-				for (Node* cur = las; cur != end->getNext(); cur = cur->getNext())
+				if (cur->getSegment()->get_normal().dot(cur->getNext()->getSegment()->get_normal()) > 0.95)
 				{
-					Vec3f dir1 = end->getPosition() - las->getSegments()->get_v1();
-					dir1.normalize();
-					Vec3f dir2 = cur->Normal();
-					err3 += pow(cur->getSegments()->get_length(), 3.0)*abs(dir1.cross(dir2).length() / dir1.dot(dir2)) / 3.f;
+					for (int k = 0; k < cur->getRibs().size(); k++)
+					{
+						std::vector<Node*> & nodes_ = cur->getRibs()[k]->Nodes();;
+						for (auto iter =nodes_.begin(); iter != nodes_.end(); iter++)
+						{
+							if (*iter == cur)
+							{
+								if (iter == nodes_.begin())
+								{
+									cur->getRibs()[k]->popFront();
+								}
+								else if (iter == nodes_.end()-1)
+								{
+									nodes_.pop_back();
+								}
+								else
+								{
+									Rib* rib = new Rib();
+									rib->Nodes() = std::vector<Node*>(iter + 1, cur->getRibs()[k]->Nodes().end() - 1);
+									ribs.push_back(rib);
+									std::vector<Node*> half_front(nodes_.begin(), iter - 1);
+									nodes_ = half_front;
+								}
+								break;
+							}
+						}
+					}
 				}
-				if (!end->isHeadforALlRibs()/*||err3 > ERR*/)
-				{
-					las = end;
-				}
-				else
-				{
-					end->beRemovedFromRibs();
-				}
-				end = end->getNext();
-			} while (end!=sta);
-
+			}
 		}
 	}
 }
 bool Node::isHeadforALlRibs()
+{
+	bool is_head_for_all_rib = true;
+	for (int r = 0; r < ribs.size(); r++)
+	{
+		is_head_for_all_rib = is_head_for_all_rib &&  this == ribs[r]->getHeadNodePtr();
+	}
+	return is_head_for_all_rib;
+}
+bool Node::isEndforAllRibs()
 {
 	bool is_head_for_all_rib = true;
 	for (int r = 0; r < ribs.size(); r++)

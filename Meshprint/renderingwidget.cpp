@@ -1400,18 +1400,37 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 			}
 			glEnd();
 
-			glLineWidth(3.0);
 			auto ribs = ctn_obj[id]->ppcs->su->getRibs();
-			glColor4ub(0, 0, 0, 255);
 	
 			for (auto iter = ribs.begin(); iter != ribs.end(); iter++)
 			{
-				glBegin(GL_LINE_STRIP);
-				for (auto iterp = (*iter)->Nodes().begin(); iterp != (*iter)->Nodes().end(); iterp++)
+				if ((*iter)->Nodes().size()==1)
 				{
-					glVertex3fv((*iterp)->getPosition());
+					glColor4ub(228, 26, 28, 255);
+					for (auto iterf = faces->begin(); iterf != faces->end(); iterf++)
+					{
+						HE_edge* sta = (*iterf)->pedge_;
+						HE_edge* cur = sta;
+						do
+						{
+							glVertex3fv(cur->pvert_->position() + (*iter)->Nodes().front()->getPosition());	
+							cur = cur->pnext_;
+						} while (cur != sta);
+					}
 				}
-				glEnd();
+				else
+				{
+					glLineWidth(3.0);
+					glColor4ub(0, 0, 0, 255);
+
+					glBegin(GL_LINE_STRIP);
+					for (auto iterp = (*iter)->Nodes().begin(); iterp != (*iter)->Nodes().end(); iterp++)
+					{
+						glVertex3fv((*iterp)->getPosition());
+					}
+					glEnd();
+				}
+				
 			}
 
 			auto paths = ctn_obj[id]->ppcs->su->getPaths();
@@ -1424,8 +1443,8 @@ void RenderingWidget::DrawSupportRibAndPoints(bool bv)
 					glBegin(GL_LINES);
 					for (int k = 0; k < paths[i][j].size(); k++)
 					{
-						glVertex3fv(paths[i][j][k]->getSegments()->get_v1());
-						glVertex3fv(paths[i][j][k]->getSegments()->get_v2());
+						glVertex3fv(paths[i][j][k]->getSegment()->get_v1());
+						glVertex3fv(paths[i][j][k]->getSegment()->get_v2());
 					}
 					glEnd();
 				}

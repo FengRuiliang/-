@@ -37,7 +37,7 @@ public:
 	Node* getNext() { return next_; }
 	std::vector<Rib*>&	getRibs() { return ribs; }
 
-	Segment* getSegments() { return seg_; }
+	Segment* getSegment() { return seg_; }
 	Vec3f getPosition() { return pos; }
 	void setRib(Rib* rib_in_)
 	{
@@ -46,11 +46,13 @@ public:
 	
 	bool isHeadforALlRibs();
 
+	bool isEndforAllRibs();
 	void beRemovedFromRibs();
 };
 class Rib
 {
 public:
+	Rib() {};
 	Rib(Node* ni_) 
 	{
 		edge_ = ni_->Edge();
@@ -70,6 +72,7 @@ public:
 	void setCandidateNode(Node* node_in_) { candidate_node = node_in_; }
 	void setEdge(HE_edge* in_) { edge_ = in_; };
 	Node* getHeadNodePtr() { return nodes.empty()? NULL:nodes.front(); }
+	Node* getEndNodePtr() { return nodes.empty() ? NULL : nodes.back(); }
 private:
 	HE_edge* edge_;
 	HE_edge* candidate_edge_;
